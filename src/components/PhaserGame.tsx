@@ -16,6 +16,21 @@ export default function PhaserGame() {
         const PhaserModule = await import("phaser");
         const PhaserLib: any = PhaserModule?.default ?? PhaserModule;
 
+        // Ensure any previous game is destroyed and container cleared (prevents duplicate canvases)
+        if (gameRef.current) {
+          try {
+            gameRef.current.destroy(true);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn("Error destroying previous Phaser game before init:", e);
+          }
+          gameRef.current = null;
+        }
+
+        if (containerRef.current) {
+          containerRef.current.innerHTML = "";
+        }
+
         const config: any = {
           type: PhaserLib.AUTO,
           parent: containerRef.current,
