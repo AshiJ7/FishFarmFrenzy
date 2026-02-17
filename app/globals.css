@@ -3,13 +3,38 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /*pallete colors from figma*/
+  --peach-soft: #F5D7C8;
+  --coral-medium: #E49678;
+  --mint-light: #B8D8A8;
+  --periwinkle: #A8C8E8;
+  --teal-medium: #4A8E9E;
+  --gold-tan: #A39D6B;
+  --olive-green: #6B8E4E;
+
+  /*general purpose colors*/
+  --color-background: var(--tan-primary);
+  --color-surface: var(--cream-light);
+  --color-primary: var(--sage-green);
+  --color-secondary: var(--sky-blue);
+  --color-accent: var(--coral-salmon);
+
+  /*interactive colors*/
+  --color-success: var(--forest-green);
+  --color-warning: var(--gold-tan);
+  --color-error: var(--coral-salmon);
+  --color-info: var(--teal-medium);
+
+  /*text colors? idk if we want something else*/
+  --color-text-primary: #2C2416;
+  --color-text-secondary: #5C5444;
+  --color-text-light: #8C8474;
+
+  /*border colors if we wanna use them for anything*/
+  --color-border-light: #D4C9A0;
+  --color-border-medium: #A39D6B;
+  --color-border-dark: #6B8E4E;
 }
 
 @media (prefers-color-scheme: dark) {
