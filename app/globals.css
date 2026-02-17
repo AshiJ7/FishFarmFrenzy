@@ -41,3 +41,35 @@ body {
   transform: rotateY(180deg);
 }
 
+.falling-objects-container {
+  position: relative;
+  width: 500px;   /* match canvas width */
+  height: 400px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+}
+
+
+.falling-object {
+  position: absolute;
+  top: -50px; /* Start above the container */
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; /* Makes them circles, can be squares */
+  animation: fall linear forwards;
+  animation-duration: 5s; /* Duration of the fall */
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(450px) rotate(720deg); /* Adjust translateY based on container height */
+    opacity: 0;
+  }
+}
+
+
