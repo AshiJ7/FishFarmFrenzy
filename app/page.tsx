@@ -6,7 +6,7 @@ export default function Home() {
 			<main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
 				<h1 className="text-4xl font-bold text-black dark:text-zinc-50">Home</h1>
 				<p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-					Welcome to Fish Farm Frenzy — choose a mini-game from the navigation to begin.
+					Welcome to Fish Farm Frenzy! Select a mini-game to begin.
 				</p>
 			</main>
 		</div>

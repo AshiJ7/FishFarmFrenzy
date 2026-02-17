@@ -3,13 +3,38 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /*pallete colors from figma*/
+  --peach-soft: #F5D7C8;
+  --coral-medium: #E49678;
+  --mint-light: #B8D8A8;
+  --periwinkle: #A8C8E8;
+  --teal-medium: #4A8E9E;
+  --gold-tan: #A39D6B;
+  --olive-green: #6B8E4E;
+
+  /*general purpose colors*/
+  --color-background: var(--tan-primary);
+  --color-surface: var(--cream-light);
+  --color-primary: var(--sage-green);
+  --color-secondary: var(--sky-blue);
+  --color-accent: var(--coral-salmon);
+
+  /*interactive colors*/
+  --color-success: var(--forest-green);
+  --color-warning: var(--gold-tan);
+  --color-error: var(--coral-salmon);
+  --color-info: var(--teal-medium);
+
+  /*text colors? idk if we want something else*/
+  --color-text-primary: #2C2416;
+  --color-text-secondary: #5C5444;
+  --color-text-light: #8C8474;
+
+  /*border colors if we wanna use them for anything*/
+  --color-border-light: #D4C9A0;
+  --color-border-medium: #A39D6B;
+  --color-border-dark: #6B8E4E;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,4 +65,36 @@ body {
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+.falling-objects-container {
+  position: relative;
+  width: 500px;   /* match canvas width */
+  height: 400px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+}
+
+
+.falling-object {
+  position: absolute;
+  top: -50px; /* Start above the container */
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; /* Makes them circles, can be squares */
+  animation: fall linear forwards;
+  animation-duration: 5s; /* Duration of the fall */
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(450px) rotate(720deg); /* Adjust translateY based on container height */
+    opacity: 0;
+  }
+}
+
 
