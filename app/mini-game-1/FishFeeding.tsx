@@ -7,6 +7,7 @@ type Food = {
   isGood: boolean;
 };
 
+
 export default function FishFeeding() {
   // hardcode good and bad foods for now
   const foods: Food[] = [
@@ -14,6 +15,30 @@ export default function FishFeeding() {
     { id: 2, name: "Algae", isGood: true },
     { id: 3, name: "Cake", isGood: false },
   ];
+
+  const usedFoodArr: integer[] = [];
+
+  function randomizeFoods() {
+    let min = 0;
+    let max = 2;
+
+    // from geeksforgeeks
+    let random = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    if (usedFoodArr.includes(random)) {
+      randomizeFoods();
+    }
+
+    console.log("random ", random);
+
+    usedFoodArr.push(random);
+
+    console.log(usedFoodArr);
+
+    return random;
+  }
+
+  let foodNum: integer = randomizeFoods();
 
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState("");
@@ -50,7 +75,7 @@ export default function FishFeeding() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
 
       <h2 className="text-xl font-bold">
         Score: {score}
@@ -58,9 +83,21 @@ export default function FishFeeding() {
 
       {/* food blocks */}
       <div className="flex gap-4">
+          <div
+            key={foods[foodNum].id}
+            draggable
+            onDragStart={(e) => handleDraggingStart(e, foods[foodNum])}
+            className="cursor-grab solid border border-black px-6 py-4 bg-white-100 hover:bg-gray-200"
+          >
+            {foods[foodNum].name}
+          </div>
+      </div>
+
+      {/* food blocks
+      <div className="flex gap-4">
         {foods.map(food => (
           <div
-            key={food.id}
+            key={food}
             draggable
             onDragStart={(e) => handleDraggingStart(e, food)}
             className="cursor-grab solid border border-black px-6 py-4 bg-white-100 hover:bg-gray-200"
@@ -68,15 +105,23 @@ export default function FishFeeding() {
             {food.name}
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* fish block */}
-      <div
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        className="flex h-48 w-48 items-center justify-center border-1 border-solid border-black"
-      >
-        Tilapia
+      <div className="flex gap-4">
+        <div
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black"
+        >
+          Tilapia
+        </div>
+
+        <div
+          className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black"
+        >
+          Trash
+        </div>
       </div>
 
       {/* message for good or bad food */}
