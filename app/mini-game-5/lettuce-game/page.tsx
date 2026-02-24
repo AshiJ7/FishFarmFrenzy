@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import FlipCard from "./flipcard";
 //What needs to be done:
 //There will be 3 pages for this particular minigame
 //Every page will have the same style of progress, we start with information on the logistics
@@ -21,20 +20,11 @@ interface LettuceData {
   color: string; 
 }
 
-interface SalmonData {
-  id: number;
-  x: number;
-  y: number;
-  color: string; 
-}
-
-export default function MiniGame5() {
+export default function LettuceGame() {
 
   
   const [objects, setObjects] = useState<LettuceData[]>([]);
-  const [objects2, setObjects2] = useState<SalmonData[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const secondcontainerRef = useRef<HTMLDivElement>(null);
  const createLettuce = useCallback(() => {
   if (!containerRef.current) return;
 
@@ -153,16 +143,63 @@ useEffect(() => {
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
         <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          Placeholder for mini-game 5.
+          Placeholder for Lettuce game.
         </p>
+        <div id="counter">Score : <span>{score}</span></div>
+        <div
+  className="falling-objects-container"
+  ref={containerRef} //canvas for now
+  style={{
+    position: 'relative',
+    width: '500px',
+    height: '400px',
+    overflow: 'hidden',
+    border: '1px solid #ccc',
+    backgroundColor: '#f0f0f0',
+  }}
+>
 
-        <h4>The matching fish will go here</h4>
+  {objects.map(obj => (
+    <div
+      key={obj.id}
+      style={{
+        position: 'absolute',
+        top: `${obj.y}px`,
+        left: `${obj.x}px`,
+        width: '30px',
+        height: '30px',
+        borderRadius: '50%',
+        backgroundColor: obj.color,
+      }}
+    />
+  ))}
+
+  <div
+    ref={divRef}
+    onKeyDown={handleKeyDown}
+    tabIndex={0}
+    style={{
+      position: 'absolute',
+      bottom: '0px',        // anchoring it to the bottom of the canvas
+      left: `${position.x}px`,
+      width: '50px',
+      height: '50px',
+      backgroundColor: 'red',
+      outline: 'none',
+    }}
+  >
+    Move Me
+  </div>
+
+  
+
+</div>
 
         <nav className="mt-8 flex gap-4">
           <Link href="/" className="text-foreground">Home</Link>
           {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
           <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link>
+          <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link>
         </nav>
       </main>
     </div>
