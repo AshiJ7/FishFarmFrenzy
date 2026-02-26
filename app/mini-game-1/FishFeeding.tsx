@@ -8,18 +8,35 @@ type Food = {
 };
 
 export default function FishFeeding() {
-  // hardcode good and bad foods for now
+  // hardcode good and bad foods with boolean for each fish
   const foods: Food[] = [
     { id: 1, name: "Cookies", isGood: false },
     { id: 2, name: "Algae", isGood: true },
     { id: 3, name: "Cake", isGood: false },
+    { id: 4, name: "Duckweed", isGood: true },
+    { id: 5, name: "Water lettuce", isGood: false },
+    { id: 6, name: "Water lettuce", isGood: false },
+    { id: 7, name: "Corn meal", isGood: false },
+    { id: 8, name: "Soybean meal", isGood: false },
+    { id: 9, name: "Mayflies", isGood: false },
+    { id: 10, name: "Stoneflies", isGood: false },
+    { id: 11, name: "Caddisflies", isGood: false },
+    { id: 12, name: "Crawfish", isGood: false },
+    { id: 13, name: "Worms", isGood: false },
+    { id: 14, name: "Herring", isGood: false },
+    { id: 15, name: "Shrimp", isGood: false },
+    { id: 16, name: "Krill", isGood: false },
   ];
+
+  const fish: string[] = ["Tilapia", "Trout", "Salmon"];
 
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState("");
   const [usedFoodArr, setUsedFoodArr] = useState<number[]>([]);
   const [foodNum, setFoodNum] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [fishSelected, setFishSelected] = useState(false);
+  const [currentFish, setCurrentFish] = useState("");
 
   // randomly selects next food to appear from foods not yet used after current food has been dropped
   function getNextFoodIndex(used: number[]) {
@@ -98,6 +115,34 @@ export default function FishFeeding() {
     });
   };
 
+  const handleFishSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const currFish = e.currentTarget.name;
+    setCurrentFish(currFish);
+    setFishSelected(true);
+  };
+
+
+  if (!fishSelected) {
+    return (
+      <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
+        <h2 className="text-2xl font-bold"> Select Fish </h2>
+        <div className="flex gap-4">
+          {fish.map((fishName) => (
+            <button
+              key={fishName}
+              name={fishName}
+              className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black hover:bg-gray-200"
+              onClick={handleFishSelection}
+            >
+              {fishName}
+            </button>
+          ))}
+
+        </div>
+      </div>
+    );
+  }
+
   if (gameOver) {
     return (
       <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
@@ -133,7 +178,7 @@ export default function FishFeeding() {
           onDrop={handleDrop}
           className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black fish"
         >
-          Tilapia
+          {currentFish}
         </div>
 
         <div
