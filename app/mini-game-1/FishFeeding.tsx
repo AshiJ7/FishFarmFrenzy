@@ -4,28 +4,128 @@ import { useState } from "react";
 type Food = {
   id: number;
   name: string;
-  isGood: boolean;
+  tilapiaGood: boolean;
+  troutGood: boolean;
+  salmonGood: boolean;
 };
+
+type FishGoodKey = "tilapiaGood" | "troutGood" | "salmonGood";
 
 export default function FishFeeding() {
   // hardcode good and bad foods with boolean for each fish
   const foods: Food[] = [
-    { id: 1, name: "Cookies", isGood: false },
-    { id: 2, name: "Algae", isGood: true },
-    { id: 3, name: "Cake", isGood: false },
-    { id: 4, name: "Duckweed", isGood: true },
-    { id: 5, name: "Water lettuce", isGood: false },
-    { id: 6, name: "Water lettuce", isGood: false },
-    { id: 7, name: "Corn meal", isGood: false },
-    { id: 8, name: "Soybean meal", isGood: false },
-    { id: 9, name: "Mayflies", isGood: false },
-    { id: 10, name: "Stoneflies", isGood: false },
-    { id: 11, name: "Caddisflies", isGood: false },
-    { id: 12, name: "Crawfish", isGood: false },
-    { id: 13, name: "Worms", isGood: false },
-    { id: 14, name: "Herring", isGood: false },
-    { id: 15, name: "Shrimp", isGood: false },
-    { id: 16, name: "Krill", isGood: false },
+    {
+      id: 1,
+      name: "Cookies",
+      tilapiaGood: false,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 2,
+      name: "Algae",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 3,
+      name: "Cake",
+      tilapiaGood: false,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 4,
+      name: "Duckweed",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 5,
+      name: "Water lettuce",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 6,
+      name: "Rice bran",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 7,
+      name: "Corn meal",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 8,
+      name: "Soybean meal",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 9,
+      name: "Mayflies",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 10,
+      name: "Stoneflies",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 11,
+      name: "Caddisflies",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 12,
+      name: "Crawfish",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 13, 
+      name: "Worms",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 14,
+      name: "Herring",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 15,
+      name: "Shrimp",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 16,
+      name: "Krill",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
   ];
 
   const fish: string[] = ["Tilapia", "Trout", "Salmon"];
@@ -37,6 +137,7 @@ export default function FishFeeding() {
   const [gameOver, setGameOver] = useState(false);
   const [fishSelected, setFishSelected] = useState(false);
   const [currentFish, setCurrentFish] = useState("");
+  const [fishGood, setFishGood] = useState<FishGoodKey | null>(null);
 
   // randomly selects next food to appear from foods not yet used after current food has been dropped
   function getNextFoodIndex(used: number[]) {
@@ -80,8 +181,12 @@ export default function FishFeeding() {
     if (!droppedFood) return;
 
 
+    const selectedFishGood = fishGood
+       ? droppedFood[fishGood]
+       : null;
+        
     if (e.currentTarget.className.includes("fish")) {
-      if (droppedFood.isGood) {
+      if (selectedFishGood) {
         setScore((prev) => prev + 1);
         setMessage("Good food");
       }
@@ -90,9 +195,9 @@ export default function FishFeeding() {
       }
     }
     else if (e.currentTarget.className.includes("trash")) {
-      if (!droppedFood.isGood) {
+      if (!selectedFishGood) {
         setScore((prev) => prev + 1);
-        setMessage("Bad food in trash");
+        setMessage("Correct - Bad food in trash");
       }
       else {
         setMessage("Incorrect - good food in trash");
@@ -117,11 +222,15 @@ export default function FishFeeding() {
 
   const handleFishSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
     const currFish = e.currentTarget.name;
+    const fishKey = `${currFish.toLowerCase()}Good` as FishGoodKey;
+
     setCurrentFish(currFish);
     setFishSelected(true);
+    setFishGood(fishKey);
   };
 
 
+  // fish selection screen
   if (!fishSelected) {
     return (
       <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
