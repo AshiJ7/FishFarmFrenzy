@@ -1,19 +1,10 @@
 "use client";
 import Link from "next/link";
 import Timer from "./timer";
-//import FlipCard from "./flipcard";
-//What needs to be done:
-//There will be 3 pages for this particular minigame
-//Every page will have the same style of progress, we start with information on the logistics
-//Then there is the game and the user must hit a certain score or time
-// so first game, they will match correctly then go to the next page
-//Second game is falling lettuce and talks about yeild for typical farm
-//Third page is salmon and lettuce
-//for the yield game, there will be a 30 second timer that will count down and a counter
-// of money and amount made as well as resources spent which can be a lower amount of time for the second game
-//same thing will apply for salmon and lettuce to show it is better 
+
 
 import React, { useState, useEffect, useRef, useCallback} from 'react';
+import { randomInt } from "crypto";
 
 interface LettuceData {
   id: number;
@@ -34,6 +25,38 @@ export default function SalmonGame() {
   
   const [objects, setObjects] = useState<LettuceData[]>([]);
   const [objects2, setObjects2] = useState<SalmonData[]>([]);
+  //everything to track player movement
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  //setting game objects before so everything is fresh
+  const startGame = () => {
+    setScore(0);
+    setScore2(0);
+    setObjects([]);
+    setObjects2([]);
+    setTimeLeft(30);
+    setGameOver(false);
+    setIsPlaying(true);
+  };
+
+  useEffect(() => {
+  if (!isPlaying) return;
+
+  if (timeLeft <= 0) {
+    setIsPlaying(false);
+    setGameOver(true);
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setTimeLeft(prev => prev - 1);
+  }, 1000);
+
+  return () => clearTimeout(timer);
+}, [isPlaying, timeLeft]);
+
+
   const containerRef = useRef<HTMLDivElement>(null);
  const createLettuce = useCallback(() => {
   if (!containerRef.current) return;
@@ -53,12 +76,14 @@ export default function SalmonGame() {
 
 
 useEffect(() => {
+  if (!isPlaying) return;
+
   const spawnInterval = setInterval(() => {
     createLettuce();
-  }, 1000); // spawn every second
+  }, 1000);
 
   return () => clearInterval(spawnInterval);
-}, [createLettuce]);
+}, [createLettuce, isPlaying]);
 
 
 const createSalmon = useCallback(() => {
@@ -79,18 +104,22 @@ const createSalmon = useCallback(() => {
 
 
 useEffect(() => {
+  if (!isPlaying) return;
+
   const spawnInterval = setInterval(() => {
     createSalmon();
-  }, 1000); // spawn every second
+  }, 1000);
 
   return () => clearInterval(spawnInterval);
-}, [createSalmon]);
+}, [createSalmon, isPlaying]);
+
+
 const [position, setPosition] = useState({ x: 200});
   
 const basketWidth = 50;
 const basketHeight = 50;
 const objectSize = 30;
-const gravity = 3;
+const gravity = Math.floor(Math.random() * (6 - 3 + 1)) + 3;
 const [score, setScore] = useState(0);
 const [score2, setScore2] = useState(0);
 
@@ -101,6 +130,7 @@ useEffect(() => {
 }, [position]);
 
 useEffect(() => {
+  if (!isPlaying) return;
   const interval = setInterval(() => {
     setObjects(prevObjects =>
       prevObjects
@@ -138,9 +168,10 @@ useEffect(() => {
   }, 30);
 
   return () => clearInterval(interval);
-}, []);
-
+}, [isPlaying]);
+//salmon colider
 useEffect(() => {
+  if (!isPlaying) return;
   const interval = setInterval(() => {
     setObjects2(prevObjects =>
       prevObjects
@@ -179,7 +210,7 @@ useEffect(() => {
 
 
   return () => clearInterval(interval);
-}, []);
+}, [isPlaying]);
 
 
   //const [position, setPosition] = useState({ x: 400, y: 480 });
@@ -187,9 +218,10 @@ useEffect(() => {
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!isPlaying) return;
     // need this to mount
     divRef.current?.focus(); 
-  }, []);
+  }, [isPlaying]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     switch (event.key) {
@@ -225,10 +257,31 @@ useEffect(() => {
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
         <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          Placeholder for Salmon Game!
+          Blurb about aquaponics and it's benefits goes here. This is the educational section. 
         </p>
+        <br></br>
+        <h2>How to play</h2>
+        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect salmon and lettuce.
+          You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
+        </p>
+        <br></br>
         <div id="counter">Lettuce Score : <span>{score}</span> Salmon Score : <span>{score2}</span></div>
-        <Timer/>
+        <div style={{ marginBottom: "10px" }}>
+  {!isPlaying && !gameOver && (
+    <button onClick={startGame}>Start Game</button>
+  )}
+
+  {isPlaying && <div>Time Left: {timeLeft}</div>}
+
+  
+  {gameOver && (
+    <div>
+      <p>Game Over!</p>
+      <button onClick={startGame}>Retry</button>
+    </div>
+  )}
+</div>
+{!gameOver && (
         <div
   className="falling-objects-container"
   ref={containerRef} //canvas for now
@@ -292,6 +345,8 @@ useEffect(() => {
   
 
 </div>
+
+  )}
 
         <nav className="mt-8 flex gap-4">
           <Link href="/" className="text-foreground">Home</Link>

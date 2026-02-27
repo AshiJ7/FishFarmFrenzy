@@ -25,6 +25,36 @@ export default function LettuceGame() {
   
   const [objects, setObjects] = useState<LettuceData[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  //everything to track player movement
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(30);
+    //setting game objects before so everything is fresh
+    const startGame = () => {
+      setScore(0);
+      setObjects([]);
+      setTimeLeft(30);
+      setGameOver(false);
+      setIsPlaying(true);
+    };
+
+    useEffect(() => {
+      if (!isPlaying) return;
+    
+      if (timeLeft <= 0) {
+        setIsPlaying(false);
+        setGameOver(true);
+        return;
+      }
+    
+      const timer = setTimeout(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    
+      return () => clearTimeout(timer);
+    }, [isPlaying, timeLeft]);
+
  const createLettuce = useCallback(() => {
   if (!containerRef.current) return;
 
@@ -41,12 +71,13 @@ export default function LettuceGame() {
 }, []);
 
 useEffect(() => {
+  if (!isPlaying) return;
   const spawnInterval = setInterval(() => {
     createLettuce();
   }, 1000); // spawn every second
 
   return () => clearInterval(spawnInterval);
-}, [createLettuce]);
+}, [createLettuce, isPlaying]);
 const [position, setPosition] = useState({ x: 200});
   
 const basketWidth = 50;
@@ -62,6 +93,7 @@ useEffect(() => {
 }, [position]);
 
 useEffect(() => {
+  if (!isPlaying) return;
   const interval = setInterval(() => {
     setObjects(prevObjects =>
       prevObjects
@@ -99,7 +131,7 @@ useEffect(() => {
   }, 30);
 
   return () => clearInterval(interval);
-}, []);
+}, [isPlaying]);
 
 
   //const [position, setPosition] = useState({ x: 400, y: 480 });
@@ -108,8 +140,9 @@ useEffect(() => {
 
   useEffect(() => {
     // need this to mount
+    if (!isPlaying) return;
     divRef.current?.focus(); 
-  }, []);
+  }, [isPlaying]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     switch (event.key) {
@@ -143,9 +176,23 @@ useEffect(() => {
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
         <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          Placeholder for Lettuce game.
+          Blurb about traditional farm stats goes here. This is the educational section. 
         </p>
-        <div id="counter">Score : <span>{score}</span></div>
+        <br></br>
+        <h2>How to play</h2>
+        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect as much lettuce from the farm as you can.
+          You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
+        </p>
+        <br></br>
+        <div id="counter">Lettuce Score : <span>{score}</span></div>
+        {!isPlaying && !gameOver && (
+    <button onClick={startGame}>Start Game</button>
+  )}
+
+  {isPlaying && <div>Time Left: {timeLeft}</div>}
+
+
+{gameOver && (
         <div
   className="falling-objects-container"
   ref={containerRef} //canvas for now
@@ -194,6 +241,7 @@ useEffect(() => {
   
 
 </div>
+)}
 
         <nav className="mt-8 flex gap-4">
           <Link href="/" className="text-foreground">Home</Link>
