@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 //scenario types
 type Choice = {
@@ -698,6 +698,87 @@ function getRandomScenarios(count: number): Scenario[] {
   return shuffled.slice(0, count);
 }
 
+//making it cute with icons and such
+const FishIcon = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 24 24" className={className}>
+    <ellipse cx="10" cy="12" rx="6" ry="4" fill="var(--periwinkle)" />
+    <polygon points="16,12 21,9 21,15" fill="var(--teal-medium)" />
+    <circle cx="8.5" cy="11" r="0.8" fill="var(--color-text-primary)" />
+  </svg>
+);
+
+const LeafIcon = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 24 24" className={className}>
+    <path
+      d="M4 14C4 8 10 4 20 4C20 14 14 20 8 20C5 20 4 17 4 14Z"
+      fill="var(--mint-light)"
+    />
+  </svg>
+);
+
+const BubbleIcon = ({ className = "w-5 h-5" }) => (
+  <svg viewBox="0 0 24 24" className={className}>
+    <circle cx="8" cy="10" r="3" fill="var(--periwinkle)" />
+    <circle cx="16" cy="14" r="2" fill="var(--periwinkle)" />
+  </svg>
+);
+
+const StarIcon = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 24 24" fill="var(--success-yellow)" className={className}>
+    <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
+  </svg>
+);
+
+//otter icon for mascot
+const OtterMascot = ({ message }: { message: string }) => (
+  <div className="flex items-start gap-4 bg-white p-4 rounded-2xl shadow-md mb-6">
+    <div className="text-5xl">🦦</div>
+    <div className="bg-[var(--mint-light)] p-3 rounded-xl text-gray-700 text-sm">
+      {message}
+    </div>
+  </div>
+);
+
+//bubble animation
+const BubbleBackground = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    {[...Array(18)].map((_, i) => {
+      const size = 12 + Math.random() * 24;
+      return (
+        <div
+          key={i}
+          className="absolute rounded-full opacity-40"
+          style={{
+            bottom: "-60px",
+            left: `${Math.random() * 100}%`,
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: "var(--periwinkle)",
+            animation: `floatUp ${8 + Math.random() * 8}s linear infinite`,
+            animationDelay: `${Math.random() * 5}s`,
+          }}
+        />
+      );
+    })}
+
+      <style>{`
+      @keyframes floatUp {
+        0% { transform: translateY(0) scale(1); opacity: 0.4; }
+        100% { transform: translateY(-120vh) scale(1.3); opacity: 0; }
+      }
+      @keyframes gentleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+      }
+      @keyframes rotateBounce {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(10deg); }
+        100% { transform: rotate(0deg); }
+      }
+    `}</style>
+  </div>
+);
+
 export default function SaveFishFarmGame() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
@@ -707,6 +788,11 @@ export default function SaveFishFarmGame() {
   const [lastImpact, setLastImpact] = useState(0);
   const [decisionsHistory, setDecisionsHistory] = useState<{ scenario: string; choice: string; impact: number }[]>([]);
   const [shuffledChoices, setShuffledChoices] = useState<Choice[]>([]);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [hoveredNext, setHoveredNext] = useState(false);
+  const [hoveredRestart, setHoveredRestart] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const bubbleBackground = useMemo(() => <BubbleBackground />, []);
 
   //initialize scenarios
   useEffect(() => {
@@ -742,6 +828,7 @@ export default function SaveFishFarmGame() {
   };
 
   const handleNext = () => {
+    setHoveredNext(false);
     if (currentScenarioIndex < scenarios.length - 1) {
       const nextIndex = currentScenarioIndex + 1;
       setCurrentScenarioIndex(nextIndex);
@@ -754,6 +841,7 @@ export default function SaveFishFarmGame() {
   };
 
   const handleRestart = () => {
+    setHoveredRestart(false);
     const randomScenarios = getRandomScenarios(SCENARIOS_PER_GAME);
     setScenarios(randomScenarios);
     setCurrentScenarioIndex(0);
@@ -788,9 +876,13 @@ export default function SaveFishFarmGame() {
   if (gameState === "complete") {
     const { rating, message } = getScoreRating();
     const maxScore = scenarios.length * 10;
+    const bgColor = rating === "Excellent" ? "bg-gradient-to-b from-[var(--mint-light)] to-[var(--mint-light)]"
+      : rating === "Good" ? "bg-gradient-to-b from-[var(--periwinkle)] to-[var(--periwinkle)]"
+      : rating === "Fair" ? "bg-gradient-to-b from-[var(--peach-soft)] to-[var(--peach-soft)]"
+      : "bg-gradient-to-b from-[var(--coral-medium)] to-[var(--coral-medium)]";
     
     return (
-      <div className="w-full max-w-2xl mx-auto p-6 bg-[var(--peach-soft)] rounded-lg border-2 border-[var(--color-border-medium)]">
+      <div className={`w-full max-w-2xl mx-auto p-6 rounded-3xl border-2 border-[var(--color-border-medium)] ${bgColor}`}>
         <h2 className="text-2xl font-bold text-center mb-4 text-[var(--color-text-primary)]">
           Game Complete!
         </h2>
@@ -813,7 +905,7 @@ export default function SaveFishFarmGame() {
             {decisionsHistory.map((decision, index) => (
               <div 
                 key={index} 
-                className="p-3 rounded bg-white border border-[var(--color-border-light)]"
+                className="p-3 rounded bg-white border border-[var(--color-border-light)] rounded-2xl"
               >
                 <div className="font-medium text-sm text-[var(--color-text-primary)]">
                   {decision.scenario}
@@ -835,7 +927,13 @@ export default function SaveFishFarmGame() {
 
         <button
           onClick={handleRestart}
-          className="w-full py-3 px-4 bg-[var(--olive-green)] hover:bg-[var(--color-border-dark)] text-white font-semibold rounded-lg transition-colors"
+          onMouseEnter={() => setHoveredRestart(true)}
+          onMouseLeave={() => setHoveredRestart(false)}
+          style={{
+            transform: hoveredRestart ? 'scale(1.03)' : 'scale(1)',
+            transition: 'all 0.2s ease',
+          }}
+          className="w-full py-3 px-4 bg-[var(--olive-green)] text-white font-semibold rounded-lg"
         >
           Play Again
         </button>
@@ -844,87 +942,131 @@ export default function SaveFishFarmGame() {
   }
 
   if (gameState === "feedback") {
-    return (
-      <div className="w-full max-w-2xl mx-auto p-6 bg-[var(--peach-soft)] rounded-lg border-2 border-[var(--color-border-medium)]">
-        <div className="text-center mb-6">
-          <div className={`text-6xl mb-4 ${lastImpact > 0 ? 'text-[var(--olive-green)]' : 'text-[var(--coral-medium)]'}`}>
-            {lastImpact > 0 ? '✓' : '✗'}
-          </div>
-          <div className={`text-xl font-semibold mb-2 ${
-            lastImpact > 0 
-              ? 'text-[var(--olive-green)]' 
-              : 'text-[var(--coral-medium)]'
-          }`}>
-            {lastImpact > 0 ? 'Good Decision!' : 'Poor Decision!'}
-          </div>
-          <p className="text-[var(--color-text-primary)]">
-            {lastFeedback}
-          </p>
-        </div>
+  return (
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FDF6EC] to-[#D6F4FF] p-20 rounded-3xl">
 
-        <div className="mb-6 p-4 bg-white rounded-lg border border-[var(--color-border-light)]">
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-[var(--color-text-primary)]">Current Score:</span>
-            <span className="text-2xl font-bold text-[var(--color-text-primary)]">{score}</span>
+      {bubbleBackground}
+
+      <div className="relative z-10 w-full max-w-xl p-8 bg-white rounded-3xl shadow-2xl text-center">
+
+        {lastImpact > 0 ? (
+          <>
+            <StarIcon className="w-16 h-16 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-green-600 mb-2">
+              Great Job!
+            </h2>
+          </>
+        ) : (
+          <>
+            <div className="text-6xl mb-4">🐡</div>
+            <h2 className="text-2xl font-bold text-red-500 mb-2">
+              Oh No!
+            </h2>
+          </>
+        )}
+
+        <p className="text-gray-700 mb-6">{lastFeedback}</p>
+
+        <div className="text-gray-700 mb-6">
+          <div className={`text-2xl font-bold mb-1 ${lastImpact > 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {lastImpact > 0 ? '+' : ''}{lastImpact} points
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-sm text-[var(--color-text-secondary)]">Progress:</span>
-            <span className="text-sm text-[var(--color-text-secondary)]">
-              {currentScenarioIndex + 1} / {scenarios.length}
-            </span>
-          </div>
+          <div className="text-xl font-semibold">Total Score: {score}</div>
         </div>
 
         <button
           onClick={handleNext}
-          className="w-full py-3 px-4 bg-[var(--olive-green)] hover:bg-[var(--color-border-dark)] text-white font-semibold rounded-lg transition-colors"
+          onMouseEnter={() => setHoveredNext(true)}
+          onMouseLeave={() => setHoveredNext(false)}
+          style={{
+            transform: hoveredNext ? 'scale(1.03)' : 'scale(1)',
+            transition: 'all 0.2s ease',
+            background: `linear-gradient(to right, var(--teal-medium), var(--success-yellow))`,
+          }}
+          className="w-full py-4 text-white font-bold rounded-2xl shadow-lg"
         >
-          {currentScenarioIndex < scenarios.length - 1 ? 'Next Scenario' : 'See Results'}
+          {currentScenarioIndex < scenarios.length - 1
+            ? "Next Scenario"
+            : "See Results"}
         </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 bg-[var(--peach-soft)] rounded-lg border-2 border-[var(--color-border-medium)]">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm font-medium text-[var(--color-text-secondary)]">
-            Scenario {currentScenarioIndex + 1} of {scenarios.length}
-          </span>
-          <span className="text-sm font-medium text-[var(--color-text-secondary)]">
-            Score: <span className="text-lg font-bold text-[var(--color-text-primary)]">{score}</span>
-          </span>
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FDF6EC] to-[#D6F4FF] p-20 rounded-3xl">
+
+      {bubbleBackground}
+
+      <div className="relative z-10 w-full max-w-2xl p-8 bg-gradient-to-b from-[#FFF9F2] to-[#E8F8F5] rounded-3xl shadow-2xl border-4 border-white">
+
+        //header
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <FishIcon />
+            <span className="text-sm text-gray-600">
+              Scenario {currentScenarioIndex + 1} of {scenarios.length}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white px-4 py-1 rounded-full shadow">
+            <StarIcon className="w-4 h-4" />
+            <span className="font-bold text-gray-700">{score}</span>
+          </div>
         </div>
-        
-        <div className="w-full bg-[var(--color-border-light)] rounded-full h-2 mb-4">
-          <div 
-            className="bg-[var(--teal-medium)] h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentScenarioIndex + 1) / scenarios.length) * 100}%` }}
+
+        //progress
+        <div className="w-full bg-white rounded-full h-3 mb-6 shadow-inner">
+          <div
+            className="bg-gradient-to-r from-[#76D7C4] to-[#5DADE2] h-3 rounded-full transition-all duration-500"
+            style={{
+              width: `${((currentScenarioIndex + 1) / scenarios.length) * 100}%`
+            }}
           />
         </div>
-      </div>
 
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-3 text-[var(--color-text-primary)]">
-          {currentScenario.title}
-        </h2>
-        <p className="text-[var(--color-text-primary)] leading-relaxed">
-          {currentScenario.description}
-        </p>
-      </div>
+        //otter
+        <OtterMascot message="Let’s take care of your fish farm together! Choose wisely 🐟✨" />
 
-      <div className="space-y-3">
-        <p className="font-semibold text-[var(--color-text-primary)]">What will you do?</p>
-        {shuffledChoices.map((choice, index) => (
-          <button
-            key={index}
-            onClick={() => handleChoice(choice)}
-            className="w-full p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]"
-          >
-            {choice.text}
-          </button>
-        ))}
+        //card for scenario
+        <div className="mb-6 bg-white p-6 rounded-2xl shadow-md">
+          <div className="flex items-center gap-2 mb-2">
+            <LeafIcon />
+            <h2 className="text-2xl font-bold text-gray-800">
+              {currentScenario.title}
+            </h2>
+          </div>
+
+          <p className="text-gray-700 leading-relaxed">
+            {currentScenario.description}
+          </p>
+        </div>
+
+        //choices
+        <div className="space-y-4">
+          <p className="font-semibold text-gray-700">What will you do?</p>
+
+          {shuffledChoices.map((choice, index) => (
+            <button
+              key={index}
+              onClick={() => handleChoice(choice)}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              style={{
+                transform: hoveredIndex === index ? 'scale(1.03)' : 'scale(1)',
+                borderColor: hoveredIndex === index ? '#76D7C4' : 'transparent',
+                transition: 'all 0.2s ease',
+              }}
+              className="w-full p-4 text-left bg-white rounded-2xl shadow-md border-2"
+            >
+              <div className="flex items-start gap-3">
+                <BubbleIcon />
+                <span className="text-gray-800">{choice.text}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
