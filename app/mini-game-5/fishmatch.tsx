@@ -103,7 +103,7 @@ export default function FishCropMatch() {
         ))}
       </div>
 
-      {/* message for good or bad food */}
+      {/* message for good or bad pair*/}
       <p className="h-6">{message}</p>
     </div>
   );

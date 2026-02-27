@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import FlipCard from "./flipcard";
 //What needs to be done:
 //There will be 3 pages for this particular minigame
 //Every page will have the same style of progress, we start with information on the logistics
@@ -26,6 +25,12 @@ export default function MiniGame5() {
         <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
           Here is where there will be text about how certain crops go best with certain species of fishes. 
+        </p>
+        <br></br>
+        <h2>How to play the game:</h2>
+        <p>Below are cards with different crops and different fish. Using what you just learned, 
+          click on the plant cards and slide to the fish it grows best with. 
+          After you have correctly matched each pair, continue to the next game.
         </p>
 
         <FishCropMatch/>
