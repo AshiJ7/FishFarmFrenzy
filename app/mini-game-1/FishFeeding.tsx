@@ -133,7 +133,7 @@ export default function FishFeeding() {
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState("");
   const [usedFoodArr, setUsedFoodArr] = useState<number[]>([]);
-  const [foodNum, setFoodNum] = useState(0);
+  const [foodNum, setFoodNum] = useState(Math.floor(Math.random() * foods.length));
   const [gameOver, setGameOver] = useState(false);
   const [fishSelected, setFishSelected] = useState(false);
   const [currentFish, setCurrentFish] = useState("");
@@ -229,6 +229,17 @@ export default function FishFeeding() {
     setFishGood(fishKey);
   };
 
+  const restartGame = () => {
+    setScore(0);
+    setMessage("");
+    setUsedFoodArr([]);
+    setFoodNum(Math.floor(Math.random() * foods.length));
+    setFishSelected(false);
+    setGameOver(false);
+    setFishSelected(false);
+    setCurrentFish("");
+    setFishGood(null);
+  };
 
   // fish selection screen
   if (!fishSelected) {
@@ -257,6 +268,15 @@ export default function FishFeeding() {
       <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
         <h2 className="text-2xl font-bold"> Game Over </h2>
         <p className="text-lg"> Final Score: {score} </p>
+        <div className="flex gap-10">
+          <button
+          name="Start Over"
+          onClick={restartGame}
+          className="flex h-10 w-30 items-center justify-center border-1 border-solid border-black hover:bg-gray-200"
+          >
+            Start Over
+          </button>
+        </div>
       </div>
     );
   }
