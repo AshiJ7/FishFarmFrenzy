@@ -244,7 +244,7 @@ export default function FishFeeding() {
   // fish selection screen
   if (!fishSelected) {
     return (
-      <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
+      <div className="bg-[url(../public/minigame_1_background.png)] flex flex-col items-center gap-6 px-30 py-30">
         <h2 className="text-2xl font-bold"> Select Fish </h2>
         <div className="flex gap-4">
           {fish.map((fishName) => (
@@ -265,7 +265,7 @@ export default function FishFeeding() {
 
   if (gameOver) {
     return (
-      <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
+      <div className="bg-[url(../public/minigame_1_background.png)] flex flex-col items-center gap-6 px-30 py-30">
         <h2 className="text-2xl font-bold"> Game Over </h2>
         <p className="text-lg"> Final Score: {score} </p>
         <div className="flex gap-10">
@@ -282,7 +282,7 @@ export default function FishFeeding() {
   }
 
   return (
-    <div className="bg-blue-500 flex flex-col items-center gap-6 px-30 py-30">
+    <div className="bg-[url(../public/minigame_1_background.png)] flex flex-col items-center gap-6 px-30 py-30">
 
       <h2 className="text-xl font-bold">
         Score: {score}
@@ -313,9 +313,14 @@ export default function FishFeeding() {
         <div
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black trash"
+          className="trash flex h-30 w-30 flex-col items-center justify-center gap-0 overflow-hidden border-1 border-solid border-black"
         >
-          Trash
+          <img
+            src="/trashcan.png"
+            alt="trash can"
+            className="pointer-events-none h-30 w-30 scale-200 select-none object-contain px-5"
+          />
+          {/* <span className="text-[10px] leading-none">Trash</span> */}
         </div>
       </div>
 
