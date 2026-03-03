@@ -1000,8 +1000,6 @@ export default function SaveFishFarmGame() {
       {bubbleBackground}
 
       <div className="relative z-10 w-full max-w-2xl p-8 bg-gradient-to-b from-[#FFF9F2] to-[#E8F8F5] rounded-3xl shadow-2xl border-4 border-white">
-
-        //header
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <FishIcon />
@@ -1015,8 +1013,6 @@ export default function SaveFishFarmGame() {
             <span className="font-bold text-gray-700">{score}</span>
           </div>
         </div>
-
-        //progress
         <div className="w-full bg-white rounded-full h-3 mb-6 shadow-inner">
           <div
             className="bg-gradient-to-r from-[#76D7C4] to-[#5DADE2] h-3 rounded-full transition-all duration-500"
@@ -1026,10 +1022,8 @@ export default function SaveFishFarmGame() {
           />
         </div>
 
-        //otter
         <OtterMascot message="Let’s take care of your fish farm together! Choose wisely 🐟✨" />
 
-        //card for scenario
         <div className="mb-6 bg-white p-6 rounded-2xl shadow-md">
           <div className="flex items-center gap-2 mb-2">
             <LeafIcon />
@@ -1043,7 +1037,6 @@ export default function SaveFishFarmGame() {
           </p>
         </div>
 
-        //choices
         <div className="space-y-4">
           <p className="font-semibold text-gray-700">What will you do?</p>
 
