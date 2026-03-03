@@ -172,9 +172,9 @@ useEffect(() => {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
-        <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
+    <div className="flex min-h-screen items-center justify-center bg-[var(--peach-soft)] font-sans dark:bg-black">
+      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-[var(--peach-soft)] dark:bg-black">
+        <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Lettuce Catcher</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
           Blurb about traditional farm stats goes here. This is the educational section. 
         </p>
@@ -184,64 +184,74 @@ useEffect(() => {
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
         <br></br>
-        <div id="counter">Lettuce Score : <span>{score}</span></div>
         {!isPlaying && !gameOver && (
-    <button onClick={startGame}>Start Game</button>
+    <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Start Game</button>
+  )}
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Score : <span>{score}</span></div>
+        {gameOver && (
+    <div>
+      <p>Game Over!</p>
+      <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Retry</button>
+    </div>
+
   )}
 
   {isPlaying && <div>Time Left: {timeLeft}</div>}
 
-
-{gameOver && (
-        <div
-  className="falling-objects-container"
-  ref={containerRef} //canvas for now
-  style={{
-    position: 'relative',
-    width: '500px',
-    height: '400px',
-    overflow: 'hidden',
-    border: '1px solid #ccc',
-    backgroundColor: '#f0f0f0',
-  }}
->
-
-  {objects.map(obj => (
-    <div
-      key={obj.id}
-      style={{
-        position: 'absolute',
-        top: `${obj.y}px`,
-        left: `${obj.x}px`,
-        width: '30px',
-        height: '30px',
-        borderRadius: '50%',
-        backgroundColor: obj.color,
-      }}
-    />
-  ))}
-
+  {!gameOver && (
   <div
-    ref={divRef}
-    onKeyDown={handleKeyDown}
-    tabIndex={0}
+    className="falling-objects-container"
+    ref={containerRef}
     style={{
-      position: 'absolute',
-      bottom: '0px',        // anchoring it to the bottom of the canvas
-      left: `${position.x}px`,
-      width: '50px',
-      height: '50px',
-      backgroundColor: 'red',
-      outline: 'none',
+      position: 'relative',
+      width: '500px',
+      height: '400px',
+      overflow: 'hidden',
+      border: '1px solid #ccc',
+      backgroundColor: '#f0f0f0',
     }}
   >
-    Move Me
+    {objects.map(obj => (
+      <div
+        key={obj.id}
+        style={{
+          position: 'absolute',
+          top: `${obj.y}px`,
+          left: `${obj.x}px`,
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          fontSize:'20pt',
+          
+        }}
+        >🥬
+      </div>
+    ))}
+
+    <div
+      ref={divRef}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      style={{
+        position: 'absolute',
+        bottom: '0px',
+        left: `${position.x}px`,
+        width: '50px',
+        height: '50px',
+        fontSize: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        outline: 'none',
+      }}
+    >
+      🧺
+    </div>
   </div>
-
-  
-
-</div>
 )}
+
+
+
 
         <nav className="mt-8 flex gap-4">
           <Link href="/" className="text-foreground">Home</Link>
