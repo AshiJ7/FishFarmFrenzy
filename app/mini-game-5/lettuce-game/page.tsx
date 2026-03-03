@@ -221,9 +221,11 @@ useEffect(() => {
           width: '30px',
           height: '30px',
           borderRadius: '50%',
-          backgroundColor: obj.color,
+          fontSize:'20pt',
+          
         }}
-      />
+        >🥬
+      </div>
     ))}
 
     <div
