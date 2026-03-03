@@ -20,18 +20,44 @@ export default function MiniGame5() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
-        <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
-        <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          Here is where there will be text about how certain crops go best with certain species of fishes. 
-        </p>
-        <br></br>
-        <h2>How to play the game:</h2>
-        <p>Below are cards with different crops and different fish. Using what you just learned, 
-          click on the plant cards and slide to the fish it grows best with. 
-          After you have correctly matched each pair, continue to the next game.
-        </p>
+    <div className="flex min-h-screen items-center justify-center bg-[var(--peach-soft)] font-sans dark:bg-black">
+      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-[var(--peach-soft)] dark:bg-black">
+        <div className="max-w-2xl mx-auto">
+  
+  <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50">
+    Fish & Crop Match
+  </h1>
+
+  
+  <h2 className="text-left mt-4 text-xl">
+    Did you know that some plants and fish grow better together?
+  </h2>
+  <br></br>
+
+  <p className="text-left">
+    In special farms called aquaponics farms, fish and plants help each other grow! It works by having fish live in water and produce waste.
+    That waste turns into nutrients which plants needs to grow big and healthy. As plants clean the water, the fish get fresh, clean water again! It’s a team effort!
+  </p>
+
+  <br></br>
+
+  <ul className="mt-3 text-gray-800 space-y-1">
+  <li>🐟 <strong>Tilapia</strong> loves to help lettuce and basil grow!</li>
+  <li>🐠 <strong>Trout</strong> likes spinach and arugula!</li>
+  <li>🐟 <strong>Catfish</strong> helps tomatoes and cucumbers!</li>
+  <li>🐠 <strong>Koi</strong> is friends with watercress and mint!</li>
+</ul>
+
+  <h2 className="text-left mt-6 font-semibold">
+    How to play the game:
+  </h2>
+  <p className="text-left">
+    Below are cards with different crops and different fish. Using what you just learned,
+    click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair and gotten a score of 3,
+    continue to the next game.
+  </p>
+
+</div>
 
         <FishCropMatch/>
 

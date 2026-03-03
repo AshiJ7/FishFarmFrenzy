@@ -253,9 +253,9 @@ useEffect(() => {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-white dark:bg-black">
-        <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">Mini-game 5</h1>
+    <div className="flex min-h-screen items-center justify-center bg-[var(--peach-soft)] font-sans dark:bg-black">
+      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-[var(--peach-soft)] dark:bg-black">
+        <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Aquaponics Adventure</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
           Blurb about aquaponics and it's benefits goes here. This is the educational section. 
         </p>
@@ -265,10 +265,10 @@ useEffect(() => {
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
         <br></br>
-        <div id="counter">Lettuce Score : <span>{score}</span> Salmon Score : <span>{score2}</span></div>
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Score : <span>{score}</span> Salmon Score : <span>{score2}</span></div>
         <div style={{ marginBottom: "10px" }}>
   {!isPlaying && !gameOver && (
-    <button onClick={startGame}>Start Game</button>
+    <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Start Game</button>
   )}
 
   {isPlaying && <div>Time Left: {timeLeft}</div>}
@@ -277,7 +277,7 @@ useEffect(() => {
   {gameOver && (
     <div>
       <p>Game Over!</p>
-      <button onClick={startGame}>Retry</button>
+      <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Retry</button>
     </div>
   )}
 </div>
@@ -335,12 +335,15 @@ useEffect(() => {
       left: `${position.x}px`,
       width: '50px',
       height: '50px',
-      backgroundColor: 'red',
-      outline: 'none',
-    }}
-  >
-    Move Me
-  </div>
+      fontSize: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        outline: 'none',
+      }}
+    >
+      🧺
+    </div>
 
   
 

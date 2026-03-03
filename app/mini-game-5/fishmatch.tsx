@@ -17,8 +17,8 @@ export default function FishCropMatch() {
   
   const crops: Crop[] = [
     { id: 1, name: "Lettuce", fishMatch: 1 },
-    { id: 2, name: "Spinach", fishMatch: 2 },
-    { id: 3, name: "Kale", fishMatch: 3 },
+    { id: 2, name: "Spinach", fishMatch: 3 },
+    { id: 3, name: "Cucumbers", fishMatch: 2 },
   ];
 
   const fish: Fish[] = [
@@ -71,7 +71,7 @@ export default function FishCropMatch() {
   return (
     <div className="flex flex-col items-center gap-6">
 
-      <h2 className="text-xl font-bold">
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)]">
         Score: {score}
       </h2>
 
@@ -82,7 +82,7 @@ export default function FishCropMatch() {
             key={crop.id}
             draggable={!matchedCrops.includes(crop.id)}
             onDragStart={(e) => handleDraggingStart(e, crop)}
-            className="cursor-grab solid border border-black px-6 py-4 bg-white-100 hover:bg-gray-200"
+            className="cursor-grab solid border rounded-lg border-black px-6 py-4 bg-[var(--mint-light)] hover:bg-gray-200"
           >
             {crop.name}
           </div>
@@ -96,7 +96,7 @@ export default function FishCropMatch() {
             key={f.id}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, f.id)}
-            className="flex h-32 w-32 items-center justify-center border border-black"
+            className="flex h-32 w-32 items-center rounded-lg justify-center bg-[var(--periwinkle)] border border-black"
           >
             {f.name}
           </div>
