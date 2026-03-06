@@ -43,7 +43,7 @@ export default function BacteriaGame() {
           parent: containerRef.current,
           width: GAME_WIDTH,
           height: GAME_HEIGHT,
-          backgroundColor: "#0a2a3a",
+          backgroundColor: "#e8f5ff",
           physics: {
             default: "arcade",
             arcade: {
@@ -57,9 +57,9 @@ export default function BacteriaGame() {
             create: function (this: any) {
               // --- Background ---
               const bg = this.add.graphics();
-              bg.fillStyle(0x0a2a3a, 1);
+              bg.fillStyle(0xe8f5ff, 1);
               bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-              bg.lineStyle(1, 0x0d3548, 0.4);
+              bg.lineStyle(1, 0xa8c8e8, 0.35);
               for (let x = 0; x < GAME_WIDTH; x += 40) {
                 bg.lineBetween(x, 0, x, GAME_HEIGHT);
               }
@@ -69,37 +69,37 @@ export default function BacteriaGame() {
 
               // --- Textures ---
               const headGfx = this.make.graphics({ x: 0, y: 0, add: false });
-              headGfx.fillStyle(0x4caf50, 1);
+              headGfx.fillStyle(0x4a8e9e, 1);
               headGfx.fillCircle(24, 24, 22);
-              headGfx.fillStyle(0x66cc6a, 1);
+              headGfx.fillStyle(0x7ab5c8, 1);
               headGfx.fillCircle(22, 22, 14);
-              headGfx.fillStyle(0x2e7d32, 1);
+              headGfx.fillStyle(0x2e6878, 1);
               headGfx.fillCircle(20, 20, 6);
-              headGfx.fillStyle(0x81d4fa, 0.8);
+              headGfx.fillStyle(0xa8c8e8, 0.8);
               headGfx.fillCircle(30, 18, 3);
               headGfx.fillCircle(28, 30, 2);
               headGfx.generateTexture("bacteria_head", 48, 48);
 
               const bodyGfx = this.make.graphics({ x: 0, y: 0, add: false });
-              bodyGfx.fillStyle(0x4caf50, 0.7);
+              bodyGfx.fillStyle(0x4a8e9e, 0.7);
               bodyGfx.fillCircle(12, 12, 10);
-              bodyGfx.fillStyle(0x66cc6a, 0.5);
+              bodyGfx.fillStyle(0x7ab5c8, 0.5);
               bodyGfx.fillCircle(11, 11, 6);
               bodyGfx.generateTexture("bacteria_body", 24, 24);
 
-              // Nutrient (ammonia) — bright cyan
+              // Nutrient (ammonia) — warm yellow from palette
               const nutrientGfx = this.make.graphics({ x: 0, y: 0, add: false });
-              nutrientGfx.fillStyle(0x00e5ff, 1);
+              nutrientGfx.fillStyle(0xffd966, 1);
               nutrientGfx.fillCircle(16, 16, 14);
-              nutrientGfx.fillStyle(0x80f3ff, 1);
+              nutrientGfx.fillStyle(0xffe599, 1);
               nutrientGfx.fillCircle(11, 11, 6);
               nutrientGfx.generateTexture("nutrient", 32, 32);
 
-              // Waste product — brown
+              // Waste product — coral from palette
               const wasteGfx = this.make.graphics({ x: 0, y: 0, add: false });
-              wasteGfx.fillStyle(0x8d6e63, 1);
+              wasteGfx.fillStyle(0xe49678, 1);
               wasteGfx.fillCircle(12, 12, 10);
-              wasteGfx.fillStyle(0x6d4c41, 1);
+              wasteGfx.fillStyle(0xb87058, 1);
               wasteGfx.fillCircle(9, 9, 5);
               wasteGfx.generateTexture("waste", 24, 24);
 
@@ -196,28 +196,28 @@ export default function BacteriaGame() {
               this.scoreText = this.add
                 .text(10, 10, "Score: 0", {
                   fontSize: "18px",
-                  color: "#80cbc4",
+                  color: "#2e6878",
                   fontFamily: "sans-serif",
                 })
                 .setScrollFactor(0);
 
               // Toxicity bar
               const toxBg = this.add.graphics();
-              toxBg.fillStyle(0x333333, 1);
+              toxBg.fillStyle(0xd4c9a0, 1);
               toxBg.fillRect(GAME_WIDTH - 215, 10, 200, 20);
 
               this.toxicityBar = this.add.graphics();
 
               this.add.text(GAME_WIDTH - 215, 34, "Toxicity", {
                 fontSize: "13px",
-                color: "#ef9a9a",
+                color: "#b87058",
                 fontFamily: "sans-serif",
               });
 
               this.fishLabel = this.add
                 .text(GAME_WIDTH / 2, 10, "Fish: Alive", {
                   fontSize: "16px",
-                  color: "#80cbc4",
+                  color: "#2e6878",
                   fontFamily: "sans-serif",
                 })
                 .setOrigin(0.5, 0);
@@ -225,10 +225,10 @@ export default function BacteriaGame() {
               this.add.text(
                 10,
                 GAME_HEIGHT - 30,
-                "Cyan = nutrients (+10pts)   Brown = waste (+5pts, reduces toxicity)",
+                "Yellow = nutrients (+10pts)   Coral = waste (+5pts, reduces toxicity)",
                 {
                   fontSize: "13px",
-                  color: "#607d8b",
+                  color: "#5c5444",
                   fontFamily: "sans-serif",
                 }
               );
@@ -296,10 +296,10 @@ export default function BacteriaGame() {
               const barWidth = (this.toxicity / this.MAX_TOXICITY) * 200;
               const barColor =
                 this.toxicity > 70
-                  ? 0xff1744
+                  ? 0xe49678
                   : this.toxicity > 40
-                  ? 0xffa726
-                  : 0x66bb6a;
+                  ? 0xffd966
+                  : 0x6b8e4e;
               this.toxicityBar.fillStyle(barColor, 1);
               this.toxicityBar.fillRect(
                 this.GAME_WIDTH - 215,
@@ -312,7 +312,7 @@ export default function BacteriaGame() {
               if (this.toxicity >= this.MAX_TOXICITY) {
                 this.gameOver = true;
                 this.bacteriaHead.setVelocity(0, 0);
-                this.fishLabel.setText("Fish: DEAD").setColor("#ff1744");
+                this.fishLabel.setText("Fish: DEAD").setColor("#b87058");
                 this.add
                   .text(
                     this.GAME_WIDTH / 2,
@@ -321,7 +321,7 @@ export default function BacteriaGame() {
                       this.score,
                     {
                       fontSize: "32px",
-                      color: "#ff1744",
+                      color: "#e49678",
                       fontFamily: "sans-serif",
                       align: "center",
                     }
@@ -365,10 +365,10 @@ export default function BacteriaGame() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#fee",
+          background: "#e8f5ff",
         }}
       >
-        <div style={{ color: "#900", maxWidth: 700 }}>
+        <div style={{ color: "#b87058", maxWidth: 700 }}>
           <strong>Game initialization error:</strong>
           <pre style={{ whiteSpace: "pre-wrap" }}>{error}</pre>
         </div>
