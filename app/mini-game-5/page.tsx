@@ -20,8 +20,9 @@ export default function MiniGame5() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--peach-soft)] font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-24 px-8 bg-[var(--peach-soft)] dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center font-sans dark:bg-black">
+      <div className="bg-bubbles" id="bubbles"></div>
+      <main className="card" >
         <div className="max-w-2xl mx-auto">
   
   <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50">
@@ -68,6 +69,8 @@ export default function MiniGame5() {
           <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link>
         </nav>
       </main>
+      
     </div>
+    
   );
 }

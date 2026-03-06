@@ -82,7 +82,7 @@ export default function FishCropMatch() {
             key={crop.id}
             draggable={!matchedCrops.includes(crop.id)}
             onDragStart={(e) => handleDraggingStart(e, crop)}
-            className="cursor-grab solid border rounded-lg border-black px-6 py-4 bg-[var(--mint-light)] hover:bg-gray-200"
+            className="stat-card plants"
           >
             {crop.name}
           </div>
@@ -96,7 +96,7 @@ export default function FishCropMatch() {
             key={f.id}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, f.id)}
-            className="flex h-32 w-32 items-center rounded-lg justify-center bg-[var(--periwinkle)] border border-black"
+            className="stat-card water"
           >
             {f.name}
           </div>
