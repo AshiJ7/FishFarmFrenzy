@@ -4,19 +4,157 @@ import { useState } from "react";
 type Food = {
   id: number;
   name: string;
-  isGood: boolean;
+  tilapiaGood: boolean;
+  troutGood: boolean;
+  salmonGood: boolean;
 };
 
+type FishGoodKey = "tilapiaGood" | "troutGood" | "salmonGood";
+
 export default function FishFeeding() {
-  // hardcode good and bad foods for now
+  // hardcode good and bad foods with boolean for each fish
   const foods: Food[] = [
-    { id: 1, name: "Cookies", isGood: false },
-    { id: 2, name: "Algae", isGood: true },
-    { id: 3, name: "Cake", isGood: false },
+    {
+      id: 1,
+      name: "Cookies",
+      tilapiaGood: false,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 2,
+      name: "Algae",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 3,
+      name: "Cake",
+      tilapiaGood: false,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 4,
+      name: "Duckweed",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 5,
+      name: "Water lettuce",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 6,
+      name: "Rice bran",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 7,
+      name: "Corn meal",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 8,
+      name: "Soybean meal",
+      tilapiaGood: true,
+      troutGood: false,
+      salmonGood: false
+    },
+    {
+      id: 9,
+      name: "Mayflies",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 10,
+      name: "Stoneflies",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 11,
+      name: "Caddisflies",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 12,
+      name: "Crawfish",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 13, 
+      name: "Worms",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 14,
+      name: "Herring",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 15,
+      name: "Shrimp",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
+    {
+      id: 16,
+      name: "Krill",
+      tilapiaGood: false,
+      troutGood: true,
+      salmonGood: true
+    },
   ];
+
+  const fish: string[] = ["Tilapia", "Trout", "Salmon"];
 
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState("");
+  const [usedFoodArr, setUsedFoodArr] = useState<number[]>([]);
+  const [foodNum, setFoodNum] = useState(Math.floor(Math.random() * foods.length));
+  const [gameOver, setGameOver] = useState(false);
+  const [fishSelected, setFishSelected] = useState(false);
+  const [currentFish, setCurrentFish] = useState("");
+  const [fishGood, setFishGood] = useState<FishGoodKey | null>(null);
+
+  // randomly selects next food to appear from foods not yet used after current food has been dropped
+  function getNextFoodIndex(used: number[]) {
+    if (used.length >= foods.length) {
+      return null;
+    }
+
+    const availableIndexes = foods
+      .map((_, index) => index)
+      .filter((index) => !used.includes(index));
+
+    const randomAvailableIndex = Math.floor(
+      Math.random() * availableIndexes.length
+    );
+
+    return availableIndexes[randomAvailableIndex];
+  }
 
   // store the id of dragged food in dataTransfer object
   const handleDraggingStart = (
@@ -33,6 +171,8 @@ export default function FishFeeding() {
 
   // handler for after dropping block on fish
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    if (gameOver) return;
+
     e.preventDefault();
 
     const foodId = Number(e.dataTransfer.getData("foodId"));
@@ -40,17 +180,109 @@ export default function FishFeeding() {
 
     if (!droppedFood) return;
 
-    if (droppedFood.isGood) {
-      setScore(score + 1);
-      setMessage("Good food");
+
+    const selectedFishGood = fishGood
+       ? droppedFood[fishGood]
+       : null;
+        
+    if (e.currentTarget.className.includes("fish")) {
+      if (selectedFishGood) {
+        setScore((prev) => prev + 1);
+        setMessage("Good food");
+      }
+      else {
+        setMessage("Bad food");
+      }
     }
-    else {
-      setMessage("Bad food");
+    else if (e.currentTarget.className.includes("trash")) {
+      if (!selectedFishGood) {
+        setScore((prev) => prev + 1);
+        setMessage("Correct - Bad food in trash");
+      }
+      else {
+        setMessage("Incorrect - good food in trash");
+      }
     }
+
+    // update used food array with food just dropped and either get new food block or end game
+    setUsedFoodArr((prev) => {
+      const updated = [...prev, foodNum];
+      const nextFood = getNextFoodIndex(updated);
+
+      if (nextFood === null) {
+        setGameOver(true);
+      }
+      else {
+        setFoodNum(nextFood);
+      }
+
+      return updated;
+    });
   };
 
+  const handleFishSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const currFish = e.currentTarget.name;
+    const fishKey = `${currFish.toLowerCase()}Good` as FishGoodKey;
+
+    setCurrentFish(currFish);
+    setFishSelected(true);
+    setFishGood(fishKey);
+  };
+
+  const restartGame = () => {
+    setScore(0);
+    setMessage("");
+    setUsedFoodArr([]);
+    setFoodNum(Math.floor(Math.random() * foods.length));
+    setFishSelected(false);
+    setGameOver(false);
+    setFishSelected(false);
+    setCurrentFish("");
+    setFishGood(null);
+  };
+
+  // fish selection screen
+  if (!fishSelected) {
+    return (
+      <div className="bg-[url(../public/minigame_1_background.png)] flex flex-col items-center gap-6 px-30 py-30">
+        <h2 className="text-2xl font-bold"> Select Fish </h2>
+        <div className="flex gap-4">
+          {fish.map((fishName) => (
+            <button
+              key={fishName}
+              name={fishName}
+              className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black hover:bg-gray-200"
+              onClick={handleFishSelection}
+            >
+              {fishName}
+            </button>
+          ))}
+
+        </div>
+      </div>
+    );
+  }
+
+  if (gameOver) {
+    return (
+      <div className="bg-[url(../public/minigame_1_background.png)] flex flex-col items-center gap-6 px-30 py-30">
+        <h2 className="text-2xl font-bold"> Game Over </h2>
+        <p className="text-lg"> Final Score: {score} </p>
+        <div className="flex gap-10">
+          <button
+          name="Start Over"
+          onClick={restartGame}
+          className="flex h-10 w-30 items-center justify-center border-1 border-solid border-black hover:bg-gray-200"
+          >
+            Start Over
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="bg-[url(../public/minigame_1_background.png)] flex flex-col items-center gap-6 px-30 py-30">
 
       <h2 className="text-xl font-bold">
         Score: {score}
@@ -58,29 +290,42 @@ export default function FishFeeding() {
 
       {/* food blocks */}
       <div className="flex gap-4">
-        {foods.map(food => (
           <div
-            key={food.id}
+            key={foods[foodNum].id}
             draggable
-            onDragStart={(e) => handleDraggingStart(e, food)}
+            onDragStart={(e) => handleDraggingStart(e, foods[foodNum])}
             className="cursor-grab solid border border-black px-6 py-4 bg-white-100 hover:bg-gray-200"
           >
-            {food.name}
+            {foods[foodNum].name}
           </div>
-        ))}
       </div>
 
       {/* fish block */}
-      <div
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        className="flex h-48 w-48 items-center justify-center border-1 border-solid border-black"
-      >
-        Tilapia
+      <div className="flex gap-4">
+        <div
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black fish"
+        >
+          {currentFish}
+        </div>
+
+        <div
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className="trash flex h-30 w-30 flex-col items-center justify-center gap-0 overflow-hidden border-1 border-solid border-black"
+        >
+          <img
+            src="/trashcan.png"
+            alt="trash can"
+            className="pointer-events-none h-30 w-30 scale-200 select-none object-contain px-5"
+          />
+          {/* <span className="text-[10px] leading-none">Trash</span> */}
+        </div>
       </div>
 
       {/* message for good or bad food */}
-      <p className="h-6">{message}</p>
+      <p className="h-6"> {message} </p>
     </div>
   );
 }

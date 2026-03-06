@@ -30,13 +30,13 @@ export default function BacteriaGame() {
 
         const GAME_WIDTH = 800;
         const GAME_HEIGHT = 600;
-
-        // Number of body segments trailing behind the head
         const BODY_SEGMENT_COUNT = 8;
-        // Spacing between each segment (in pixels of delay)
         const SEGMENT_SPACING = 12;
-        // How quickly the head moves toward the cursor
         const MOVE_SPEED = 220;
+        const MAX_NUTRIENTS = 6;
+        // toxicity gained per second per waste item on screen
+        const TOXICITY_RATE = 2;
+        const MAX_TOXICITY = 100;
 
         const config: any = {
           type: Phaser.AUTO,
@@ -52,17 +52,13 @@ export default function BacteriaGame() {
             },
           },
           scene: {
-            preload: function (this: any) {
-              // All textures created procedurally in create()
-            },
+            preload: function (this: any) {},
 
             create: function (this: any) {
-              // --- Draw water background with subtle grid ---
+              // --- Background ---
               const bg = this.add.graphics();
-              // Dark water gradient feel
               bg.fillStyle(0x0a2a3a, 1);
               bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-              // Subtle grid lines to give sense of movement/scale
               bg.lineStyle(1, 0x0d3548, 0.4);
               for (let x = 0; x < GAME_WIDTH; x += 40) {
                 bg.lineBetween(x, 0, x, GAME_HEIGHT);
@@ -71,24 +67,19 @@ export default function BacteriaGame() {
                 bg.lineBetween(0, y, GAME_WIDTH, y);
               }
 
-              // --- Create bacteria head texture ---
+              // --- Textures ---
               const headGfx = this.make.graphics({ x: 0, y: 0, add: false });
-              // Outer membrane
               headGfx.fillStyle(0x4caf50, 1);
               headGfx.fillCircle(24, 24, 22);
-              // Inner body lighter shade
               headGfx.fillStyle(0x66cc6a, 1);
               headGfx.fillCircle(22, 22, 14);
-              // Nucleus
               headGfx.fillStyle(0x2e7d32, 1);
               headGfx.fillCircle(20, 20, 6);
-              // Small organelle dots
               headGfx.fillStyle(0x81d4fa, 0.8);
               headGfx.fillCircle(30, 18, 3);
               headGfx.fillCircle(28, 30, 2);
               headGfx.generateTexture("bacteria_head", 48, 48);
 
-              // --- Create body segment texture ---
               const bodyGfx = this.make.graphics({ x: 0, y: 0, add: false });
               bodyGfx.fillStyle(0x4caf50, 0.7);
               bodyGfx.fillCircle(12, 12, 10);
@@ -96,10 +87,55 @@ export default function BacteriaGame() {
               bodyGfx.fillCircle(11, 11, 6);
               bodyGfx.generateTexture("bacteria_body", 24, 24);
 
-              // --- Position history for trailing body segments ---
-              this.positionHistory = [] as { x: number; y: number }[];
+              // Nutrient (ammonia) — bright cyan
+              const nutrientGfx = this.make.graphics({ x: 0, y: 0, add: false });
+              nutrientGfx.fillStyle(0x00e5ff, 1);
+              nutrientGfx.fillCircle(16, 16, 14);
+              nutrientGfx.fillStyle(0x80f3ff, 1);
+              nutrientGfx.fillCircle(11, 11, 6);
+              nutrientGfx.generateTexture("nutrient", 32, 32);
 
-              // --- Create body segments (rendered behind the head) ---
+              // Waste product — brown
+              const wasteGfx = this.make.graphics({ x: 0, y: 0, add: false });
+              wasteGfx.fillStyle(0x8d6e63, 1);
+              wasteGfx.fillCircle(12, 12, 10);
+              wasteGfx.fillStyle(0x6d4c41, 1);
+              wasteGfx.fillCircle(9, 9, 5);
+              wasteGfx.generateTexture("waste", 24, 24);
+
+              // --- Spawn helpers (defined early so overlap callbacks can use them) ---
+              this.spawnNutrient = () => {
+                const margin = 50;
+                const x = Phaser.Math.Between(margin, GAME_WIDTH - margin);
+                const y = Phaser.Math.Between(margin, GAME_HEIGHT - margin);
+                this.nutrientGroup.create(x, y, "nutrient");
+              };
+
+              this.spawnWaste = (x: number, y: number) => {
+                const ox = Phaser.Math.Clamp(
+                  x + Phaser.Math.Between(-40, 40),
+                  20,
+                  GAME_WIDTH - 20
+                );
+                const oy = Phaser.Math.Clamp(
+                  y + Phaser.Math.Between(-40, 40),
+                  20,
+                  GAME_HEIGHT - 20
+                );
+                this.wasteGroup.create(ox, oy, "waste");
+              };
+
+              // --- Groups ---
+              this.nutrientGroup = this.physics.add.staticGroup();
+              this.wasteGroup = this.physics.add.staticGroup();
+
+              // Spawn initial nutrients
+              for (let i = 0; i < MAX_NUTRIENTS; i++) {
+                this.spawnNutrient();
+              }
+
+              // --- Body segments (rendered before head) ---
+              this.positionHistory = [] as { x: number; y: number }[];
               this.bodySegments = [] as any[];
               for (let i = BODY_SEGMENT_COUNT - 1; i >= 0; i--) {
                 const scale = 0.95 - i * 0.07;
@@ -114,7 +150,7 @@ export default function BacteriaGame() {
                 this.bodySegments.push(seg);
               }
 
-              // --- Create head sprite with physics ---
+              // --- Bacteria head ---
               this.bacteriaHead = this.physics.add.sprite(
                 GAME_WIDTH / 2,
                 GAME_HEIGHT / 2,
@@ -124,62 +160,173 @@ export default function BacteriaGame() {
               this.bacteriaHead.setDrag(100);
               this.bacteriaHead.setMaxVelocity(MOVE_SPEED);
 
-              // --- UI label ---
-              this.add
-                .text(10, 10, "Move your mouse to guide the bacteria", {
-                  fontSize: "16px",
+              // --- Overlaps ---
+              this.physics.add.overlap(
+                this.bacteriaHead,
+                this.nutrientGroup,
+                (head: any, nutrient: any) => {
+                  nutrient.destroy();
+                  this.score += 10;
+                  this.scoreText.setText("Score: " + this.score);
+                  this.spawnWaste(head.x, head.y);
+                  this.spawnNutrient();
+                },
+                undefined,
+                this
+              );
+
+              this.physics.add.overlap(
+                this.bacteriaHead,
+                this.wasteGroup,
+                (_head: any, waste: any) => {
+                  waste.destroy();
+                  this.score += 5;
+                  this.scoreText.setText("Score: " + this.score);
+                },
+                undefined,
+                this
+              );
+
+              // --- Game state ---
+              this.score = 0;
+              this.toxicity = 0;
+              this.gameOver = false;
+
+              // --- UI ---
+              this.scoreText = this.add
+                .text(10, 10, "Score: 0", {
+                  fontSize: "18px",
                   color: "#80cbc4",
                   fontFamily: "sans-serif",
                 })
                 .setScrollFactor(0);
 
+              // Toxicity bar
+              const toxBg = this.add.graphics();
+              toxBg.fillStyle(0x333333, 1);
+              toxBg.fillRect(GAME_WIDTH - 215, 10, 200, 20);
+
+              this.toxicityBar = this.add.graphics();
+
+              this.add.text(GAME_WIDTH - 215, 34, "Toxicity", {
+                fontSize: "13px",
+                color: "#ef9a9a",
+                fontFamily: "sans-serif",
+              });
+
+              this.fishLabel = this.add
+                .text(GAME_WIDTH / 2, 10, "Fish: Alive", {
+                  fontSize: "16px",
+                  color: "#80cbc4",
+                  fontFamily: "sans-serif",
+                })
+                .setOrigin(0.5, 0);
+
+              this.add.text(
+                10,
+                GAME_HEIGHT - 30,
+                "Cyan = nutrients (+10pts)   Brown = waste (+5pts, reduces toxicity)",
+                {
+                  fontSize: "13px",
+                  color: "#607d8b",
+                  fontFamily: "sans-serif",
+                }
+              );
+
               // Store constants for update
               this.MOVE_SPEED = MOVE_SPEED;
               this.SEGMENT_SPACING = SEGMENT_SPACING;
+              this.TOXICITY_RATE = TOXICITY_RATE;
+              this.MAX_TOXICITY = MAX_TOXICITY;
+              this.GAME_WIDTH = GAME_WIDTH;
+              this.GAME_HEIGHT = GAME_HEIGHT;
             },
 
-            update: function (this: any) {
+            update: function (this: any, _time: number, delta: number) {
+              if (this.gameOver) return;
+
               const head = this.bacteriaHead;
               if (!head) return;
 
+              // --- Move toward cursor ---
               const pointer = this.input.activePointer;
               const dx = pointer.worldX - head.x;
               const dy = pointer.worldY - head.y;
               const dist = Math.sqrt(dx * dx + dy * dy);
 
-              // Move toward cursor if it's far enough away (dead zone to prevent jitter)
               if (dist > 8) {
                 const angle = Math.atan2(dy, dx);
-                // Scale speed so bacteria slows down near cursor
                 const speedFactor = Math.min(dist / 100, 1);
                 head.setVelocity(
                   Math.cos(angle) * this.MOVE_SPEED * speedFactor,
                   Math.sin(angle) * this.MOVE_SPEED * speedFactor
                 );
-                // Rotate head to face movement direction
                 head.setRotation(angle);
               } else {
                 head.setVelocity(0, 0);
               }
 
-              // Record position history
+              // --- Body segments ---
               this.positionHistory.unshift({ x: head.x, y: head.y });
-              // Keep only as many positions as we need
               const maxHistory =
                 this.bodySegments.length * this.SEGMENT_SPACING + 1;
               if (this.positionHistory.length > maxHistory) {
                 this.positionHistory.length = maxHistory;
               }
-
-              // Place each body segment at a past position
               for (let i = 0; i < this.bodySegments.length; i++) {
                 const index = (i + 1) * this.SEGMENT_SPACING;
-                const pos = this.positionHistory[
-                  Math.min(index, this.positionHistory.length - 1)
-                ];
+                const pos =
+                  this.positionHistory[
+                    Math.min(index, this.positionHistory.length - 1)
+                  ];
                 if (pos) {
                   this.bodySegments[i].setPosition(pos.x, pos.y);
                 }
+              }
+
+              // --- Toxicity ---
+              const wasteCount = this.wasteGroup.getChildren().length;
+              if (wasteCount > 0) {
+                this.toxicity += (this.TOXICITY_RATE * wasteCount * delta) / 1000;
+              }
+              this.toxicity = Math.min(this.toxicity, this.MAX_TOXICITY);
+
+              // Redraw toxicity bar
+              this.toxicityBar.clear();
+              const barWidth = (this.toxicity / this.MAX_TOXICITY) * 200;
+              const barColor =
+                this.toxicity > 70
+                  ? 0xff1744
+                  : this.toxicity > 40
+                  ? 0xffa726
+                  : 0x66bb6a;
+              this.toxicityBar.fillStyle(barColor, 1);
+              this.toxicityBar.fillRect(
+                this.GAME_WIDTH - 215,
+                10,
+                barWidth,
+                20
+              );
+
+              // --- Game over ---
+              if (this.toxicity >= this.MAX_TOXICITY) {
+                this.gameOver = true;
+                this.bacteriaHead.setVelocity(0, 0);
+                this.fishLabel.setText("Fish: DEAD").setColor("#ff1744");
+                this.add
+                  .text(
+                    this.GAME_WIDTH / 2,
+                    this.GAME_HEIGHT / 2,
+                    "GAME OVER\nThe fish died from toxicity!\nFinal Score: " +
+                      this.score,
+                    {
+                      fontSize: "32px",
+                      color: "#ff1744",
+                      fontFamily: "sans-serif",
+                      align: "center",
+                    }
+                  )
+                  .setOrigin(0.5);
               }
             },
           },
