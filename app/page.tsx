@@ -41,6 +41,45 @@ const BubbleBackground = () => (
   </div>
 );
 
+//bubble animation
+const BubbleBackground = () => (
+  <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    {[...Array(18)].map((_, i) => {
+      const size = 12 + Math.random() * 24;
+      return (
+        <div
+          key={i}
+          className="absolute rounded-full opacity-40"
+          style={{
+            bottom: "-60px",
+            left: `${Math.random() * 100}%`,
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: "var(--periwinkle)",
+            animation: `floatUp ${8 + Math.random() * 8}s linear infinite`,
+            animationDelay: `${Math.random() * 5}s`,
+          }}
+        />
+      );
+    })}
+
+      <style>{`
+      @keyframes floatUp {
+        0% { transform: translateY(0) scale(1); opacity: 0.4; }
+        100% { transform: translateY(-120vh) scale(1.3); opacity: 0; }
+      }
+      @keyframes gentleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+      }
+      @keyframes rotateBounce {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(10deg); }
+        100% { transform: rotate(0deg); }
+      }
+    `}</style>
+  </div>
+);
 export default function Home() {
 	const bubbleBackground = useMemo(() => <BubbleBackground />, []);
 	

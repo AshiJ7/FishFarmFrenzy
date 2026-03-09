@@ -20,7 +20,7 @@ export default function MiniGame5() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center dark:bg-black">
       <div className="bg-bubbles" id="bubbles"></div>
       <main className="card" >
         <div className="max-w-2xl mx-auto">

@@ -253,7 +253,7 @@ useEffect(() => {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center dark:bg-black">
       <main className="card">
         <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Aquaponics Adventure</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">

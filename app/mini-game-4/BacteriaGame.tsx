@@ -197,7 +197,7 @@ export default function BacteriaGame() {
                 .text(10, 10, "Score: 0", {
                   fontSize: "18px",
                   color: "#2e6878",
-                  fontFamily: "sans-serif",
+                  fontFamily: "Nunito, sans-serif",
                 })
                 .setScrollFactor(0);
 
@@ -211,14 +211,14 @@ export default function BacteriaGame() {
               this.add.text(GAME_WIDTH - 215, 34, "Toxicity", {
                 fontSize: "13px",
                 color: "#b87058",
-                fontFamily: "sans-serif",
+                fontFamily: "Nunito, sans-serif",
               });
 
               this.fishLabel = this.add
                 .text(GAME_WIDTH / 2, 10, "Fish: Alive", {
                   fontSize: "16px",
                   color: "#2e6878",
-                  fontFamily: "sans-serif",
+                  fontFamily: "Nunito, sans-serif",
                 })
                 .setOrigin(0.5, 0);
 
@@ -229,7 +229,7 @@ export default function BacteriaGame() {
                 {
                   fontSize: "13px",
                   color: "#5c5444",
-                  fontFamily: "sans-serif",
+                  fontFamily: "Nunito, sans-serif",
                 }
               );
 
@@ -322,7 +322,7 @@ export default function BacteriaGame() {
                     {
                       fontSize: "32px",
                       color: "#e49678",
-                      fontFamily: "sans-serif",
+                      fontFamily: "Nunito, sans-serif",
                       align: "center",
                     }
                   )
