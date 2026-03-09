@@ -80,7 +80,7 @@ const scenarios: Scenario[] = [
       {
         text: "Do nothing and hope they get better",
         impact: -15,
-        feedback: "Very bad decision! The disease spread to more fish. Early intervention is crucial!"
+        feedback: "Very bad decision! The disease spread to more fish. Early intervention is crucial."
       }
     ]
   },
@@ -251,7 +251,7 @@ const scenarios: Scenario[] = [
       {
         text: "Spray pesticides on the plants",
         impact: -12,
-        feedback: "Disaster! Pesticides killed the beneficial bacteria and poisoned the fish. Never use chemicals in aquaponics!"
+        feedback: "Disaster! Pesticides killed the beneficial bacteria and poisoned the fish. Never use chemicals in aquaponics."
       },
       {
         text: "Spray plants with diluted soapy water",
@@ -383,7 +383,7 @@ const scenarios: Scenario[] = [
       {
         text: "Add garden fertilizer to boost nutrients",
         impact: -12,
-        feedback: "Disaster! Garden fertilizers contain chemicals toxic to fish. You've poisoned your system!"
+        feedback: "Disaster! Garden fertilizers contain chemicals toxic to fish. You've poisoned your system."
       },
       {
         text: "Increase fish feeding to add more nutrients",
@@ -454,7 +454,7 @@ const scenarios: Scenario[] = [
       {
         text: "Use chemical snail killer",
         impact: -12,
-        feedback: "Terrible decision! The chemicals killed beneficial organisms and poisoned your fish. Never use chemicals!"
+        feedback: "Terrible decision! The chemicals killed beneficial organisms and poisoned your fish. Never use chemicals."
       }
     ]
   },
@@ -549,7 +549,7 @@ const scenarios: Scenario[] = [
   {
     id: 25,
     title: "Beneficial Bacteria Die-Off",
-    description: "Something killed your beneficial bacteria! Ammonia is spiking and the system is crashing!",
+    description: "Something killed your beneficial bacteria! Ammonia is spiking and the system is crashing.",
     choices: [
       {
         text: "Add bottled bacteria, reduce feeding, and monitor closely",
@@ -564,7 +564,7 @@ const scenarios: Scenario[] = [
       {
         text: "Do nothing and hope bacteria regrow quickly",
         impact: -12,
-        feedback: "Catastrophic failure! Ammonia poisoning killed most of your fish. Always take immediate action!"
+        feedback: "Catastrophic failure! Ammonia poisoning killed most of your fish. Always take immediate action."
       }
     ]
   },
@@ -711,15 +711,15 @@ const LeafIcon = ({ className = "w-6 h-6" }) => (
   <svg viewBox="0 0 24 24" className={className}>
     <path
       d="M4 14C4 8 10 4 20 4C20 14 14 20 8 20C5 20 4 17 4 14Z"
-      fill="var(--mint-light)"
+      fill="var(--olive-green)"
     />
   </svg>
 );
 
 const BubbleIcon = ({ className = "w-5 h-5" }) => (
   <svg viewBox="0 0 24 24" className={className}>
-    <circle cx="8" cy="10" r="3" fill="var(--periwinkle)" />
-    <circle cx="16" cy="14" r="2" fill="var(--periwinkle)" />
+    <circle cx="8" cy="10" r="3" fill="var(--teal-medium)" />
+    <circle cx="16" cy="14" r="2" fill="var(--teal-medium)" />
   </svg>
 );
 
@@ -731,9 +731,18 @@ const StarIcon = ({ className = "w-6 h-6" }) => (
 
 //otter icon for mascot
 const OtterMascot = ({ message }: { message: string }) => (
-  <div className="flex items-start gap-4 bg-white p-4 rounded-2xl shadow-md mb-6">
-    <div className="text-5xl">🦦</div>
-    <div className="bg-[var(--mint-light)] p-3 rounded-xl text-gray-700 text-sm">
+  <div
+    className="flex items-start gap-4 p-4 rounded-2xl shadow-md mb-6 w-full"
+    style={{ backgroundColor: "rgba(255,255,255,0.7)", border: "2px solid var(--mint-light)" }}
+  >
+    <div className="text-4xl" style={{ animation: "gentleFloat 3s ease-in-out infinite" }}>🦦</div>
+    <div
+      className="p-3 rounded-xl text-sm leading-relaxed"
+      style={{
+        backgroundColor: "var(--mint-light)",
+        color: "var(--color-text-primary)",
+      }}
+    >
       {message}
     </div>
   </div>
@@ -854,12 +863,11 @@ export default function SaveFishFarmGame() {
 
   const getScoreRating = () => {
     const maxScore = scenarios.length * 10;
-    const percentage = (score / maxScore) * 100;
-    
-    if (percentage >= 80) return { rating: "Excellent", message: "You're an aquaponics expert!" };
-    if (percentage >= 60) return { rating: "Good", message: "You understand the basics well!" };
-    if (percentage >= 40) return { rating: "Fair", message: "Keep learning and improving!" };
-    return { rating: "Needs Improvement", message: "Study aquaponics care more carefully." };
+    const pct = (score / maxScore) * 100;
+    if (pct >= 80) return { rating: "Excellent", message: "You're an aquaponics expert! 🌟" };
+    if (pct >= 60) return { rating: "Good", message: "You understand the basics well! 🐟" };
+    if (pct >= 40) return { rating: "Fair", message: "Keep learning and improving! 🌿" };
+    return { rating: "Needs Improvement", message: "Study aquaponics care more carefully. 📚" };
   };
 
   //show loading if needed
@@ -876,49 +884,72 @@ export default function SaveFishFarmGame() {
   if (gameState === "complete") {
     const { rating, message } = getScoreRating();
     const maxScore = scenarios.length * 10;
-    const bgColor = rating === "Excellent" ? "bg-gradient-to-b from-[var(--mint-light)] to-[var(--mint-light)]"
-      : rating === "Good" ? "bg-gradient-to-b from-[var(--periwinkle)] to-[var(--periwinkle)]"
-      : rating === "Fair" ? "bg-gradient-to-b from-[var(--peach-soft)] to-[var(--peach-soft)]"
-      : "bg-gradient-to-b from-[var(--coral-medium)] to-[var(--coral-medium)]";
-    
+    const ratingBg: Record<string, string> = {
+      Excellent: "var(--mint-light)",
+      Good: "var(--periwinkle)",
+      Fair: "var(--peach-soft)",
+      "Needs Improvement": "var(--coral-medium)",
+    };
+
     return (
-      <div className={`w-full max-w-2xl mx-auto p-6 rounded-3xl border-2 border-[var(--color-border-medium)] ${bgColor}`}>
-        <h2 className="text-2xl font-bold text-center mb-4 text-[var(--color-text-primary)]">
-          Game Complete!
+      <div
+        className="w-full max-w-2xl mx-auto p-6 rounded-3xl border-2"
+        style={{
+          backgroundColor: ratingBg[rating] ?? "var(--peach-soft)",
+          borderColor: "var(--color-border-medium)",
+        }}
+      >
+        <h2
+          className="text-2xl font-bold text-center mb-4"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          Game Complete! 🎉
         </h2>
-        
+
         <div className="mb-6 text-center">
-          <div className="text-5xl font-bold mb-2 text-[var(--color-text-primary)]">
+          <div
+            className="text-5xl font-bold mb-2"
+            style={{ color: "var(--color-text-primary)" }}
+          >
             {score} / {maxScore}
           </div>
-          <div className="text-xl font-semibold text-[var(--olive-green)]">
+          <div className="text-xl font-semibold" style={{ color: "var(--olive-green)" }}>
             {rating}
           </div>
-          <div className="text-[var(--color-text-secondary)]">
-            {message}
-          </div>
+          <div style={{ color: "var(--color-text-secondary)" }}>{message}</div>
         </div>
 
         <div className="mb-6">
-          <h3 className="font-semibold mb-3 text-[var(--color-text-primary)]">Your Decisions:</h3>
+          <h3
+            className="font-semibold mb-3"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            Your Decisions:
+          </h3>
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {decisionsHistory.map((decision, index) => (
-              <div 
-                key={index} 
-                className="p-3 rounded bg-white border border-[var(--color-border-light)] rounded-2xl"
+            {decisionsHistory.map((decision, i) => (
+              <div
+                key={i}
+                className="p-3 rounded-2xl border"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.75)",
+                  borderColor: "var(--color-border-light)",
+                }}
               >
-                <div className="font-medium text-sm text-[var(--color-text-primary)]">
+                <div
+                  className="font-medium text-sm"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
                   {decision.scenario}
                 </div>
-                <div className="text-xs text-[var(--color-text-secondary)] mt-1">
+                <div className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
                   {decision.choice}
                 </div>
-                <div className={`text-xs mt-1 font-semibold ${
-                  decision.impact > 0 
-                    ? 'text-[var(--olive-green)]' 
-                    : 'text-[var(--coral-medium)]'
-                }`}>
-                  {decision.impact > 0 ? '+' : ''}{decision.impact} points
+                <div
+                  className="text-xs mt-1 font-semibold"
+                  style={{ color: decision.impact > 0 ? "var(--olive-green)" : "var(--coral-medium)" }}
+                >
+                  {decision.impact > 0 ? "+" : ""}{decision.impact} points
                 </div>
               </div>
             ))}
@@ -929,11 +960,12 @@ export default function SaveFishFarmGame() {
           onClick={handleRestart}
           onMouseEnter={() => setHoveredRestart(true)}
           onMouseLeave={() => setHoveredRestart(false)}
+          className="w-full py-3 px-4 text-white font-semibold rounded-2xl shadow-md"
           style={{
-            transform: hoveredRestart ? 'scale(1.03)' : 'scale(1)',
-            transition: 'all 0.2s ease',
+            backgroundColor: "var(--olive-green)",
+            transform: hoveredRestart ? "scale(1.03)" : "scale(1)",
+            transition: "all 0.2s ease",
           }}
-          className="w-full py-3 px-4 bg-[var(--olive-green)] text-white font-semibold rounded-lg"
         >
           Play Again
         </button>
@@ -942,103 +974,152 @@ export default function SaveFishFarmGame() {
   }
 
   if (gameState === "feedback") {
-  return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FDF6EC] to-[#D6F4FF] p-20 rounded-3xl">
+    return (
+      <div
+        className="relative min-h-[480px] flex items-center justify-center p-8 rounded-3xl"
+        style={{
+          background: `linear-gradient(160deg, var(--sky-blue) 0%, var(--mint-light) 100%)`,
+        }}
+      >
+        {bubbleBackground}
 
-      {bubbleBackground}
-
-      <div className="relative z-10 w-full max-w-xl p-8 bg-white rounded-3xl shadow-2xl text-center">
-
-        {lastImpact > 0 ? (
-          <>
-            <StarIcon className="w-16 h-16 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-green-600 mb-2">
-              Great Job!
-            </h2>
-          </>
-        ) : (
-          <>
-            <div className="text-6xl mb-4">🐡</div>
-            <h2 className="text-2xl font-bold text-red-500 mb-2">
-              Oh No!
-            </h2>
-          </>
-        )}
-
-        <p className="text-gray-700 mb-6">{lastFeedback}</p>
-
-        <div className="text-gray-700 mb-6">
-          <div className={`text-2xl font-bold mb-1 ${lastImpact > 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {lastImpact > 0 ? '+' : ''}{lastImpact} points
-          </div>
-          <div className="text-xl font-semibold">Total Score: {score}</div>
-        </div>
-
-        <button
-          onClick={handleNext}
-          onMouseEnter={() => setHoveredNext(true)}
-          onMouseLeave={() => setHoveredNext(false)}
+        <div
+          className="relative z-10 w-full max-w-xl p-8 rounded-3xl shadow-2xl text-center"
           style={{
-            transform: hoveredNext ? 'scale(1.03)' : 'scale(1)',
-            transition: 'all 0.2s ease',
-            background: `linear-gradient(to right, var(--teal-medium), var(--success-yellow))`,
+            backgroundColor: "rgba(255,255,255,0.88)",
+            border: "2px solid var(--color-border-light)",
           }}
-          className="w-full py-4 text-white font-bold rounded-2xl shadow-lg"
         >
-          {currentScenarioIndex < scenarios.length - 1
-            ? "Next Scenario"
-            : "See Results"}
-        </button>
+          {lastImpact > 0 ? (
+            <>
+              <StarIcon className="w-16 h-16 mx-auto mb-4" />
+              <h2
+                className="text-2xl font-bold mb-2"
+                style={{ color: "var(--olive-green)" }}
+              >
+                Great Job! 🌿
+              </h2>
+            </>
+          ) : (
+            <>
+              <div className="text-6xl mb-4">🐡</div>
+              <h2
+                className="text-2xl font-bold mb-2"
+                style={{ color: "var(--coral-medium)" }}
+              >
+                Oh No!
+              </h2>
+            </>
+          )}
+
+          <p className="mb-6" style={{ color: "var(--color-text-secondary)" }}>
+            {lastFeedback}
+          </p>
+
+          <div className="mb-6">
+            <div
+              className="text-2xl font-bold mb-1"
+              style={{ color: lastImpact > 0 ? "var(--olive-green)" : "var(--coral-medium)" }}
+            >
+              {lastImpact > 0 ? "+" : ""}{lastImpact} points
+            </div>
+            <div className="text-xl font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Total Score: {score}
+            </div>
+          </div>
+
+          <button
+            onClick={handleNext}
+            onMouseEnter={() => setHoveredNext(true)}
+            onMouseLeave={() => setHoveredNext(false)}
+            className="w-full py-4 text-white font-bold rounded-2xl shadow-lg"
+            style={{
+              background: `linear-gradient(to right, var(--teal-medium), var(--olive-green))`,
+              transform: hoveredNext ? "scale(1.03)" : "scale(1)",
+              transition: "all 0.2s ease",
+            }}
+          >
+            {currentScenarioIndex < scenarios.length - 1 ? "Next Scenario →" : "See Results 🏆"}
+          </button>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FDF6EC] to-[#D6F4FF] p-20 rounded-3xl">
-
+    <div
+      className="relative min-h-[480px] flex items-center justify-center p-6 rounded-3xl"
+      style={{
+        background: `linear-gradient(160deg, var(--sky-blue) 0%, var(--mint-light) 100%)`,
+      }}
+    >
       {bubbleBackground}
 
-      <div className="relative z-10 w-full max-w-2xl p-8 bg-gradient-to-b from-[#FFF9F2] to-[#E8F8F5] rounded-3xl shadow-2xl border-4 border-white">
-        <div className="flex items-center justify-between mb-4">
+      <div
+        className="relative z-10 w-full max-w-2xl p-8 rounded-3xl shadow-2xl"
+        style={{
+          backgroundColor: "rgba(255,255,255,0.88)",
+          border: "2px solid var(--color-border-light)",
+        }}
+      >
+        {/* Header row: scenario counter + score */}
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <FishIcon />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
               Scenario {currentScenarioIndex + 1} of {scenarios.length}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 bg-white px-4 py-1 rounded-full shadow">
+          <div
+            className="flex items-center gap-2 px-4 py-1 rounded-full shadow"
+            style={{ backgroundColor: "rgba(255,255,255,0.9)", border: "1.5px solid var(--color-border-light)" }}
+          >
             <StarIcon className="w-4 h-4" />
-            <span className="font-bold text-gray-700">{score}</span>
+            <span className="font-bold" style={{ color: "var(--color-text-primary)" }}>
+              {score}
+            </span>
           </div>
         </div>
-        <div className="w-full bg-white rounded-full h-3 mb-6 shadow-inner">
+
+        {/* Progress bar */}
+        <div
+          className="w-full rounded-full h-3 mb-6 shadow-inner"
+          style={{ backgroundColor: "var(--peach-soft)" }}
+        >
           <div
-            className="bg-gradient-to-r from-[#76D7C4] to-[#5DADE2] h-3 rounded-full transition-all duration-500"
+            className="h-3 rounded-full transition-all duration-500"
             style={{
-              width: `${((currentScenarioIndex + 1) / scenarios.length) * 100}%`
+              width: `${((currentScenarioIndex + 1) / scenarios.length) * 100}%`,
+              background: `linear-gradient(to right, var(--teal-medium), var(--olive-green))`,
             }}
           />
         </div>
 
-        <OtterMascot message="Let’s take care of your fish farm together! Choose wisely 🐟✨" />
+        {/* Otter mascot */}
+        <OtterMascot message="Let's take care of your fish farm together! Choose wisely, good luck ✨" />
 
-        <div className="mb-6 bg-white p-6 rounded-2xl shadow-md">
+        {/* Scenario card */}
+        <div
+          className="mb-6 p-6 rounded-2xl shadow-md"
+          style={{ backgroundColor: "rgba(255,255,255,0.75)", border: "1.5px solid var(--color-border-light)" }}
+        >
           <div className="flex items-center gap-2 mb-2">
             <LeafIcon />
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
               {currentScenario.title}
             </h2>
           </div>
-
-          <p className="text-gray-700 leading-relaxed">
+          <p className="leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
             {currentScenario.description}
           </p>
         </div>
 
+        {/* Choice buttons */}
         <div className="space-y-4">
-          <p className="font-semibold text-gray-700">What will you do?</p>
+          <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            What will you do?
+          </p>
 
           {shuffledChoices.map((choice, index) => (
             <button
@@ -1046,16 +1127,17 @@ export default function SaveFishFarmGame() {
               onClick={() => handleChoice(choice)}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
+              className="w-full p-4 text-left rounded-2xl shadow-md border-2"
               style={{
-                transform: hoveredIndex === index ? 'scale(1.03)' : 'scale(1)',
-                borderColor: hoveredIndex === index ? '#76D7C4' : 'transparent',
-                transition: 'all 0.2s ease',
+                backgroundColor: hoveredIndex === index ? "var(--mint-light)" : "rgba(255,255,255,0.9)",
+                borderColor: hoveredIndex === index ? "var(--teal-medium)" : "var(--color-border-light)",
+                transform: hoveredIndex === index ? "scale(1.02)" : "scale(1)",
+                transition: "all 0.2s ease",
               }}
-              className="w-full p-4 text-left bg-white rounded-2xl shadow-md border-2"
             >
               <div className="flex items-start gap-3">
                 <BubbleIcon />
-                <span className="text-gray-800">{choice.text}</span>
+                <span style={{ color: "var(--color-text-primary)" }}>{choice.text}</span>
               </div>
             </button>
           ))}
