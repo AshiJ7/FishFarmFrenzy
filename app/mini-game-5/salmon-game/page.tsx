@@ -257,7 +257,19 @@ useEffect(() => {
       <main className="card">
         <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Aquaponics Adventure</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          Blurb about aquaponics and it's benefits goes here. This is the educational section. 
+          What is aquaponics?
+Aquaponics (say it with us: AH-kwuh-PON-iks) is a special way of farming that grows plants and fish at the same time!
+Here's the big secret: fish and plants are best friends in aquaponics.
+So how does it work?
+Step 1 — Fish eat and make waste 🐟
+Fish like salmon live in a big tank of water. Just like you, fish eat food and then make waste (yes, that means fish poop! 💩). That waste goes into the water.
+Step 2 — Tiny helpers clean the water 🦠
+Super tiny living things called bacteria (so small you can't even see them!) eat the fish waste and turn it into plant food called nutrients.
+Step 3 — Plants drink up the nutrients 🥬
+The nutrient-filled water flows to where the plants are growing. The lettuce and other plants drink up those nutrients and grow big and healthy!
+Step 4 — Plants clean the water 💧
+As the plants soak up the nutrients, they clean the water — and then that clean water goes back to the fish tank!
+Then the whole cycle starts all over again! 🔄
         </p>
         <br></br>
         <h2>How to play</h2>
