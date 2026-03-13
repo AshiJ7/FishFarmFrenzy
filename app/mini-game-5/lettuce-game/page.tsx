@@ -22,6 +22,7 @@ export default function LettuceGame() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
+    const [showInfo, setShowInfo] = useState<boolean>(true);
     //setting game objects before so everything is fresh
     const startGame = () => {
       setScore(0);
@@ -165,31 +166,65 @@ useEffect(() => {
 
   return (
     <div className="flex min-h-screen items-center justify-center dark:bg-black">
+      {/* INFO MODAL */}
+      {showInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-4xl">🦦</span>
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-none px-4 py-2 text-sm text-blue-800 font-medium">
+                Hi! I'm Otto the Otter. Let me explain how this works!
+              </div>
+            </div>
+            <h2 className="text-xl font-bold mb-3 text-gray-800">What is a regular farm?</h2>
+            <h4 className="text-medium mb-3 text-gray-800">Have you ever seen a big field full of green plants growing in the dirt? That's a traditional farm!
+On a regular farm, farmers need a lot of things to grow food:</h4>
+            <ul className="space-y-2 text-sm text-gray-700 mb-6">
+              <li className="flex gap-2"><span>🐟</span><span><strong>Water</strong> — They spray water on the plants every single day</span></li>
+              <li className="flex gap-2"><span>🐠</span><span><strong>Soil</strong> — The dirt holds the plants and gives them food</span></li>
+              <li className="flex gap-2"><span>🐟</span><span><strong>Sunlight</strong> — Plants use sunlight to grow big and strong</span></li>
+              <li className="flex gap-2"><span>🐠</span><span><strong>Fertilizer</strong> — Special plant food added to the dirt</span></li>
+            </ul>
+            <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A lettuce farm grows lettuce. A fish farm grows fish. They are always separate!
+Regular farms also use a LOT of water. In fact, it can take up to 250 cups of water just to grow one head of lettuce! Most of that water gets used up or soaks into the ground and is gone. </h4>
+            <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
+
+            <p className="text-sm text-gray-500 mb-6 italic">
+              After you press the start button, you will use your left and right arrow keys to move your basket to collect as much lettuce from the farm as you can.
+          You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
+            </p>
+            <button
+              onClick={() => setShowInfo(false)}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
+            >
+              Let's Play! 🎮
+            </button>
+          </div>
+        </div>
+      )}
       <main className="card">
         <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Lettuce Catcher</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          What is a regular farm?
-Have you ever seen a big field full of green plants growing in the dirt? That's a regular farm! Farmers work really hard to grow vegetables like lettuce for us to eat.
-On a regular farm, farmers need a lot of things to grow food:
-
-🌧️ Water — They spray water on the plants every single day
-🌱 Soil — The dirt holds the plants and gives them food
-☀️ Sunlight — Plants use sunlight to grow big and strong
-🧪 Fertilizer — Special plant food added to the dirt
-
-But here's something to think about... regular farms only grow ONE thing at a time. A lettuce farm grows lettuce. A fish farm grows fish. They are always separate!
-Regular farms also use a LOT of water. In fact, it can take up to 250 cups of water just to grow one head of lettuce! Most of that water gets used up or soaks into the ground and is gone. 
+          Press Start to begin!
         </p>
         <br></br>
-        <h2>How to play</h2>
-        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect as much lettuce from the farm as you can.
-          You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
-        </p>
-        <br></br>
+        {/* Floating otter button — bottom right */}
+        <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-center gap-1">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
+            Learn More
+          </span>
+          <button
+            onClick={() => setShowInfo(true)}
+            className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 text-4xl shadow-lg transition-colors flex items-center justify-center"
+          >
+            🦦
+          </button>
+        </div>
         {!isPlaying && !gameOver && (
     <button className="btn btn-green" onClick={startGame}>Start Game</button>
   )}
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Score : <span>{score}</span></div>
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3)}</span></div>
         {gameOver && (
     <div>
       <p>Game Over!</p>
