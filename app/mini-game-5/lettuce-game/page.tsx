@@ -1,15 +1,7 @@
 "use client";
 import Link from "next/link";
-//What needs to be done:
-//There will be 3 pages for this particular minigame
-//Every page will have the same style of progress, we start with information on the logistics
-//Then there is the game and the user must hit a certain score or time
-// so first game, they will match correctly then go to the next page
-//Second game is falling lettuce and talks about yeild for typical farm
-//Third page is salmon and lettuce
-//for the yield game, there will be a 30 second timer that will count down and a counter
-// of money and amount made as well as resources spent which can be a lower amount of time for the second game
-//same thing will apply for salmon and lettuce to show it is better 
+import grassImg from './grass.jpg';
+
 
 import React, { useState, useEffect, useRef, useCallback} from 'react';
 
@@ -176,7 +168,17 @@ useEffect(() => {
       <main className="card">
         <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Lettuce Catcher</h1>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          Blurb about traditional farm stats goes here. This is the educational section. 
+          What is a regular farm?
+Have you ever seen a big field full of green plants growing in the dirt? That's a regular farm! Farmers work really hard to grow vegetables like lettuce for us to eat.
+On a regular farm, farmers need a lot of things to grow food:
+
+🌧️ Water — They spray water on the plants every single day
+🌱 Soil — The dirt holds the plants and gives them food
+☀️ Sunlight — Plants use sunlight to grow big and strong
+🧪 Fertilizer — Special plant food added to the dirt
+
+But here's something to think about... regular farms only grow ONE thing at a time. A lettuce farm grows lettuce. A fish farm grows fish. They are always separate!
+Regular farms also use a LOT of water. In fact, it can take up to 250 cups of water just to grow one head of lettuce! Most of that water gets used up or soaks into the ground and is gone. 
         </p>
         <br></br>
         <h2>How to play</h2>
@@ -191,7 +193,7 @@ useEffect(() => {
         {gameOver && (
     <div>
       <p>Game Over!</p>
-      <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Retry</button>
+      <button className="btn btn-green" onClick={startGame}>Retry</button>
     </div>
 
   )}
@@ -208,7 +210,9 @@ useEffect(() => {
       height: '400px',
       overflow: 'hidden',
       border: '1px solid #ccc',
-      backgroundColor: '#f0f0f0',
+      backgroundImage: `url(${grassImg.src})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
     }}
   >
     {objects.map(obj => (
