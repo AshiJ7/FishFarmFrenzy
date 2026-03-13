@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import Timer from "./timer";
+import grassImg from "./grass.jpg"
 
 
 import React, { useState, useEffect, useRef, useCallback} from 'react';
@@ -277,10 +277,11 @@ Then the whole cycle starts all over again! 🔄
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
         <br></br>
-        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Score : <span>{score}</span> Salmon Score : <span>{score2}</span></div>
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Caught : <span>{score}</span> Salmon Caught : <span>{score2}</span></div>
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3) + (score2 * 5)}</span></div>
         <div style={{ marginBottom: "10px" }}>
   {!isPlaying && !gameOver && (
-    <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Start Game</button>
+    <button className="btn btn-green" onClick={startGame}>Start Game</button>
   )}
 
   {isPlaying && <div>Time Left: {timeLeft}</div>}
@@ -289,7 +290,7 @@ Then the whole cycle starts all over again! 🔄
   {gameOver && (
     <div>
       <p>Game Over!</p>
-      <button className="p-4 text-left border-2 border-[var(--color-border-light)] rounded-lg hover:border-[var(--teal-medium)] hover:bg-[var(--mint-light)] transition-all text-[var(--color-text-primary)]" onClick={startGame}>Retry</button>
+      <button className="btn btn-green" onClick={startGame}>Retry</button>
     </div>
   )}
 </div>
@@ -303,7 +304,9 @@ Then the whole cycle starts all over again! 🔄
     height: '400px',
     overflow: 'hidden',
     border: '1px solid #ccc',
-    backgroundColor: '#f0f0f0',
+    backgroundImage: `url(${grassImg.src})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
   }}
 >
 
