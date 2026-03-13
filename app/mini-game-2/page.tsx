@@ -17,7 +17,6 @@
 // - "quiz mode" similar idea to game 3, bunch of scenarios with mcq and have to identify whats wrong/how to fix. points based on speed and accuracy 
 // - "challenge mode" where you have to keep the system balanced for a certain amount of time while random events happen (fish getting sick, or a plant dying) and you have to react to them
 
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -93,6 +92,7 @@ export default function MiniGame2() {
   const [showInfo, setShowInfo] = useState<boolean>(true);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
+  //define the scenarios
   const scenarios = {
     balanced: {
       fish: 6,
@@ -197,16 +197,6 @@ export default function MiniGame2() {
       {bubbleBackground}
 
       <style>{`
-        /* Fish bob up/down slightly as they swim (left/right handled via JS-injected per-fish keyframes) */
-        @keyframes fishBob {
-          0%, 100% { margin-top: 0px; }
-          50%       { margin-top: -6px; }
-        }
-        @keyframes fishBobSlow {
-          0%, 100% { margin-top: 0px; }
-          50%       { margin-top: -3px; }
-        }
-
         /* Plant sway */
         @keyframes sway {
           0%, 100% { transform-origin: bottom center; transform: rotate(-4deg); }
@@ -357,31 +347,27 @@ export default function MiniGame2() {
               />
             ))}
 
-            {/* Per-fish swim keyframes injected into a style tag */}
+            {/* Per-fish swim keyframes */}
             <style>{
               Array.from({ length: data.fish }).map((_, i) => {
                 const lane = FISH_LANES[i % FISH_LANES.length];
-                const dur = isUnhealthy ? lane.duration * 2.5 : lane.duration;
+                const dur = isUnhealthy ? lane.duration * 3 : lane.duration;
                 if (lane.startDir === 1) {
-                  // starts at left (0%), swims right to ~88%, flips, swims back
                   return `
                     @keyframes fish-swim-${i} {
                       0%   { left: 2%;  transform: scaleX(1); }
-                      48%  { left: 88%; transform: scaleX(1); }
-                      50%  { left: 88%; transform: scaleX(-1); }
-                      98%  { left: 2%;  transform: scaleX(-1); }
-                      100% { left: 2%;  transform: scaleX(1); }
+                      49%  { left: 85%; transform: scaleX(1); }
+                      51%  { left: 85%; transform: scaleX(-1); }
+                      100% { left: 2%;  transform: scaleX(-1); }
                     }
                   `;
                 } else {
-                  // starts at right (88%), swims left to ~2%, flips, swims back
                   return `
                     @keyframes fish-swim-${i} {
-                      0%   { left: 88%; transform: scaleX(-1); }
-                      48%  { left: 2%;  transform: scaleX(-1); }
-                      50%  { left: 2%;  transform: scaleX(1); }
-                      98%  { left: 88%; transform: scaleX(1); }
-                      100% { left: 88%; transform: scaleX(-1); }
+                      0%   { left: 85%; transform: scaleX(-1); }
+                      49%  { left: 2%;  transform: scaleX(-1); }
+                      51%  { left: 2%;  transform: scaleX(1); }
+                      100% { left: 85%; transform: scaleX(1); }
                     }
                   `;
                 }
@@ -391,23 +377,31 @@ export default function MiniGame2() {
             {/* Fish */}
             {Array.from({ length: data.fish }).map((_, i) => {
               const lane = FISH_LANES[i % FISH_LANES.length];
-              const dur = isUnhealthy ? lane.duration * 2.5 : lane.duration;
+              const dur = isUnhealthy ? lane.duration * 3 : lane.duration;
+              // Use a negative delay to pre-offset each fish into the middle of its cycle,
+              // spreading them across the tank instead of all starting at the same edge.
+              const offset = -(dur * (i / data.fish));
               return (
-                <span
+                <div
                   key={i}
-                  className="absolute text-3xl select-none"
+                  className="absolute"
                   style={{
                     top: `${lane.laneY}%`,
+                    width: "48px",
+                    height: "48px",
                     filter: isUnhealthy ? "saturate(0.4) brightness(0.8)" : "none",
                     transition: "filter 0.6s",
                     zIndex: 3,
-                    display: "inline-block",
-                    animation: `fish-swim-${i} ${dur}s linear infinite, ${isUnhealthy ? "fishBobSlow" : "fishBob"} ${dur / 4}s ease-in-out infinite`,
-                    animationDelay: `${lane.delay}s`,
+                    animation: `fish-swim-${i} ${dur}s linear infinite`,
+                    animationDelay: `${offset}s`,
                   }}
                 >
-                  {data.fishIcon}
-                </span>
+                  <img
+                    src={isUnhealthy ? "/sad_fish.png" : "/happy_fish.png"}
+                    alt="fish"
+                    style={{ width: "48px", height: "48px", objectFit: "contain", display: "block" }}
+                  />
+                </div>
               );
             })}
 
