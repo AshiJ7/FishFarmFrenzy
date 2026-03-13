@@ -50,13 +50,13 @@ export default function MiniGame4() {
       {bubbleBackground}
 
       <main className="relative z-10 flex w-full max-w-3xl flex-col items-center py-8 px-8 bg-gradient-to-b from-[#FFF9F2] to-[#E8F8F5] rounded-3xl shadow-2xl border-4 border-white">
-        <OtterMascot message="Guide your bacteria to eat nutrients and keep the fish alive! Watch that toxicity meter! 🦠" />
+        <OtterMascot message="Switch between Nitrosomonas and Nitrobacter to complete the nitrogen cycle! Ammonia → Nitrite → Nitrate → Plant growth! 🦠🌿" />
 
         <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
-          Control Bacteria
+          Bacteria Battle
         </h1>
         <p className="mb-6 text-center text-[var(--color-text-secondary)]">
-          Guide your bacteria through the tank to eat nutrients and keep the fish alive!
+          Control two types of bacteria to convert ammonia into plant food. Switch with Space or the on-screen button!
         </p>
 
         <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
