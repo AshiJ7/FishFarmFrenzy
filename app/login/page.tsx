@@ -87,7 +87,7 @@ export default function LoginPage() {
           <button
             onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
             className="font-bold underline"
-            style={{ color: "var(--teal-medium)" }}
+            style={{ color: "var(--salmon)", cursor: "pointer"}}
           >
             {isSignUp ? "Sign In" : "Sign Up"}
           </button>
