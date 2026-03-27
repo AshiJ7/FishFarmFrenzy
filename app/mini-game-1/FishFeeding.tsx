@@ -1,5 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useAuth } from "../../context/AuthContext";
+import { db } from "../../lib/firebase";
 
 type Food = {
   id: number;
@@ -12,6 +15,8 @@ type Food = {
 type FishGoodKey = "tilapiaGood" | "troutGood" | "salmonGood";
 
 export default function FishFeeding() {
+  const { user } = useAuth();
+
   // hardcode good and bad foods with boolean for each fish
   const foods: Food[] = [
     {
@@ -138,6 +143,62 @@ export default function FishFeeding() {
   const [fishSelected, setFishSelected] = useState(false);
   const [currentFish, setCurrentFish] = useState("");
   const [fishGood, setFishGood] = useState<FishGoodKey | null>(null);
+  const [bestScore, setBestScore] = useState(0);
+  const [progressStatus, setProgressStatus] = useState("");
+  const hasSavedGameOver = useRef(false);
+
+  // load in users' old progress if it exists
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!user) return;
+
+      const progressRef = doc(db, "users", user.uid, "progress", "miniGame1");
+      const snapshot = await getDoc(progressRef);
+
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const savedBestScore = data.bestScore;
+        if (typeof savedBestScore === "number") {
+          setBestScore(savedBestScore);
+        }
+      }
+    };
+
+    loadProgress().catch(() => {
+      setProgressStatus("Could not load saved progress");
+    });
+  }, [user]);
+
+  const saveProgress = async (finalScore: number) => {
+    if (!user) return;
+
+    const nextBestScore = Math.max(bestScore, finalScore);
+    const progressRef = doc(db, "users", user.uid, "progress", "miniGame1");
+
+    await setDoc(
+      progressRef,
+      {
+        bestScore: nextBestScore,
+        lastScore: finalScore,
+        lastFish: currentFish,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    setBestScore(nextBestScore);
+    setProgressStatus("Progress saved");
+  };
+
+  // save progress when game is over 
+  useEffect(() => {
+    if (!gameOver || hasSavedGameOver.current) return;
+
+    hasSavedGameOver.current = true;
+    saveProgress(score).catch(() => {
+      setProgressStatus("Could not save progress");
+    });
+  }, [gameOver, score, user]);
 
   // randomly selects next food to appear from foods not yet used after current food has been dropped
   function getNextFoodIndex(used: number[]) {
@@ -232,10 +293,12 @@ export default function FishFeeding() {
   const restartGame = () => {
     setScore(0);
     setMessage("");
+    setProgressStatus("");
     setUsedFoodArr([]);
     setFoodNum(Math.floor(Math.random() * foods.length));
     setFishSelected(false);
     setGameOver(false);
+    hasSavedGameOver.current = false;
     setFishSelected(false);
     setCurrentFish("");
     setFishGood(null);
@@ -287,6 +350,7 @@ export default function FishFeeding() {
       <h2 className="text-xl font-bold">
         Score: {score}
       </h2>
+      <p className="text-sm">Best Score: {bestScore}</p>
 
       {/* food blocks */}
       <div className="flex gap-4">
@@ -326,6 +390,7 @@ export default function FishFeeding() {
 
       {/* message for good or bad food */}
       <p className="h-6"> {message} </p>
+      <p className="h-6 text-sm">{progressStatus}</p>
     </div>
   );
 }

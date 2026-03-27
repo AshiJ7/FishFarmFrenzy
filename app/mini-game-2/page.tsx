@@ -1,22 +1,3 @@
-// things to do: 
-// - add image of the cycle as reference as a pop up button on the side 
-// - make otter speech bubble larger
-// - fix the size and text in pop up 
-// - add more scenarios but make it harder to guess the correct answer
-// - when you level up the scenarios will get harder and more complex, more factors to consider (like light, pH, etc) 
-// - pixel art to differentiate between healthy and sad fish and plants 
-// - add more feedback to the quiz answers, like why the correct answer is correct and why wrong is wrong 
-// - second wrong guess will say try one more time 
-// - know what scenario you are in, increase size of text box 
-// - change color and text for the informational boxes 
-// - interactivity in the tank, fish moving around, plants swaying, water bubbling 
-// - add sound effects for correct and incorrect answers
-// - for each quiz option, whether that makes it slightly better or worse, and explain the reasoning behind it in the feedback
-// game additions: 
-// - "sandbox mode" freely adjust num of fish, plants, etc and see real time effects with no right or wrong answers 
-// - "quiz mode" similar idea to game 3, bunch of scenarios with mcq and have to identify whats wrong/how to fix. points based on speed and accuracy 
-// - "challenge mode" where you have to keep the system balanced for a certain amount of time while random events happen (fish getting sick, or a plant dying) and you have to react to them
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -57,8 +38,6 @@ type Scenario =
   | "coldTemp"
   | "noBacteria";
 
-// Each fish swims in a horizontal lane across the full tank
-// startDir: 1 = starts swimming right, -1 = starts swimming left
 const FISH_LANES = [
   { laneY: 8,  duration: 8,  delay: 0,   startDir:  1 },
   { laneY: 22, duration: 11, delay: 2.5, startDir: -1 },
@@ -90,26 +69,22 @@ export default function MiniGame2() {
   const [locked, setLocked] = useState<boolean>(false);
   const [feedback, setFeedback] = useState<string>("");
   const [showInfo, setShowInfo] = useState<boolean>(true);
+  const [showCycle, setShowCycle] = useState<boolean>(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
-  //define the scenarios
   const scenarios = {
     balanced: {
       fish: 6,
       plants: 6,
       waterColor: "#60a5fa",
-      fishIcon: "🐟",
-      plantIcon: "🌿",
-      message: "This is a balanced aquaponics system. Fish waste becomes nitrate, plants absorb it, and water stays clean.",
+      message: "This is a balanced aquaponics system. Fish waste converts to nitrate, plants absorb it as fertilizer, and the water stays clean.",
       quiz: [],
     },
     tooManyFish: {
       fish: 12,
       plants: 3,
       waterColor: "#ef4444",
-      fishIcon: "🐠",
-      plantIcon: "🌱",
-      message: "Too many fish produce excess ammonia. Toxic waste builds up and fish become stressed.",
+      message: "Too many fish means more toxic waste in the water, and this produces excess ammonia. The fish and the plants become sick.",
       quiz: [
         { text: "Add more fish", correct: false },
         { text: "Remove some fish", correct: true },
@@ -120,9 +95,7 @@ export default function MiniGame2() {
       fish: 6,
       plants: 1,
       waterColor: "#facc15",
-      fishIcon: "🐟",
-      plantIcon: "🥀",
-      message: "Without enough plants, nitrate builds up in the water.",
+      message: "Without enough plants, nitrate builds up in the water. This can stress the fish.",
       quiz: [
         { text: "Add more plants", correct: true },
         { text: "Add more fish", correct: false },
@@ -133,9 +106,7 @@ export default function MiniGame2() {
       fish: 6,
       plants: 6,
       waterColor: "#93c5fd",
-      fishIcon: "🐠",
-      plantIcon: "🌱",
-      message: "Cold temperatures slow down nitrifying bacteria. Waste begins to accumulate.",
+      message: "Cold temperatures slow down nitrifying bacteria. Waste from the fish begins to build up, and not enough nitrate is created.",
       quiz: [
         { text: "Lower the temperature more", correct: false },
         { text: "Raise the temperature", correct: true },
@@ -146,9 +117,7 @@ export default function MiniGame2() {
       fish: 6,
       plants: 6,
       waterColor: "#ef4444",
-      fishIcon: "🐟",
-      plantIcon: "🥀",
-      message: "Without bacteria, ammonia and nitrite don't convert to nitrate, which harms the fish and plants.",
+      message: "Without bacteria, ammonia and nitrite (from fish waste) don't convert to nitrate, and the excess waste harms the fish and plants.",
       quiz: [
         { text: "Add more fish", correct: false },
         { text: "Remove plants", correct: false },
@@ -186,9 +155,9 @@ export default function MiniGame2() {
   const bubbleBackground = useMemo(() => <BubbleBackground />, []);
 
   const scenarioButtons = [
-    { key: "tooManyFish",  label: "Too Many Fish",    activeClass: "bg-red-700 border-red-900 ring-2 ring-red-300",       baseClass: "bg-red-500 hover:bg-red-600 border-transparent" },
+    { key: "tooManyFish",  label: "Too Many Fish",    activeClass: "bg-red-700 border-red-900 ring-2 ring-red-300",          baseClass: "bg-red-500 hover:bg-red-600 border-transparent" },
     { key: "tooFewPlants", label: "Too Few Plants",   activeClass: "bg-yellow-600 border-yellow-800 ring-2 ring-yellow-300", baseClass: "bg-yellow-500 hover:bg-yellow-600 border-transparent" },
-    { key: "coldTemp",     label: "Cold Temperature", activeClass: "bg-blue-700 border-blue-900 ring-2 ring-blue-300",     baseClass: "bg-blue-500 hover:bg-blue-600 border-transparent" },
+    { key: "coldTemp",     label: "Cold Temperature", activeClass: "bg-blue-700 border-blue-900 ring-2 ring-blue-300",       baseClass: "bg-blue-500 hover:bg-blue-600 border-transparent" },
     { key: "noBacteria",   label: "No Bacteria",      activeClass: "bg-purple-700 border-purple-900 ring-2 ring-purple-300", baseClass: "bg-purple-500 hover:bg-purple-600 border-transparent" },
   ];
 
@@ -197,7 +166,6 @@ export default function MiniGame2() {
       {bubbleBackground}
 
       <style>{`
-        /* Plant sway */
         @keyframes sway {
           0%, 100% { transform-origin: bottom center; transform: rotate(-4deg); }
           50%       { transform-origin: bottom center; transform: rotate(4deg); }
@@ -206,16 +174,18 @@ export default function MiniGame2() {
           0%, 100% { transform-origin: bottom center; transform: rotate(3deg); }
           50%       { transform-origin: bottom center; transform: rotate(-5deg); }
         }
-
-        /* Water bubbles rising inside tank */
         @keyframes riseUp {
           0%   { transform: translateY(0) scale(1); opacity: 0.7; }
           80%  { opacity: 0.5; }
           100% { transform: translateY(-220px) scale(0.6); opacity: 0; }
         }
+        @keyframes popIn {
+          0%   { opacity: 0; transform: scale(0.92) translateY(8px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
       `}</style>
 
-      {/* INFO MODAL */}
+      {/* OTTER INFO MODAL */}
       {showInfo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
@@ -248,20 +218,68 @@ export default function MiniGame2() {
         </div>
       )}
 
+      {/* NITROGEN CYCLE IMAGE POPUP */}
+      {showCycle && (
+        <div
+          className="fixed bottom-36 right-6 z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-80"
+          style={{ animation: "popIn 0.2s ease-out" }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-gray-800 text-sm">The Nitrogen Cycle</h3>
+            <button
+              onClick={() => setShowCycle(false)}
+              className="text-gray-400 hover:text-gray-600 text-lg leading-none font-bold"
+            >
+              ×
+            </button>
+          </div>
+          <img
+            src="/nitrogen-cycle.png"
+            alt="Nitrogen Cycle Diagram"
+            className="w-full rounded-lg object-contain"
+          />
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            Fish → Ammonia → Nitrite → Nitrate → Plants → Clean Water
+          </p>
+        </div>
+      )}
+
       {/* MAIN GAME */}
       <main className="relative z-10 flex w-full min-h-screen flex-col items-center py-10 px-6 lg:px-16">
 
-        {/* Floating otter button — bottom right */}
-        <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-center gap-1">
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
-            Learn More
-          </span>
-          <button
-            onClick={() => setShowInfo(true)}
-            className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 shadow-lg transition-colors flex items-center justify-center overflow-hidden p-1"
-          >
-            <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
-          </button>
+        {/* Floating buttons — bottom right stack */}
+        <div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-3">
+
+          {/* Nitrogen cycle button */}
+          <div className="group flex flex-col items-center gap-1">
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none whitespace-nowrap">
+              Image Of The Nitrogen Cycle
+            </span>
+            <button
+              onClick={() => { setShowCycle((v) => !v); setShowInfo(false); }}
+              className={`border-2 rounded-full w-20 h-20 shadow-lg transition-all flex items-center justify-center text-3xl
+                ${showCycle
+                  ? "bg-green-200 border-green-400 scale-110"
+                  : "bg-green-100 hover:bg-green-200 border-green-300"
+                }`}
+            >
+              <img src="/happy_plant.png" alt="otter" className="w-full h-full object-contain" />
+            </button>
+          </div>
+
+
+          {/* Otter button */}
+          <div className="group flex flex-col items-center gap-1">
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
+              Learn More About The Game
+            </span>
+            <button
+              onClick={() => { setShowInfo(true); setShowCycle(false); }}
+              className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 shadow-lg transition-colors flex items-center justify-center overflow-hidden p-1"
+            >
+              <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+            </button>
+          </div>
         </div>
 
         {/* Page header */}
@@ -317,18 +335,12 @@ export default function MiniGame2() {
               height: "300px",
             }}
           >
-            {/* Water background */}
-            <div
-              className="absolute inset-0 transition-colors duration-700"
-              style={{ backgroundColor: data.waterColor }}
-            />
-
-            {/* Shimmer */}
+            <div className="absolute inset-0 transition-colors duration-700" style={{ backgroundColor: data.waterColor }} />
             <div className="absolute inset-0 pointer-events-none" style={{
               background: "linear-gradient(160deg, rgba(255,255,255,0.25) 0%, transparent 55%)"
             }} />
 
-            {/* Water bubbles inside tank */}
+            {/* Water bubbles */}
             {WATER_BUBBLES.map((b, i) => (
               <div
                 key={i}
@@ -378,8 +390,6 @@ export default function MiniGame2() {
             {Array.from({ length: data.fish }).map((_, i) => {
               const lane = FISH_LANES[i % FISH_LANES.length];
               const dur = isUnhealthy ? lane.duration * 3 : lane.duration;
-              // Use a negative delay to pre-offset each fish into the middle of its cycle,
-              // spreading them across the tank instead of all starting at the same edge.
               const offset = -(dur * (i / data.fish));
               return (
                 <div
@@ -414,7 +424,6 @@ export default function MiniGame2() {
                 zIndex: 4,
               }}
             >
-              {/* Pebbles */}
               {[8, 22, 38, 55, 68, 80, 91].map((pos, i) => (
                 <div key={i} className="absolute rounded-full" style={{
                   left: `${pos}%`, bottom: `${4 + (i % 4) * 3}px`,
@@ -422,46 +431,61 @@ export default function MiniGame2() {
                   backgroundColor: i % 2 === 0 ? "#92622a" : "#7a4f20", opacity: 0.5,
                 }} />
               ))}
-
-              {/* Plants with sway animation */}
               {Array.from({ length: data.plants }).map((_, i) => (
-                <span
-                  key={i}
-                  className="absolute text-3xl select-none"
+              <div
+                key={i}
+                className="absolute"
+                style={{
+                  left: `${(i + 0.8) * (88 / (data.plants + 1))}%`,
+                  bottom: "10px",
+                  zIndex: 5,
+                  display: "inline-block",
+                  animation: `${i % 2 === 0 ? "sway" : "swayAlt"} ${
+                    2.5 + (i % 3) * 0.5
+                  }s ease-in-out infinite`,
+                  animationDelay: `${(i * 0.4) % 2}s`,
+                }}
+              >
+                <img
+                  src={isUnhealthy ? "/sad_plant.png" : "/happy_plant.png"}
+                  alt="plant"
                   style={{
-                    left: `${(i + 0.8) * (88 / (data.plants + 1))}%`,
-                    bottom: "10px",
-                    lineHeight: 1,
-                    zIndex: 5,
-                    display: "inline-block",
-                    animation: `${i % 2 === 0 ? "sway" : "swayAlt"} ${2.5 + (i % 3) * 0.5}s ease-in-out infinite`,
-                    animationDelay: `${(i * 0.4) % 2}s`,
+                    width: "48px",
+                    height: "48px",
+                    objectFit: "contain",
+                    filter: isUnhealthy
+                      ? "saturate(0.5) brightness(0.85)"
+                      : "none",
+                    transition: "filter 0.6s",
                   }}
-                >
-                  {data.plantIcon}
-                </span>
-              ))}
+                />
+              </div>
+            ))}
             </div>
           </div>
 
           {/* Info + stats row */}
           <div className="flex gap-3 mt-4">
             <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-center shadow-sm min-w-[80px]">
-              <div className="text-2xl mb-0.5">🐟</div>
+              <div className="mb-0.5 flex justify-center">
+                <img src={isUnhealthy ? "/sad_fish.png" : "/happy_fish.png"} alt="fish" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
+              </div>
               <div className="text-xl font-bold text-blue-600">{data.fish}</div>
               <div className="text-xs text-gray-400 font-medium">Fish</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-center shadow-sm min-w-[80px]">
-              <div className="text-2xl mb-0.5">🌿</div>
+              <div className="mb-0.5 flex justify-center">
+                <img src={isUnhealthy ? "/sad_plant.png" : "/happy_plant.png"} alt="plant" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
+              </div>
               <div className="text-xl font-bold text-green-600">{data.plants}</div>
               <div className="text-xs text-gray-400 font-medium">Plants</div>
             </div>
             <div
               className="flex-1 rounded-xl px-5 py-3 flex items-center gap-3 border shadow-sm"
-              style={{ backgroundColor: `${data.waterColor}22`, borderColor: `${data.waterColor}88` }}
+              style={{ backgroundColor: `${data.waterColor}66`, borderColor: `${data.waterColor}88` }}
             >
               <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: data.waterColor }} />
-              <p className="text-sm text-gray-700 leading-snug">{data.message}</p>
+              <p className="text-base md:text-lg font-medium text-gray-800 leading-relaxed">{data.message}</p>
             </div>
           </div>
         </div>
@@ -516,3 +540,19 @@ export default function MiniGame2() {
     </div>
   );
 }
+
+
+// things to do: 
+// - make otter speech bubble larger
+// - fix the size and text in pop up 
+// - add more scenarios but make it harder to guess the correct answer
+// - when you level up the scenarios will get harder and more complex, more factors to consider (like light, pH, etc) 
+// - add more feedback to the quiz answers, like why the correct answer is correct and why wrong is wrong 
+// - second wrong guess will say try one more time 
+// - add sound effects for correct and incorrect answers
+// - when game is finished, pop up to go to next game? 
+// - for each quiz option, whether that makes it slightly better or worse, and explain the reasoning behind it in the feedback
+// game additions: 
+// - "sandbox mode" freely adjust num of fish, plants, etc and see real time effects with no right or wrong answers 
+// - "quiz mode" similar idea to game 3, bunch of scenarios with mcq and have to identify whats wrong/how to fix. points based on speed and accuracy 
+// - "challenge mode" where you have to keep the system balanced for a certain amount of time while random events happen (fish getting sick, or a plant dying) and you have to react to them
