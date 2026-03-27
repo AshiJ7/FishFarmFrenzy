@@ -171,7 +171,9 @@ useEffect(() => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🦦</span>
+              <span className="text-4xl">
+                <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
               <div className="bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-none px-4 py-2 text-sm text-blue-800 font-medium">
                 Hi! I'm Otto the Otter. Let me explain how this works!
               </div>
@@ -187,12 +189,6 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
             </ul>
             <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A lettuce farm grows lettuce. A fish farm grows fish. They are always separate!
 Regular farms also use a LOT of water. In fact, it can take up to 250 cups of water just to grow one head of lettuce! Most of that water gets used up or soaks into the ground and is gone. </h4>
-            <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
-
-            <p className="text-sm text-gray-500 mb-6 italic">
-              After you press the start button, you will use your left and right arrow keys to move your basket to collect as much lettuce from the farm as you can.
-          You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
-            </p>
             <button
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
@@ -204,6 +200,12 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
       )}
       <main className="card">
         <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Lettuce Catcher</h1>
+        <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
+
+            <p className="text-sm text-gray-500 mb-6 italic">
+              After you press the start button, you will use your left and right arrow keys to move your basket to collect as much lettuce from the farm as you can.
+          You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
+            </p>
         <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
           Press Start to begin!
         </p>
