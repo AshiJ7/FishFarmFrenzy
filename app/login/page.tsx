@@ -1,27 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
   const { signIn, signUp } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams?.get("from") || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     try {
       if (isSignUp) {
-        await signUp(email, password);
+        await signUp(name, email, password);
       } else {
         await signIn(email, password);
       }
-      router.push("/");
+  router.replace(from);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Something went wrong";
       setError(message);
@@ -58,6 +61,17 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {isSignUp && (
+            <input
+              type="text"
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required={isSignUp}
+              className="rounded-xl border-2 px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--teal-medium)]"
+              style={{ borderColor: "var(--color-border-light)", color: "var(--color-text-primary)" }}
+            />
+          )}
           <input
             type="email"
             placeholder="Email"

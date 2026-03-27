@@ -11,7 +11,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user && pathname !== "/login") {
-      router.push("/login");
+      // Append a redirect query so the login page can return the user to where they tried to go
+      const redirectTo = encodeURIComponent(pathname || "/");
+      router.push(`/login?from=${redirectTo}`);
     }
   }, [user, loading, pathname, router]);
 
