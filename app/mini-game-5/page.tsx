@@ -68,7 +68,9 @@ export default function MiniGame5() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🦦</span>
+              <span className="text-4xl">
+                <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
               <div className="bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-none px-4 py-2 text-sm text-blue-800 font-medium">
                 Hi! I'm Otto the Otter. Let me explain how this works!
               </div>
@@ -81,13 +83,6 @@ export default function MiniGame5() {
               <li className="flex gap-2"><span>🐟</span><span><strong>Catfish</strong> helps tomatoes and cucumbers!</span></li>
               <li className="flex gap-2"><span>🐠</span><span><strong>Koi</strong> is friends with watercress and mint!</span></li>
             </ul>
-            <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
-
-            <p className="text-sm text-gray-500 mb-6 italic">
-              Below are cards with different crops and different fish. Using what you just learned,
-    click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair and gotten a score of 3,
-    continue to the next game.
-            </p>
             <button
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
@@ -119,18 +114,25 @@ export default function MiniGame5() {
     Fish & Crop Match
   </h1>
 
-  
-  <h2 className="text-left mt-4 text-xl">
+  <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
+
+            <p className="text-sm text-gray-500 mb-6 italic">
+              Below are cards with different crops and different fish. Using what you just learned,
+    click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair and gotten a score of 3,
+    continue to the next game.
+            </p>
+            <h2 className="text-center mt-4 text-xl">
     Press Start to begin
   </h2>
   <br></br>
+  
 
 
 </div>
 
       <div style={{ marginBottom: "10px" }}>
   {!isPlaying && !gameOver && (
-    <button className="btn btn-green" onClick={startGame}>Start Game</button>
+    <button className="btn btn-green " onClick={startGame}>Start Game</button>
   )}
 
   {isPlaying && ( 
