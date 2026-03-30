@@ -298,6 +298,20 @@ Then the whole cycle starts all over again! 🔄</span></li>
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
         <br></br>
+        {/* Floating otter button — bottom right */}
+        <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-center gap-1">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
+            Learn More
+          </span>
+          <button
+            onClick={() => setShowInfo(true)}
+            className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 text-4xl shadow-lg transition-colors flex items-center justify-center"
+          >
+            <span className="text-4xl">
+                <img src="../otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
+          </button>
+        </div>
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Tomatos Caught : <span>{score}</span> Tilapia Caught : <span>{score2}</span></div>
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3) + (score2 * 5)}</span></div>
         <div style={{ marginBottom: "10px" }}>
