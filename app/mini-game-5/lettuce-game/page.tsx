@@ -23,6 +23,7 @@ export default function LettuceGame() {
     const [gameOver, setGameOver] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
     const [showInfo, setShowInfo] = useState<boolean>(true);
+    const [showCompletion, setShowCompletion] = useState(false);
     //setting game objects before so everything is fresh
     const startGame = () => {
       setScore(0);
@@ -30,6 +31,7 @@ export default function LettuceGame() {
       setTimeLeft(30);
       setGameOver(false);
       setIsPlaying(true);
+      setShowCompletion(false);
     };
 
     useEffect(() => {
@@ -38,6 +40,7 @@ export default function LettuceGame() {
       if (timeLeft <= 0) {
         setIsPlaying(false);
         setGameOver(true);
+        setShowCompletion(true);
         return;
       }
     
@@ -294,6 +297,36 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
   </div>
 )}
 
+{showCompletion && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 text-center">
+      <div className="text-5xl mb-3">🏆</div>
+      <h2 className="text-xl font-bold mb-2 text-gray-800">Great job catching tomatoes and tilapia!</h2>
+      <p className="text-medium text-gray-500 italic" id="counter">You ended up catching <span>{score}</span> tomatoes!</p>
+      <p className="text-medium text-gray-500 mb-3 italic" id="counter">In total you earned  $<span>{(score * 3)}</span>!!!</p>
+      <p className="text-medium text-gray-500 mb-3 italic">
+        Great job! Want to play again and earn more? Or return home for a new game?
+      </p>
+      <div className="flex gap-3 justify-center">
+        <button
+          onClick={startGame}
+          className="btn btn-mint"
+        >
+          🔄 Play Again
+        </button>
+        
+          <a href="/mini-game-5/salmon-game"
+          className="btn btn-green"
+        >
+          Next Game 🐟
+        </a>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
 
 
 
@@ -301,7 +334,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
           <Link href="/" className="text-foreground">Home</Link>
           {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
           <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link>
+          {/* <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link> */}
         </nav>
       </main>
     </div>
