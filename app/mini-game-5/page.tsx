@@ -135,7 +135,9 @@ export default function MiniGame5() {
 
       <div style={{ marginBottom: "10px" }}>
   {!isPlaying && !gameOver && (
-    <button className="btn btn-green " onClick={startGame}>Start Game</button>
+    <div className="flex justify-center">
+    <button className="btn btn-green" onClick={startGame}>Start Game</button>
+  </div>
   )}
 
   {isPlaying && ( 
@@ -157,7 +159,7 @@ export default function MiniGame5() {
           <Link href="/" className="text-foreground">Home</Link>
           {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
           <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link>
+          {/* <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link> */}
         </nav>
       </main>
       

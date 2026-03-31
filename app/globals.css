@@ -117,7 +117,7 @@ body {
 
 
 .btn-mint {
-    background: var(--mint-light);
+    background: var(--sky-blue);
     color: var(--forest-green);
     box-shadow: 0 3px 10px rgba(170,239,223,0.5);
 }
