@@ -6,25 +6,29 @@ type Crop = {
   id: number;
   name: string;
   fishMatch: number;
+  image: string;
 };
 
 type Fish ={
     id: number;
     name: string;
+    image: string;
 }
 
 export default function FishCropMatch() {
   
   const crops: Crop[] = [
-    { id: 1, name: "Lettuce", fishMatch: 1 },
-    { id: 2, name: "Spinach", fishMatch: 3 },
-    { id: 3, name: "Cucumbers", fishMatch: 2 },
+    { id: 1, name: "Tomato", fishMatch: 1, image: "./tomato.png"},
+    { id: 2, name: "Spinach", fishMatch: 3, image: "./spinach.png"},
+    { id: 3, name: "Cucumber", fishMatch: 2, image: "./cucumber.png"},
+    { id: 4, name: "Watercress", fishMatch: 4, image: "./watercress.png"},
   ];
 
   const fish: Fish[] = [
-    { id: 1, name: "Tilapia" },
-    { id: 2, name: "Catfish" },
-    { id: 3, name: "Trout" },
+    { id: 1, name: "Tilapia", image: "./tilapia.png" },
+    { id: 2, name: "Catfish", image: "./catfish.png"},
+    { id: 3, name: "Trout", image: "./trout.png"},
+    { id: 4, name: "Koi", image: "./koi.png"},
   ];
 
   const [score, setScore] = useState(0);
@@ -84,7 +88,8 @@ export default function FishCropMatch() {
             onDragStart={(e) => handleDraggingStart(e, crop)}
             className="stat-card plants"
           >
-            {crop.name}
+            <img src={crop.image} alt={crop.name} className="w-16 h-16 object-contain" />
+            <span>{crop.name}</span>
           </div>
         ))}
       </div>
@@ -98,7 +103,8 @@ export default function FishCropMatch() {
             onDrop={(e) => handleDrop(e, f.id)}
             className="stat-card water"
           >
-            {f.name}
+            <img src={f.image} alt={f.name} className="w-16 h-16 object-contain" />
+            <span>{f.name}</span>
           </div>
         ))}
       </div>
