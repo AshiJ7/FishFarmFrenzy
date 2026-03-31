@@ -7,6 +7,7 @@ import { db } from "../../lib/firebase";
 type Food = {
   id: number;
   name: string;
+  image: string;
   tilapiaGood: boolean;
   troutGood: boolean;
   salmonGood: boolean;
@@ -16,12 +17,18 @@ type FishGoodKey = "tilapiaGood" | "troutGood" | "salmonGood";
 
 export default function FishFeeding() {
   const { user } = useAuth();
+  const fishImagePaths: Record<string, string> = {
+    Tilapia: "/tilapia_image.png",
+    Trout: "/trout_image.png",
+    Salmon: "/salmon_image.png",
+  };
 
   // hardcode good and bad foods with boolean for each fish
   const foods: Food[] = [
     {
       id: 1,
       name: "Cookies",
+      image: "/cookies.png",
       tilapiaGood: false,
       troutGood: false,
       salmonGood: false
@@ -29,6 +36,7 @@ export default function FishFeeding() {
     {
       id: 2,
       name: "Algae",
+      image: "/water_plant.png",
       tilapiaGood: true,
       troutGood: false,
       salmonGood: false
@@ -36,6 +44,7 @@ export default function FishFeeding() {
     {
       id: 3,
       name: "Cake",
+      image: "/cake.png",
       tilapiaGood: false,
       troutGood: false,
       salmonGood: false
@@ -43,6 +52,7 @@ export default function FishFeeding() {
     {
       id: 4,
       name: "Duckweed",
+      image: "/water_plant.png",
       tilapiaGood: true,
       troutGood: false,
       salmonGood: false
@@ -50,6 +60,7 @@ export default function FishFeeding() {
     {
       id: 5,
       name: "Water lettuce",
+      image: "/water_plant.png",
       tilapiaGood: true,
       troutGood: false,
       salmonGood: false
@@ -57,6 +68,7 @@ export default function FishFeeding() {
     {
       id: 6,
       name: "Rice bran",
+      image: "/rice_bran.png",
       tilapiaGood: true,
       troutGood: false,
       salmonGood: false
@@ -64,6 +76,7 @@ export default function FishFeeding() {
     {
       id: 7,
       name: "Corn meal",
+      image: "/fish_meal.png",
       tilapiaGood: true,
       troutGood: false,
       salmonGood: false
@@ -71,6 +84,7 @@ export default function FishFeeding() {
     {
       id: 8,
       name: "Soybean meal",
+      image: "/fish_meal.png",
       tilapiaGood: true,
       troutGood: false,
       salmonGood: false
@@ -78,6 +92,7 @@ export default function FishFeeding() {
     {
       id: 9,
       name: "Mayflies",
+      image: "/fly.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -85,6 +100,7 @@ export default function FishFeeding() {
     {
       id: 10,
       name: "Stoneflies",
+      image: "/fly.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -92,6 +108,7 @@ export default function FishFeeding() {
     {
       id: 11,
       name: "Caddisflies",
+      image: "/fly.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -99,6 +116,7 @@ export default function FishFeeding() {
     {
       id: 12,
       name: "Crawfish",
+      image: "/shrimp.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -106,6 +124,7 @@ export default function FishFeeding() {
     {
       id: 13, 
       name: "Worms",
+      image: "/worms.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -113,6 +132,7 @@ export default function FishFeeding() {
     {
       id: 14,
       name: "Herring",
+      image: "/herring.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -120,6 +140,7 @@ export default function FishFeeding() {
     {
       id: 15,
       name: "Shrimp",
+      image: "/shrimp.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -127,6 +148,7 @@ export default function FishFeeding() {
     {
       id: 16,
       name: "Krill",
+      image: "/shrimp.png",
       tilapiaGood: false,
       troutGood: true,
       salmonGood: true
@@ -146,6 +168,7 @@ export default function FishFeeding() {
   const [bestScore, setBestScore] = useState(0);
   const [progressStatus, setProgressStatus] = useState("");
   const hasSavedGameOver = useRef(false);
+  const currentFishImage = fishImagePaths[currentFish] ?? "";
 
   // load in users' old progress if it exists
   useEffect(() => {
@@ -314,10 +337,15 @@ export default function FishFeeding() {
             <button
               key={fishName}
               name={fishName}
-              className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black hover:bg-gray-200"
+              className="flex h-30 w-30 flex-col items-center justify-center gap-2 border-1 border-solid border-black hover:bg-gray-200"
               onClick={handleFishSelection}
             >
-              {fishName}
+              <img
+                src={fishImagePaths[fishName]}
+                alt={fishName}
+                className="pointer-events-none h-12 w-12 select-none object-contain"
+              />
+              <span>{fishName}</span>
             </button>
           ))}
 
@@ -360,6 +388,11 @@ export default function FishFeeding() {
             onDragStart={(e) => handleDraggingStart(e, foods[foodNum])}
             className="cursor-grab solid border border-black px-6 py-4 bg-white-100 hover:bg-gray-200"
           >
+            <img
+              src={foods[foodNum].image}
+              alt={foods[foodNum].name}
+              className="pointer-events-none h-12 w-12 select-none object-contain"
+            />
             {foods[foodNum].name}
           </div>
       </div>
@@ -369,21 +402,29 @@ export default function FishFeeding() {
         <div
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className="flex h-30 w-30 items-center justify-center border-1 border-solid border-black fish"
+          className="fish flex h-30 w-30 flex-col items-center justify-center gap-1 border-1 border-solid border-black"
         >
-          {currentFish}
+          {currentFishImage && (
+            <img
+              src={currentFishImage}
+              alt={currentFish}
+              className="pointer-events-none h-12 w-12 select-none object-contain"
+            />
+          )}
+          <span>{currentFish}</span>
         </div>
 
         <div
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className="trash flex h-30 w-30 flex-col items-center justify-center gap-0 overflow-hidden border-1 border-solid border-black"
+          className="trash flex h-30 w-30 flex-col items-center justify-center gap-1 border-1 border-solid border-black"
         >
           <img
             src="/trashcan.png"
             alt="trash can"
-            className="pointer-events-none h-30 w-30 scale-200 select-none object-contain px-5"
+            className="pointer-events-none h-12 w-12 select-none object-contain"
           />
+          Trash
           {/* <span className="text-[10px] leading-none">Trash</span> */}
         </div>
       </div>
