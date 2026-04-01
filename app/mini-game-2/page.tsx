@@ -301,6 +301,7 @@ export default function MiniGame2() {
   const [activeTab, setActiveTab] = useState<Tab>("learn");
   const [showInfo, setShowInfo] = useState<boolean>(true);
   const [showCycle, setShowCycle] = useState<boolean>(false);
+  const [score, setScore] = useState<number>(0);
 
   //states for learn mode
   const [scenario, setScenario] = useState<Scenario>("balanced");
@@ -330,7 +331,7 @@ export default function MiniGame2() {
     setSelectedAnswer(null);
     setWrongGuesses(0);
   };
-
+  
   //check the selection of quiz answers 
   const handleAnswer = (option: QuizOption, index: number) => {
     if (locked) return;
@@ -338,6 +339,14 @@ export default function MiniGame2() {
     if (option.correct) {
       setLocked(true);
       setFeedback(option.feedback);
+      //determine score and prevent farming points
+      if (!completedScenarios.has(scenario)) {
+        if (wrongGuesses === 0) {
+          setScore((prev) => prev + 5);
+        } else if (wrongGuesses === 1) {
+          setScore((prev) => prev + 2);
+        }
+      }
       const newCompleted = new Set(completedScenarios);
       newCompleted.add(scenario);
       setCompletedScenarios(newCompleted);
@@ -405,9 +414,9 @@ export default function MiniGame2() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl p-8">
             <div className="flex items-start gap-4 mb-6">
-              <div className="shrink-0 w-20 h-20 rounded-full overflow-hidden border-2 border-blue-200 bg-blue-50 flex items-center justify-center">
-                <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
-              </div>
+              <div className="shrink-0 w-40 h-40 flex items-center justify-center">
+  <img src="/otter.png" alt="otter" className="w-40 h-40 object-contain drop-shadow-md" />
+</div>
               <div className="flex-1 bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-none px-5 py-4 text-sm text-blue-800 font-medium leading-relaxed">
                 Welcome! I'm Otto the Otter. Together, let's learn about the nitrogen cycle in an aquaponics system, and how to keep the system balanced!
               </div>
@@ -442,9 +451,12 @@ export default function MiniGame2() {
             <p className="text-gray-500 mb-6">
               You've solved all {SCENARIO_ORDER.length} scenarios and mastered the nitrogen cycle. Your aquaponics system is thriving!
             </p>
+            <p className="text-lg font-bold text-teal-600 mb-6">
+              Final Score: {score}
+            </p>
             <div className="flex flex-col gap-3">
               <button
-                onClick={() => { setShowFinish(false); setCompletedScenarios(new Set()); setScenario("balanced"); }}
+                onClick={() => { setShowFinish(false); setCompletedScenarios(new Set()); setScenario("balanced"); setScore(0); }}
                 className="w-full border-2 border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 Play Again
@@ -515,6 +527,8 @@ export default function MiniGame2() {
           </h1>
         </div>
 
+        
+
         {/* tabs for the two modes */}
         <div className="flex rounded-xl overflow-hidden border-2 border-gray-200 mb-3 w-full max-w-xs shadow-sm">
           {([ ["learn", "Learn Mode"], ["sandbox", "Sandbox Mode"] ] as [Tab, string][]).map(([tab, label]) => (
@@ -528,6 +542,11 @@ export default function MiniGame2() {
               {label}
             </button>
           ))}
+        </div>
+
+        <div className="absolute top-6 right-6 z-40 bg-white/80 backdrop-blur-md border border-gray-200 rounded-xl px-4 py-2 shadow-md">
+          <span className="text-sm font-semibold text-gray-600">Score:</span>
+          <span className="ml-2 text-lg font-bold text-teal-600">{score}</span>
         </div>
 
         {/* info about the mode */}
