@@ -50,7 +50,7 @@ export default function MiniGame1() {
   
   
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans dark:bg-black">
+    <div className="flex min-h-screen items-start justify-center px-4 py-6 font-sans dark:bg-black">
         {bubbleBackground}
 
       {/* INFO MODAL */}
@@ -97,7 +97,7 @@ export default function MiniGame1() {
           </button>
         </div>
 
-      <main className="card">
+      <main className="card mt-4 mb-4">
         <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50"> Fish Feeding </h1>
         <p className="mt-2 text-center text-zinc-600 dark:text-zinc-400">
           Pick the best food for your fish to keep them healthy!
