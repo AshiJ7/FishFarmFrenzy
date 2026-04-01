@@ -34,6 +34,9 @@ export default function Header() {
           <Link href="/" className="text-2xl font-extrabold" style={{ color: "var(--color-text-primary)" }}>
             Home
           </Link>
+          <Link href="/profile" className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+            Profile
+          </Link>
           <nav className="flex items-center gap-2 text-sm">
             {[
               { n: 1, label: "Feeding Frenzy" },
