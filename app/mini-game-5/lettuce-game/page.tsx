@@ -23,6 +23,7 @@ export default function LettuceGame() {
     const [gameOver, setGameOver] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
     const [showInfo, setShowInfo] = useState<boolean>(true);
+    const [showCompletion, setShowCompletion] = useState(false);
     //setting game objects before so everything is fresh
     const startGame = () => {
       setScore(0);
@@ -30,6 +31,7 @@ export default function LettuceGame() {
       setTimeLeft(30);
       setGameOver(false);
       setIsPlaying(true);
+      setShowCompletion(false);
     };
 
     useEffect(() => {
@@ -38,6 +40,7 @@ export default function LettuceGame() {
       if (timeLeft <= 0) {
         setIsPlaying(false);
         setGameOver(true);
+        setShowCompletion(true);
         return;
       }
     
@@ -187,7 +190,7 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
               <li className="flex gap-2"><span>🐟</span><span><strong>Sunlight</strong> — Plants use sunlight to grow big and strong</span></li>
               <li className="flex gap-2"><span>🐠</span><span><strong>Fertilizer</strong> — Special plant food added to the dirt</span></li>
             </ul>
-            <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A lettuce farm grows lettuce. A fish farm grows fish. They are always separate!
+            <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A tomato farm grows tomatos. A fish farm grows fish. They are always separate!
 Regular farms also use a LOT of water. In fact, it can take up to 250 cups of water just to grow one head of lettuce! Most of that water gets used up or soaks into the ground and is gone. </h4>
             <button
               onClick={() => setShowInfo(false)}
@@ -199,7 +202,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
         </div>
       )}
       <main className="card">
-        <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Lettuce Catcher</h1>
+        <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Tomato Catcher</h1>
         <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
 
             <p className="text-sm text-gray-500 mb-6 italic">
@@ -219,13 +222,15 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
             onClick={() => setShowInfo(true)}
             className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 text-4xl shadow-lg transition-colors flex items-center justify-center"
           >
-            🦦
+            <span className="text-4xl">
+                <img src="../otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
           </button>
         </div>
         {!isPlaying && !gameOver && (
     <button className="btn btn-green" onClick={startGame}>Start Game</button>
   )}
-        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Score : <span>{score}</span></div>
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Tomato Score : <span>{score}</span></div>
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3)}</span></div>
         {gameOver && (
     <div>
@@ -259,13 +264,14 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
           position: 'absolute',
           top: `${obj.y}px`,
           left: `${obj.x}px`,
-          width: '30px',
-          height: '30px',
+          width: '40px',
+          height: '40px',
           borderRadius: '50%',
           fontSize:'20pt',
           
         }}
-        >🥬
+        >
+          <img src="../tomato.png" alt="tomato" className="object-contain" />
       </div>
     ))}
 
@@ -291,6 +297,36 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
   </div>
 )}
 
+{showCompletion && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 text-center">
+      <div className="text-5xl mb-3">🏆</div>
+      <h2 className="text-xl font-bold mb-2 text-gray-800">Great job catching tomatoes and tilapia!</h2>
+      <p className="text-medium text-gray-500 italic" id="counter">You ended up catching <span>{score}</span> tomatoes!</p>
+      <p className="text-medium text-gray-500 mb-3 italic" id="counter">In total you earned  $<span>{(score * 3)}</span>!!!</p>
+      <p className="text-medium text-gray-500 mb-3 italic">
+        Great job! Want to play again and earn more? Or return home for a new game?
+      </p>
+      <div className="flex gap-3 justify-center">
+        <button
+          onClick={startGame}
+          className="btn btn-mint"
+        >
+          🔄 Play Again
+        </button>
+        
+          <a href="/mini-game-5/salmon-game"
+          className="btn btn-green"
+        >
+          Next Game 🐟
+        </a>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
 
 
 
@@ -298,7 +334,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 250 cups of wa
           <Link href="/" className="text-foreground">Home</Link>
           {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
           <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link>
+          {/* <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link> */}
         </nav>
       </main>
     </div>

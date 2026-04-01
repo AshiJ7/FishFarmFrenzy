@@ -29,7 +29,9 @@ export default function SalmonGame() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [showCompletion, setShowCompletion] = useState(false);
   //setting game objects before so everything is fresh
+  const [showInfo, setShowInfo] = useState<boolean>(true);
   const startGame = () => {
     setScore(0);
     setScore2(0);
@@ -38,6 +40,7 @@ export default function SalmonGame() {
     setTimeLeft(30);
     setGameOver(false);
     setIsPlaying(true);
+    setShowCompletion(false);
   };
 
   useEffect(() => {
@@ -46,6 +49,7 @@ export default function SalmonGame() {
   if (timeLeft <= 0) {
     setIsPlaying(false);
     setGameOver(true);
+    setShowCompletion(true);
     return;
   }
 
@@ -254,30 +258,64 @@ useEffect(() => {
 
   return (
     <div className="flex min-h-screen items-center justify-center dark:bg-black">
+      {/* INFO MODAL */}
+      {showInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-4xl">
+                <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-none px-4 py-2 text-sm text-blue-800 font-medium">
+                Hi! I'm Otto the Otter. Let me explain how this works!
+              </div>
+            </div>
+            <h2 className="text-xl font-bold mb-3 text-gray-800">What is aquaponics?</h2>
+            <h4 className="text-medium mb-3 text-gray-800">Aquaponics (say it with us: AH-kwuh-PON-iks) is a special way of farming that grows plants and fish at the same time!
+Here's the big secret: fish and plants are best friends in aquaponics.
+So how does it work?</h4>
+            <ul className="space-y-2 text-sm text-gray-700 mb-6">
+              <li className="flex gap-2"><span>🐟</span><span><strong>Step 1</strong> — Fish eat and make waste 🐟
+Fish like tilapia live in a big tank of water. Just like you, fish eat food and then make waste (yes, that means fish poop! 💩). That waste goes into the water.</span></li>
+              <li className="flex gap-2"><span>🐠</span><span><strong>Step 2</strong> — Tiny helpers clean the water 🦠
+Super tiny living things called bacteria (so small you can't even see them!) eat the fish waste and turn it into plant food called nutrients.</span></li>
+              <li className="flex gap-2"><span>🐟</span><span><strong>Step 3</strong> — Plants drink up the nutrients 🥬
+The nutrient-filled water flows to where the plants are growing. Tomatos and other plants drink up those nutrients and grow big and healthy!</span></li>
+              <li className="flex gap-2"><span>🐠</span><span><strong>Step 4</strong> — Plants clean the water 💧
+As the plants soak up the nutrients, they clean the water — and then that clean water goes back to the fish tank!
+Then the whole cycle starts all over again! 🔄</span></li>
+            </ul>
+            <button
+              onClick={() => setShowInfo(false)}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
+            >
+              Let's Play! 🎮
+            </button>
+          </div>
+        </div>
+      )}
       <main className="card">
         <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Aquaponics Adventure</h1>
-        <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
-          What is aquaponics?
-Aquaponics (say it with us: AH-kwuh-PON-iks) is a special way of farming that grows plants and fish at the same time!
-Here's the big secret: fish and plants are best friends in aquaponics.
-So how does it work?
-Step 1 — Fish eat and make waste 🐟
-Fish like salmon live in a big tank of water. Just like you, fish eat food and then make waste (yes, that means fish poop! 💩). That waste goes into the water.
-Step 2 — Tiny helpers clean the water 🦠
-Super tiny living things called bacteria (so small you can't even see them!) eat the fish waste and turn it into plant food called nutrients.
-Step 3 — Plants drink up the nutrients 🥬
-The nutrient-filled water flows to where the plants are growing. The lettuce and other plants drink up those nutrients and grow big and healthy!
-Step 4 — Plants clean the water 💧
-As the plants soak up the nutrients, they clean the water — and then that clean water goes back to the fish tank!
-Then the whole cycle starts all over again! 🔄
-        </p>
-        <br></br>
         <h2>How to play</h2>
-        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect salmon and lettuce.
+        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect tomatos and tilapia.
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
         <br></br>
-        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Lettuce Caught : <span>{score}</span> Salmon Caught : <span>{score2}</span></div>
+        {/* Floating otter button — bottom right */}
+        <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-center gap-1">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
+            Learn More
+          </span>
+          <button
+            onClick={() => setShowInfo(true)}
+            className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 text-4xl shadow-lg transition-colors flex items-center justify-center"
+          >
+            <span className="text-4xl">
+                <img src="../otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
+          </button>
+        </div>
+        <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Tomatos Caught : <span>{score}</span> Tilapia Caught : <span>{score2}</span></div>
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3) + (score2 * 5)}</span></div>
         <div style={{ marginBottom: "10px" }}>
   {!isPlaying && !gameOver && (
@@ -317,12 +355,13 @@ Then the whole cycle starts all over again! 🔄
         position: 'absolute',
         top: `${obj.y}px`,
         left: `${obj.x}px`,
-        width: '30px',
-        height: '30px',
+        width: '40px',
+        height: '40px',
         borderRadius: '50%',
         fontSize:'20pt',
         }}
-        >🥬
+        >
+          <img src="../tomato.png" alt="tomato" className="object-contain" />
       </div>
   ))}
 
@@ -333,12 +372,13 @@ Then the whole cycle starts all over again! 🔄
         position: 'absolute',
         top: `${obj.y}px`,
         left: `${obj.x}px`,
-        width: '30px',
-        height: '30px',
+        width: '70px',
+        height: '70px',
         borderRadius: '50%',
         fontSize:'20pt',
         }}
-        >🐠
+        >
+          <img src="../tilapia.png" alt="tilapia" className="object-contain" />
       </div>
   ))}
 
@@ -362,11 +402,37 @@ Then the whole cycle starts all over again! 🔄
       🧺
     </div>
 
-  
-
 </div>
 
   )}
+
+  {showCompletion && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 text-center">
+      <div className="text-5xl mb-3">🏆</div>
+      <h2 className="text-xl font-bold mb-2 text-gray-800">Great job catching tomatoes and tilapia!</h2>
+      <p className="text-medium text-gray-500 italic" id="counter">You ended up catching <span>{score}</span> tomatoes and <span>{score2}</span> tilapia!</p>
+      <p className="text-medium text-gray-500 mb-3 italic" id="counter">In total you earned  $<span>{(score * 3) + (score2 * 5)}</span>!!!</p>
+      <p className="text-medium text-gray-500 mb-3 italic">
+        Great job! Want to play again and earn more? Or return home for a new game?
+      </p>
+      <div className="flex gap-3 justify-center">
+        <button
+          onClick={startGame}
+          className="btn btn-mint"
+        >
+          🔄 Play Again
+        </button>
+        
+          <a href="/"
+          className="btn btn-green"
+        >
+          Home 
+        </a>
+      </div>
+    </div>
+  </div>
+)}
 
         <nav className="mt-8 flex gap-4">
           <Link href="/" className="text-foreground">Home</Link>

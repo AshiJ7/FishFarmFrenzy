@@ -78,9 +78,9 @@ export default function MiniGame5() {
             <h2 className="text-xl font-bold mb-3 text-gray-800">Did you know that some plants and fish grow better together?</h2>
             <h4 className="text-medium mb-3 text-gray-800">In special farms called aquaponics farms, fish and plants help each other grow! It works by having fish live in water and produce waste. That waste turns into nutrients which plants needs to grow big and healthy. As plants clean the water, the fish get fresh, clean water again! It’s a team effort!</h4>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              <li className="flex gap-2"><span>🐟</span><span><strong>Tilapia</strong> loves to help lettuce and basil grow!</span></li>
+              <li className="flex gap-2"><span>🐟</span><span><strong>Tilapia</strong> loves to help tomatos and basil grow!</span></li>
               <li className="flex gap-2"><span>🐠</span><span><strong>Trout</strong> likes spinach and arugula!</span></li>
-              <li className="flex gap-2"><span>🐟</span><span><strong>Catfish</strong> helps tomatoes and cucumbers!</span></li>
+              <li className="flex gap-2"><span>🐟</span><span><strong>Catfish</strong> helps cucumbers and lettuce out!</span></li>
               <li className="flex gap-2"><span>🐠</span><span><strong>Koi</strong> is friends with watercress and mint!</span></li>
             </ul>
             <button
@@ -106,7 +106,9 @@ export default function MiniGame5() {
             onClick={() => setShowInfo(true)}
             className="bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 rounded-full w-20 h-20 text-4xl shadow-lg transition-colors flex items-center justify-center"
           >
-            🦦
+            <span className="text-4xl">
+                <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+              </span>
           </button>
         </div>
   
@@ -124,6 +126,7 @@ export default function MiniGame5() {
             <h2 className="text-center mt-4 text-xl">
     Press Start to begin
   </h2>
+  <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
   <br></br>
   
 
@@ -132,7 +135,9 @@ export default function MiniGame5() {
 
       <div style={{ marginBottom: "10px" }}>
   {!isPlaying && !gameOver && (
-    <button className="btn btn-green " onClick={startGame}>Start Game</button>
+    <div className="flex justify-center">
+    <button className="btn btn-green" onClick={startGame}>Start Game</button>
+  </div>
   )}
 
   {isPlaying && ( 
@@ -154,7 +159,7 @@ export default function MiniGame5() {
           <Link href="/" className="text-foreground">Home</Link>
           {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
           <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link>
+          {/* <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link> */}
         </nav>
       </main>
       

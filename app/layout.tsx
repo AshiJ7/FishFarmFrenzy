@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import AuthGate from "./AuthGate";
 import Header from "./Header";
+import TeacherSupport from "@/components/TeacherSupport";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
         <AuthProvider>
           <AuthGate>
             <Header />
+            <TeacherSupport />
             {children}
           </AuthGate>
         </AuthProvider>
