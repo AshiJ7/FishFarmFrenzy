@@ -22,16 +22,36 @@ export default function BacteriaGame() {
         if (containerRef.current) containerRef.current.innerHTML = "";
 
         // ── Constants ──────────────────────────────────────────────────
-        const GW = 800, GH = 600;
-        const PLANT_H = 90;   // plant zone: y 0..90
-        const UI_H = 90;      // ui bar:     y 510..600
-        const WATER_TOP = PLANT_H;          // 90
-        const WATER_BOT = GH - UI_H;        // 510
+        const GW = 960, GH = 700;
+        const PLANT_H = 140;
+        const UI_H = 90;
+        const WATER_TOP = PLANT_H;
+        const WATER_BOT = GH - UI_H;
         const BODY_SEGS = 8;
         const SEG_SPACE = 14;
-        const SPEED = 220;
+        const BASE_SPEED = 220;
         const PLANT_COUNT = 3;
         const GROWTH_MAX = 5;
+
+        // Stage 3 — Danger system
+        const AMMONIA_DANGER_THRESHOLD = 6;
+        const NITRITE_DANGER_THRESHOLD = 8;
+        const BASE_SPAWN_INTERVAL = 3000;
+        const MIN_SPAWN_INTERVAL = 800;
+        const SPAWN_ACCELERATION = 15; // ms faster each spawn
+
+        // Stage 4 — Feeding + Combos
+        const FEEDING_INTERVAL = 25000;
+        const FEEDING_BURST_MIN = 4;
+        const FEEDING_BURST_MAX = 6;
+        const COMBO_WINDOW = 5000;
+
+        // Stage 5 — Oxygen
+        const OXYGEN_DEPLETION_RATE = 100 / 35; // %/s
+        const OXYGEN_PER_BUBBLE = 12;
+        const BUBBLE_SPAWN_INTERVAL = 3000;
+        const LOW_OXYGEN_THRESHOLD = 25;
+        const LOW_OXYGEN_SPEED_MULT = 0.25;
 
         const config: any = {
           type: Phaser.AUTO,
@@ -43,48 +63,69 @@ export default function BacteriaGame() {
             preload() {},
 
             create(this: any) {
-              // Store constants on scene
               this.GW = GW; this.GH = GH;
               this.WATER_TOP = WATER_TOP; this.WATER_BOT = WATER_BOT;
-              this.SPEED = SPEED; this.SEG_SPACE = SEG_SPACE;
-              this.activeBacteria = "ns"; // "ns" | "nb"
+              this.SEG_SPACE = SEG_SPACE;
+              this.activeBacteria = "ns";
               this.score = 0;
               this.totalGrown = 0;
+              this.gameOver = false;
+              this.comboStreak = 0;
+              this.totalCombos = 0;
+              this.oxygen = 100;
+              this.spawnInterval = BASE_SPAWN_INTERVAL;
+              this.firstBubbleShown = false;
 
               // ── Background ──────────────────────────────────────────
               const bg = this.add.graphics().setDepth(0);
 
-              // Plant zone
-              bg.fillStyle(0x0d2a18, 1);
+              // Plant zone — very light so plants pop
+              bg.fillStyle(0xEAF5EA, 1);
               bg.fillRect(0, 0, GW, PLANT_H);
 
-              // Water column
-              bg.fillStyle(0x0a1f35, 1);
+              // Water column — light aqua blue
+              bg.fillStyle(0xCCE8F4, 1);
               bg.fillRect(0, WATER_TOP, GW, WATER_BOT - WATER_TOP);
 
+              // Caustic light dapples
+              for (let i = 0; i < 10; i++) {
+                const cx = Phaser.Math.Between(50, GW - 50);
+                const cy = Phaser.Math.Between(WATER_TOP + 30, WATER_BOT - 30);
+                bg.fillStyle(0xffffff, 0.18);
+                bg.fillEllipse(cx, cy, Phaser.Math.Between(50, 110), Phaser.Math.Between(25, 50));
+              }
+
               // Subtle grid
-              bg.lineStyle(1, 0x1a3d5c, 0.35);
+              bg.lineStyle(1, 0x4A8E9E, 0.12);
               for (let x = 0; x <= GW; x += 50) bg.lineBetween(x, WATER_TOP, x, WATER_BOT);
               for (let y = WATER_TOP; y <= WATER_BOT; y += 50) bg.lineBetween(0, y, GW, y);
 
-              // UI bar
-              bg.fillStyle(0x06100f, 1);
+              // UI bar — light teal-mint panel
+              bg.fillStyle(0xE2F0EC, 1);
               bg.fillRect(0, WATER_BOT, GW, UI_H);
 
               // Zone dividers
-              bg.lineStyle(2, 0x2a8060, 1);
+              bg.lineStyle(2, 0x4A8E9E, 0.6);
               bg.lineBetween(0, WATER_TOP, GW, WATER_TOP);
               bg.lineBetween(0, WATER_BOT, GW, WATER_BOT);
 
-              // Soil beds and static root lines (drawn once in bg)
+              // Air stone (Stage 5)
+              bg.fillStyle(0x8a8a7a, 1);
+              bg.fillRoundedRect(GW / 2 - 20, WATER_BOT - 14, 40, 12, 4);
+              bg.fillStyle(0x9a9a8a, 1);
+              bg.fillRoundedRect(GW / 2 - 16, WATER_BOT - 12, 32, 8, 3);
+
+              // Soil beds and root lines
               const plantXs: number[] = [];
               for (let i = 0; i < PLANT_COUNT; i++) {
                 const px = Math.round((GW / PLANT_COUNT) * (i + 0.5));
                 plantXs.push(px);
-                bg.fillStyle(0x5c3a1a, 1);
-                bg.fillRect(px - 38, 2, 76, 20);
-                bg.lineStyle(2, 0x7a5a30, 0.7);
-                bg.lineBetween(px, 22, px, WATER_TOP + 45);
+                bg.fillStyle(0x5D4037, 1);
+                bg.fillRect(px - 40, PLANT_H - 22, 80, 22);
+                bg.fillStyle(0x795548, 1);
+                bg.fillRect(px - 38, PLANT_H - 20, 76, 16);
+                bg.lineStyle(2, 0x6D4C30, 0.8);
+                bg.lineBetween(px, PLANT_H, px, WATER_TOP + 45);
               }
 
               // ── Texture factory ────────────────────────────────────
@@ -142,17 +183,29 @@ export default function BacteriaGame() {
                 g.fillStyle(0xa9dfbf, 0.7); g.fillCircle(9, 9, 3);
               }, "nitrate", 26, 26);
 
-              // Fish (simple tilapia silhouette)
+              // Fish — more saturated for light background
               mkTex(g => {
-                g.fillStyle(0x1a6b8a, 0.6);
+                g.fillStyle(0x2a7fa0, 0.85);
                 g.fillEllipse(24, 14, 36, 18);
-                g.fillStyle(0x1a6b8a, 0.55);
+                g.fillStyle(0x2a7fa0, 0.8);
                 g.fillTriangle(38, 14, 52, 6, 52, 22);
-                g.fillStyle(0x0d4a6a, 0.55);
+                g.fillStyle(0x1a5f80, 0.8);
                 g.fillCircle(14, 11, 3);
-                g.fillStyle(0x7fb3c8, 0.3);
+                g.fillStyle(0x4A8E9E, 0.4);
                 g.fillEllipse(22, 11, 14, 6);
               }, "fish", 56, 28);
+
+              // Oxygen bubble — slightly darker for visibility on light bg
+              mkTex(g => {
+                g.fillStyle(0x5BAED6, 0.75); g.fillCircle(8, 8, 7);
+                g.fillStyle(0xB8E0F8, 0.9); g.fillCircle(6, 6, 3);
+              }, "o2bubble", 16, 16);
+
+              // Food pellet
+              mkTex(g => {
+                g.fillStyle(0x8B4513, 1); g.fillCircle(6, 6, 5);
+                g.fillStyle(0xA0522D, 1); g.fillCircle(5, 5, 3);
+              }, "food_pellet", 12, 12);
 
               // ── Plants ──────────────────────────────────────────────
               this.plants = plantXs.map((px: number) => ({
@@ -162,47 +215,74 @@ export default function BacteriaGame() {
               }));
 
               this.drawPlants = () => {
+                const B = PLANT_H - 22; // soil surface y-coordinate (= 98)
                 for (const p of this.plants) {
                   p.gfx.clear();
                   const x = p.x;
                   const g = p.growth;
                   if (g === 0) {
-                    p.gfx.fillStyle(0x27ae60, 1);
-                    p.gfx.fillRect(x - 1, 14, 2, 6);
+                    // Tiny seedling (~18px tall)
+                    p.gfx.fillStyle(0x2D6B1E, 1);
+                    p.gfx.fillRect(x - 1, B - 16, 3, 16);
+                    p.gfx.fillStyle(0x4CAF50, 1);
+                    p.gfx.fillEllipse(x, B - 18, 12, 8);
                   } else if (g === 1) {
-                    p.gfx.fillStyle(0x27ae60, 1);
-                    p.gfx.fillRect(x - 1, 8, 2, 12);
-                    p.gfx.fillEllipse(x, 8, 16, 10);
+                    // Sprout (~35px tall)
+                    p.gfx.fillStyle(0x2D6B1E, 1);
+                    p.gfx.fillRect(x - 1, B - 32, 3, 32);
+                    p.gfx.fillStyle(0x43A047, 1);
+                    p.gfx.fillEllipse(x - 9, B - 26, 20, 14);
+                    p.gfx.fillEllipse(x + 9, B - 20, 20, 14);
+                    p.gfx.fillStyle(0x66BB6A, 1);
+                    p.gfx.fillEllipse(x, B - 32, 16, 12);
                   } else if (g === 2) {
-                    p.gfx.fillStyle(0x1e8449, 1);
-                    p.gfx.fillRect(x - 1, 5, 2, 15);
-                    p.gfx.fillEllipse(x - 9, 10, 18, 12);
-                    p.gfx.fillEllipse(x + 9, 10, 18, 12);
+                    // Small plant (~50px tall)
+                    p.gfx.fillStyle(0x1B5E20, 1);
+                    p.gfx.fillRect(x - 2, B - 48, 4, 48);
+                    p.gfx.fillStyle(0x388E3C, 1);
+                    p.gfx.fillEllipse(x - 13, B - 38, 26, 18);
+                    p.gfx.fillEllipse(x + 13, B - 30, 26, 18);
+                    p.gfx.fillStyle(0x4CAF50, 1);
+                    p.gfx.fillEllipse(x, B - 48, 24, 18);
                   } else if (g === 3) {
-                    p.gfx.fillStyle(0x196f3d, 1);
-                    p.gfx.fillRect(x - 1, 2, 2, 18);
-                    p.gfx.fillEllipse(x, 4, 24, 16);
-                    p.gfx.fillEllipse(x - 11, 12, 17, 13);
-                    p.gfx.fillEllipse(x + 11, 12, 17, 13);
+                    // Medium plant (~65px tall)
+                    p.gfx.fillStyle(0x1B5E20, 1);
+                    p.gfx.fillRect(x - 2, B - 62, 4, 62);
+                    p.gfx.fillStyle(0x2E7D32, 1);
+                    p.gfx.fillEllipse(x, B - 60, 36, 24);
+                    p.gfx.fillEllipse(x - 17, B - 44, 28, 22);
+                    p.gfx.fillEllipse(x + 17, B - 44, 28, 22);
+                    p.gfx.fillStyle(0x43A047, 1);
+                    p.gfx.fillEllipse(x, B - 54, 24, 18);
                   } else if (g === 4) {
-                    p.gfx.fillStyle(0x145a32, 1);
-                    p.gfx.fillRect(x - 1, 1, 2, 19);
-                    p.gfx.fillEllipse(x, 3, 28, 18);
-                    p.gfx.fillEllipse(x - 13, 11, 18, 14);
-                    p.gfx.fillEllipse(x + 13, 11, 18, 14);
-                    p.gfx.fillStyle(0xf9c400, 1);
-                    p.gfx.fillCircle(x, 1, 4);
+                    // Large plant with fruit (~78px tall)
+                    p.gfx.fillStyle(0x1B5E20, 1);
+                    p.gfx.fillRect(x - 2, B - 74, 4, 74);
+                    p.gfx.fillStyle(0x2E7D32, 1);
+                    p.gfx.fillEllipse(x, B - 72, 40, 28);
+                    p.gfx.fillEllipse(x - 19, B - 54, 30, 24);
+                    p.gfx.fillEllipse(x + 19, B - 54, 30, 24);
+                    p.gfx.fillStyle(0x388E3C, 1);
+                    p.gfx.fillEllipse(x, B - 64, 28, 20);
+                    p.gfx.fillStyle(0xF9C400, 1);
+                    p.gfx.fillCircle(x, B - 80, 7);
                   } else {
-                    // Fully grown
-                    p.gfx.fillStyle(0x0f4225, 1);
-                    p.gfx.fillRect(x - 1, 0, 2, 20);
-                    p.gfx.fillEllipse(x, 2, 34, 22);
-                    p.gfx.fillEllipse(x - 15, 12, 20, 16);
-                    p.gfx.fillEllipse(x + 15, 12, 20, 16);
-                    p.gfx.fillStyle(0xf9c400, 1);
-                    p.gfx.fillCircle(x, 0, 5);
-                    p.gfx.fillCircle(x - 11, 4, 3);
-                    p.gfx.fillCircle(x + 11, 4, 3);
+                    // Fully grown — lush with multiple fruits (~90px tall)
+                    p.gfx.fillStyle(0x1B5E20, 1);
+                    p.gfx.fillRect(x - 2, B - 86, 4, 86);
+                    p.gfx.fillStyle(0x1B5E20, 1);
+                    p.gfx.fillEllipse(x, B - 84, 46, 30);
+                    p.gfx.fillEllipse(x - 21, B - 64, 32, 24);
+                    p.gfx.fillEllipse(x + 21, B - 64, 32, 24);
+                    p.gfx.fillStyle(0x2E7D32, 1);
+                    p.gfx.fillEllipse(x, B - 76, 36, 24);
+                    p.gfx.fillStyle(0xF9C400, 1);
+                    p.gfx.fillCircle(x, B - 90, 7);
+                    p.gfx.fillCircle(x - 15, B - 78, 5);
+                    p.gfx.fillCircle(x + 15, B - 78, 5);
+                    p.gfx.fillStyle(0xE65100, 1);
+                    p.gfx.fillCircle(x - 8, B - 62, 4);
+                    p.gfx.fillCircle(x + 8, B - 62, 4);
                   }
                 }
               };
@@ -210,111 +290,168 @@ export default function BacteriaGame() {
 
               // ── Fish ────────────────────────────────────────────────
               this.fishes = [
-                { spr: this.add.image(140, 220, "fish").setDepth(1).setAlpha(0.45), dir: 1, spd: 33 },
-                { spr: this.add.image(520, 360, "fish").setDepth(1).setAlpha(0.45).setFlipX(true), dir: -1, spd: 26 },
-                { spr: this.add.image(310, 455, "fish").setDepth(1).setAlpha(0.45), dir: 1, spd: 40 },
+                { spr: this.add.image(140, 220, "fish").setDepth(1).setAlpha(0.7), dir: 1, baseSpd: 33, spd: 33 },
+                { spr: this.add.image(520, 360, "fish").setDepth(1).setAlpha(0.7).setFlipX(true), dir: -1, baseSpd: 26, spd: 26 },
+                { spr: this.add.image(310, 455, "fish").setDepth(1).setAlpha(0.7), dir: 1, baseSpd: 40, spd: 40 },
               ];
 
               // ── Physics groups ──────────────────────────────────────
               this.ammoniaGroup = this.physics.add.staticGroup();
               this.nitriteGroup = this.physics.add.staticGroup();
               this.nitrateGroup = this.physics.add.group();
+              this.bubbleGroup = this.physics.add.group();
 
               // ── Molecule helpers ────────────────────────────────────
-              this.spawnAmmonia = () => {
-                const x = Phaser.Math.Between(50, GW - 50);
-                const y = Phaser.Math.Between(WATER_TOP + 45, WATER_BOT - 45);
-                const spr = this.ammoniaGroup.create(x, y, "ammonia").setDepth(2);
-                spr.label = this.add.text(x, y - 22, "NH₃", {
-                  fontSize: "11px", color: "#f1948a",
+              this.spawnAmmonia = (x?: number, y?: number) => {
+                const sx = x ?? Phaser.Math.Between(50, GW - 50);
+                const sy = y ?? Phaser.Math.Between(WATER_TOP + 45, WATER_BOT - 45);
+                const spr = this.ammoniaGroup.create(sx, sy, "ammonia").setDepth(2);
+                spr.label = this.add.text(sx, sy - 22, "NH\u2083", {
+                  fontSize: "11px", color: "#B83A1A",
                   fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5).setDepth(3);
+                this.tweens.add({
+                  targets: spr,
+                  alpha: { from: 1, to: 0.6 },
+                  duration: 800,
+                  yoyo: true,
+                  repeat: -1,
+                });
               };
 
               this.dropNitrite = (ox: number, oy: number) => {
                 const x = Phaser.Math.Clamp(ox + Phaser.Math.Between(-28, 28), 30, GW - 30);
                 const y = Phaser.Math.Clamp(oy + Phaser.Math.Between(-18, 18), WATER_TOP + 25, WATER_BOT - 25);
                 const spr = this.nitriteGroup.create(x, y, "nitrite").setDepth(2);
-                spr.label = this.add.text(x, y - 20, "NO₂⁻", {
-                  fontSize: "11px", color: "#ffd966",
+                spr.createdAt = this.time.now;
+                spr.label = this.add.text(x, y - 20, "NO\u2082\u207B", {
+                  fontSize: "11px", color: "#8B6914",
                   fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5).setDepth(3);
+                this.tweens.add({
+                  targets: spr,
+                  alpha: { from: 1, to: 0.6 },
+                  duration: 900,
+                  yoyo: true,
+                  repeat: -1,
+                });
               };
 
-              this.dropNitrate = (x: number, y: number) => {
+              this.dropNitrate = (x: number, y: number, isCombo?: boolean) => {
                 const spr = this.nitrateGroup.create(x, y, "nitrate").setDepth(2);
-                spr.label = this.add.text(x, y - 18, "NO₃⁻", {
-                  fontSize: "11px", color: "#27ae60",
+                spr.isCombo = isCombo || false;
+                spr.label = this.add.text(x, y - 18, "NO\u2083\u207B", {
+                  fontSize: "11px", color: "#2D5016",
                   fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5).setDepth(3);
                 spr.setVelocityY(-65);
               };
 
-              // Spawn 5 initial ammonia
-              for (let i = 0; i < 5; i++) this.spawnAmmonia();
+              // Spawn a few initial ammonia
+              for (let i = 0; i < 3; i++) this.spawnAmmonia();
 
-              // ── Bacteria A: Nitrosomonas ─────────────────────────────
-              // segs[0] = near head (big/bright), segs[7] = tail (small/dim)
+              // ── Bacteria A: Nitrosomonas ────────────────────────────
               this.histA = [] as { x: number; y: number }[];
               this.segsA = [] as any[];
               for (let i = 0; i < BODY_SEGS; i++) {
                 const s = this.add.image(200, 300, "ns_body")
                   .setScale(Math.max(0.95 - i * 0.07, 0.3))
                   .setAlpha(Math.max(0.9 - i * 0.07, 0.3))
-                  .setDepth(4 - i * 0.1); // near-head renders on top
+                  .setDepth(4 - i * 0.1);
                 this.segsA.push(s);
               }
               this.headA = this.physics.add.sprite(200, 300, "ns_head")
-                .setMaxVelocity(SPEED).setDepth(5);
+                .setMaxVelocity(BASE_SPEED).setDepth(5);
 
-              // ── Bacteria B: Nitrobacter ──────────────────────────────
+              // ── Bacteria B: Nitrobacter ─────────────────────────────
               this.histB = [] as { x: number; y: number }[];
               this.segsB = [] as any[];
               for (let i = 0; i < BODY_SEGS; i++) {
                 const s = this.add.image(600, 300, "nb_body")
                   .setScale(Math.max(0.95 - i * 0.07, 0.3))
-                  .setAlpha(0.28) // starts dimmed
+                  .setAlpha(0.28)
                   .setDepth(4 - i * 0.1);
                 this.segsB.push(s);
               }
               this.headB = this.physics.add.sprite(600, 300, "nb_head")
-                .setMaxVelocity(SPEED).setAlpha(0.3).setDepth(5);
+                .setMaxVelocity(BASE_SPEED).setAlpha(0.3).setDepth(5);
 
               // ── Overlaps ────────────────────────────────────────────
+
               // Nitrosomonas eats ammonia → drops nitrite
               this.physics.add.overlap(this.headA, this.ammoniaGroup,
-                (head: any, spr: any) => {
-                  if (this.activeBacteria !== "ns") return;
+                (_head: any, spr: any) => {
+                  if (this.gameOver || this.activeBacteria !== "ns") return;
                   if (spr.label) spr.label.destroy();
+                  const sx = spr.x, sy = spr.y;
                   spr.destroy();
                   this.score += 10;
                   this.scoreText.setText("Score: " + this.score);
-                  this.dropNitrite(head.x, head.y);
+                  this.dropNitrite(sx, sy);
                 }, undefined, this);
 
-              // Nitrobacter eats nitrite → drops nitrate
+              // Nitrobacter eats nitrite → drops nitrate (+ combo check)
               this.physics.add.overlap(this.headB, this.nitriteGroup,
                 (head: any, spr: any) => {
-                  if (this.activeBacteria !== "nb") return;
+                  if (this.gameOver || this.activeBacteria !== "nb") return;
+                  const now = this.time.now;
+                  const isCombo = spr.createdAt && (now - spr.createdAt < COMBO_WINDOW);
+
                   if (spr.label) spr.label.destroy();
+                  const sx = spr.x, sy = spr.y;
                   spr.destroy();
-                  this.score += 15;
+
+                  if (isCombo) {
+                    this.comboStreak++;
+                    this.totalCombos++;
+                    const bonus = 20 * this.comboStreak;
+                    this.score += 15 + bonus;
+                    const label = this.comboStreak > 1
+                      ? `Full Cycle! \u00D7${this.comboStreak}`
+                      : "Full Cycle!";
+                    const ct = this.add.text(head.x, head.y - 30, label, {
+                      fontSize: "16px", color: "#B8860B",
+                      fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                      stroke: "#fff", strokeThickness: 3,
+                    }).setOrigin(0.5).setDepth(15);
+                    this.tweens.add({
+                      targets: ct, y: head.y - 70, alpha: 0,
+                      duration: 1200, onComplete: () => ct.destroy(),
+                    });
+                  } else {
+                    this.comboStreak = 0;
+                    this.score += 15;
+                  }
+
                   this.scoreText.setText("Score: " + this.score);
-                  this.dropNitrate(head.x, head.y);
+                  this.dropNitrate(sx, sy, isCombo);
                 }, undefined, this);
 
+              // Active bacterium eats oxygen bubbles
+              const eatBubble = (head: any, bubble: any) => {
+                if (this.gameOver) return;
+                const isActive = (this.activeBacteria === "ns" && head === this.headA)
+                  || (this.activeBacteria === "nb" && head === this.headB);
+                if (!isActive) return;
+                bubble.destroy();
+                this.oxygen = Math.min(100, this.oxygen + OXYGEN_PER_BUBBLE);
+              };
+              this.physics.add.overlap(this.headA, this.bubbleGroup, eatBubble, undefined, this);
+              this.physics.add.overlap(this.headB, this.bubbleGroup, eatBubble, undefined, this);
+
               // ── Switch mechanic ─────────────────────────────────────
-              this.updateUI = () => {
+              this.updateActiveLabel = () => {
                 if (this.activeBacteria === "ns") {
-                  this.activeText.setText("Active: Nitrosomonas  ·  Eats: NH₃ → NO₂⁻");
-                  this.activeText.setStyle({ color: "#2ecc71" });
+                  this.activeText.setText("Active: Nitrosomonas \u00B7 Eats NH\u2083 \u2192 NO\u2082\u207B");
+                  this.activeText.setStyle({ color: "#1a7a40" });
                 } else {
-                  this.activeText.setText("Active: Nitrobacter  ·  Eats: NO₂⁻ → NO₃⁻");
-                  this.activeText.setStyle({ color: "#bb8fce" });
+                  this.activeText.setText("Active: Nitrobacter \u00B7 Eats NO\u2082\u207B \u2192 NO\u2083\u207B");
+                  this.activeText.setStyle({ color: "#6B3FA0" });
                 }
               };
 
               this.doSwitch = () => {
+                if (this.gameOver) return;
                 if (this.activeBacteria === "ns") {
                   this.activeBacteria = "nb";
                   this.headA.setVelocity(0, 0);
@@ -334,57 +471,317 @@ export default function BacteriaGame() {
                     s.setAlpha(Math.max(0.9 - i * 0.07, 0.3))
                   );
                 }
-                this.updateUI();
+                this.updateActiveLabel();
               };
 
               const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
               spaceKey.on("down", () => this.doSwitch());
 
-              // ── UI Bar ──────────────────────────────────────────────
-              this.scoreText = this.add.text(12, WATER_BOT + 8, "Score: 0", {
-                fontSize: "16px", color: "#7ef0a8",
+              // ── UI Bar — Row 1: Score, Active, Switch ───────────────
+              this.scoreText = this.add.text(12, WATER_BOT + 5, "Score: 0", {
+                fontSize: "14px", color: "#2C2416",
                 fontFamily: "Nunito, sans-serif", fontStyle: "bold",
               }).setDepth(10);
 
-              this.plantsText = this.add.text(12, WATER_BOT + 32, "Plants fully grown: 0", {
-                fontSize: "12px", color: "#7ef0a8",
-                fontFamily: "Nunito, sans-serif",
-              }).setDepth(10);
-
-              this.activeText = this.add.text(GW / 2, WATER_BOT + 8,
-                "Active: Nitrosomonas  ·  Eats: NH₃ → NO₂⁻", {
-                  fontSize: "13px", color: "#2ecc71",
+              this.activeText = this.add.text(GW / 2, WATER_BOT + 5,
+                "Active: Nitrosomonas \u00B7 Eats NH\u2083 \u2192 NO\u2082\u207B", {
+                  fontSize: "11px", color: "#1a7a40",
                   fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5, 0).setDepth(10);
 
-              this.add.text(GW / 2, WATER_BOT + 30,
-                "🟢 Nitrosomonas: NH₃→NO₂⁻   🟣 Nitrobacter: NO₂⁻→NO₃⁻", {
-                  fontSize: "11px", color: "#7a9ab0",
+              this.add.text(GW - 12, WATER_BOT + 5, "[ SPACE to switch ]", {
+                fontSize: "10px", color: "#4A8E9E",
+                fontFamily: "Nunito, sans-serif",
+              }).setOrigin(1, 0).setDepth(11)
+                .setInteractive({ useHandCursor: true })
+                .on("pointerover", function (this: any) { this.setStyle({ color: "#2C2416" }); })
+                .on("pointerout", function (this: any) { this.setStyle({ color: "#4A8E9E" }); })
+                .on("pointerdown", () => this.doSwitch());
+
+              // ── UI Bar — Row 2: Danger gauges + Oxygen ──────────────
+              this.gaugeGfx = this.add.graphics().setDepth(10);
+              const gaugeY = WATER_BOT + 34;
+              const barH = 12;
+
+              this.add.text(15, gaugeY - 12, "NH\u2083 Danger", {
+                fontSize: "9px", color: "#B83A1A",
+                fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+              }).setDepth(10);
+              this.add.text(280, gaugeY - 12, "NO\u2082\u207B Danger", {
+                fontSize: "9px", color: "#8B6914",
+                fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+              }).setDepth(10);
+              this.add.text(545, gaugeY - 12, "O\u2082 Level", {
+                fontSize: "9px", color: "#4A8E9E",
+                fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+              }).setDepth(10);
+
+              // Count only active (non-destroyed) sprites in a group
+              this.liveCount = (group: any) =>
+                group.getChildren().filter((c: any) => c.active).length;
+
+              this.drawGauges = () => {
+                this.gaugeGfx.clear();
+                const y = gaugeY;
+                const w = 220;
+
+                // Ammonia gauge
+                const ammoniaFill = Math.min(this.liveCount(this.ammoniaGroup) / AMMONIA_DANGER_THRESHOLD, 1);
+                this.gaugeGfx.fillStyle(0xC8D0CC, 1);
+                this.gaugeGfx.fillRoundedRect(15, y, w, barH, 3);
+                if (ammoniaFill > 0) {
+                  const c = ammoniaFill > 0.75 ? 0xff0000 : ammoniaFill > 0.5 ? 0xe74c3c : 0xc0392b;
+                  this.gaugeGfx.fillStyle(c, 1);
+                  this.gaugeGfx.fillRoundedRect(15, y, w * ammoniaFill, barH, 3);
+                }
+
+                // Nitrite gauge
+                const nitriteFill = Math.min(this.liveCount(this.nitriteGroup) / NITRITE_DANGER_THRESHOLD, 1);
+                this.gaugeGfx.fillStyle(0xC8D0CC, 1);
+                this.gaugeGfx.fillRoundedRect(280, y, w, barH, 3);
+                if (nitriteFill > 0) {
+                  const c = nitriteFill > 0.75 ? 0xff8c00 : nitriteFill > 0.5 ? 0xf39c12 : 0xb7950b;
+                  this.gaugeGfx.fillStyle(c, 1);
+                  this.gaugeGfx.fillRoundedRect(280, y, w * nitriteFill, barH, 3);
+                }
+
+                // Oxygen gauge
+                const oxygenFill = this.oxygen / 100;
+                this.gaugeGfx.fillStyle(0xC8D0CC, 1);
+                this.gaugeGfx.fillRoundedRect(545, y, w, barH, 3);
+                if (oxygenFill > 0) {
+                  const c = oxygenFill < 0.25 ? 0x5a8aae : oxygenFill < 0.5 ? 0x88b4d0 : 0xA8C8E8;
+                  this.gaugeGfx.fillStyle(c, 1);
+                  this.gaugeGfx.fillRoundedRect(545, y, w * oxygenFill, barH, 3);
+                }
+
+                // Flash oxygen bar border when critical
+                if (this.oxygen < LOW_OXYGEN_THRESHOLD && this.oxygen > 0) {
+                  if (Math.sin(this.time.now / 200) > 0) {
+                    this.gaugeGfx.lineStyle(2, 0xFF7F5C, 0.8);
+                    this.gaugeGfx.strokeRoundedRect(545, y, w, barH, 3);
+                  }
+                }
+              };
+
+              // ── UI Bar — Row 3: Plants + legend ─────────────────────
+              this.plantsText = this.add.text(12, WATER_BOT + 54, "Plants grown: 0", {
+                fontSize: "10px", color: "#5C5444",
+                fontFamily: "Nunito, sans-serif",
+              }).setDepth(10);
+
+              this.add.text(GW / 2, WATER_BOT + 54,
+                "\uD83D\uDFE2 Nitrosomonas: NH\u2083\u2192NO\u2082\u207B   \uD83D\uDFE3 Nitrobacter: NO\u2082\u207B\u2192NO\u2083\u207B", {
+                  fontSize: "9px", color: "#5C5444",
                   fontFamily: "Nunito, sans-serif",
                 }).setOrigin(0.5, 0).setDepth(10);
 
-              // Switch button (right side)
-              this.add.text(GW - 12, WATER_BOT + 18, "[ SPACE / click to switch ]", {
-                fontSize: "12px", color: "#90cce0",
-                fontFamily: "Nunito, sans-serif",
-              }).setOrigin(1, 0.5).setDepth(11)
-                .setInteractive({ useHandCursor: true })
-                .on("pointerover", function (this: any) { this.setStyle({ color: "#ffffff" }); })
-                .on("pointerout", function (this: any) { this.setStyle({ color: "#90cce0" }); })
-                .on("pointerdown", () => this.doSwitch());
-
               // Plant zone label
-              this.add.text(8, 3, "🌿 Plant Zone", {
-                fontSize: "11px", color: "#7ef0a8",
+              this.add.text(8, 3, "\uD83C\uDF3F Plant Zone", {
+                fontSize: "11px", color: "#358600",
                 fontFamily: "Nunito, sans-serif",
               }).setDepth(10);
+
+              // ── Continuous ammonia spawning (Stage 3) ────────────────
+              this.spawnTimer = this.time.addEvent({
+                delay: this.spawnInterval,
+                callback: () => {
+                  if (this.gameOver) return;
+                  const fish = this.fishes[Phaser.Math.Between(0, this.fishes.length - 1)];
+                  this.spawnAmmonia(
+                    fish.spr.x + Phaser.Math.Between(-30, 30),
+                    fish.spr.y + Phaser.Math.Between(-15, 15)
+                  );
+                  this.spawnInterval = Math.max(MIN_SPAWN_INTERVAL, this.spawnInterval - SPAWN_ACCELERATION);
+                  this.spawnTimer.delay = this.spawnInterval;
+                },
+                loop: true,
+              });
+
+              // ── Feeding events (Stage 4) ────────────────────────────
+              this.feedingText = this.add.text(GW / 2, WATER_TOP + 30, "", {
+                fontSize: "22px", color: "#B8860B",
+                fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                stroke: "#fff", strokeThickness: 3,
+              }).setOrigin(0.5).setDepth(15).setAlpha(0);
+
+              this.time.addEvent({
+                delay: FEEDING_INTERVAL,
+                callback: () => {
+                  if (this.gameOver) return;
+
+                  // Flash "Feeding Time!"
+                  this.feedingText.setText("Feeding Time!");
+                  this.feedingText.setAlpha(1);
+                  this.tweens.add({
+                    targets: this.feedingText, alpha: 0,
+                    duration: 2500, delay: 1500,
+                  });
+
+                  // Food pellet drops
+                  const pelletX = Phaser.Math.Between(200, GW - 200);
+                  const pellet = this.add.image(pelletX, WATER_TOP + 10, "food_pellet").setDepth(6);
+                  this.tweens.add({
+                    targets: pellet,
+                    y: (WATER_TOP + WATER_BOT) / 2,
+                    duration: 1500,
+                    onComplete: () => {
+                      pellet.destroy();
+                      if (this.gameOver) return;
+                      // Stagger ammonia spawns so player can react
+                      const burstCount = Phaser.Math.Between(FEEDING_BURST_MIN, FEEDING_BURST_MAX);
+                      for (let i = 0; i < burstCount; i++) {
+                        this.time.delayedCall(i * 800, () => {
+                          if (this.gameOver) return;
+                          const fish = this.fishes[Phaser.Math.Between(0, this.fishes.length - 1)];
+                          this.spawnAmmonia(
+                            fish.spr.x + Phaser.Math.Between(-40, 40),
+                            fish.spr.y + Phaser.Math.Between(-25, 25)
+                          );
+                        });
+                      }
+                    },
+                  });
+                },
+                loop: true,
+              });
+
+              // ── Oxygen bubbles (Stage 5) ────────────────────────────
+              this.time.addEvent({
+                delay: BUBBLE_SPAWN_INTERVAL,
+                callback: () => {
+                  if (this.gameOver) return;
+                  const count = Phaser.Math.Between(2, 3);
+                  for (let i = 0; i < count; i++) {
+                    const bx = GW / 2 + Phaser.Math.Between(-25, 25);
+                    const by = WATER_BOT - 20;
+                    const bubble = this.bubbleGroup.create(bx, by, "o2bubble").setDepth(2);
+                    bubble.setVelocityY(Phaser.Math.Between(-50, -35));
+                    bubble.setVelocityX(Phaser.Math.Between(-12, 12));
+                    bubble.wobbleOffset = Phaser.Math.FloatBetween(0, Math.PI * 2);
+                  }
+
+                  // Tooltip on first oxygen bubble appearance
+                  if (!this.firstBubbleShown) {
+                    this.firstBubbleShown = true;
+                    const tip = this.add.text(GW / 2, WATER_TOP + 60,
+                      "Bacteria need oxygen! Swim through\nbubbles to keep your bacteria energized.", {
+                        fontSize: "13px", color: "#2C2416",
+                        fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                        stroke: "#fff", strokeThickness: 2,
+                        align: "center",
+                        backgroundColor: "#ffffffcc",
+                        padding: { x: 12, y: 8 },
+                      }).setOrigin(0.5).setDepth(20);
+                    this.time.delayedCall(4000, () => {
+                      this.tweens.add({
+                        targets: tip, alpha: 0, duration: 800,
+                        onComplete: () => tip.destroy(),
+                      });
+                    });
+                  }
+                },
+                loop: true,
+              });
+
+              // ── Game Over (Stage 3) ─────────────────────────────────
+              this.triggerGameOver = (cause: string) => {
+                if (this.gameOver) return;
+                this.gameOver = true;
+
+                this.headA.setVelocity(0, 0);
+                this.headB.setVelocity(0, 0);
+
+                // Fish death: flip upside-down, float to surface, pale
+                for (const f of this.fishes) {
+                  f.spr.setRotation(Math.PI);
+                  f.spr.setAlpha(0.7);
+                  f.spr.setTint(0xcccccc);
+                  this.tweens.add({
+                    targets: f.spr, y: WATER_TOP + 30,
+                    duration: 2000, ease: "Sine.easeOut",
+                  });
+                }
+
+                this.time.delayedCall(1200, () => {
+                  // Dark overlay
+                  this.add.rectangle(GW / 2, GH / 2, GW, GH, 0x000000, 0.75).setDepth(50);
+
+                  this.add.text(GW / 2, 100, "Game Over", {
+                    fontSize: "42px", color: "#FF7F5C",
+                    fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                    stroke: "#000", strokeThickness: 4,
+                  }).setOrigin(0.5).setDepth(51);
+
+                  const causeMsg = cause === "ammonia"
+                    ? "Fish died from ammonia (NH\u2083) poisoning!"
+                    : "Fish died from nitrite (NO\u2082\u207B) poisoning!";
+                  this.add.text(GW / 2, 160, causeMsg, {
+                    fontSize: "18px", color: "#F5D7C8",
+                    fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                  }).setOrigin(0.5).setDepth(51);
+
+                  const stats = [
+                    `Final Score: ${this.score}`,
+                    `Plants Fully Grown: ${this.totalGrown}`,
+                    `Full Cycle Combos: ${this.totalCombos}`,
+                  ];
+                  stats.forEach((txt, i) => {
+                    this.add.text(GW / 2, 210 + i * 30, txt, {
+                      fontSize: "16px", color: "#ffffff",
+                      fontFamily: "Nunito, sans-serif",
+                    }).setOrigin(0.5).setDepth(51);
+                  });
+
+                  const eduMsg = cause === "ammonia"
+                    ? "In aquaponics, Nitrosomonas bacteria are essential\nfor converting toxic ammonia into less harmful nitrite."
+                    : "Nitrite interferes with fish blood carrying oxygen.\nNitrobacter bacteria must convert it to safe nitrate.";
+                  this.add.text(GW / 2, 330, eduMsg, {
+                    fontSize: "13px", color: "#A8C8E8",
+                    fontFamily: "Nunito, sans-serif", align: "center",
+                  }).setOrigin(0.5).setDepth(51);
+
+                  const btn = this.add.text(GW / 2, 420, "  Try Again  ", {
+                    fontSize: "24px", color: "#B8D8A8",
+                    fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                    backgroundColor: "#3d5e30",
+                    padding: { x: 24, y: 12 },
+                  }).setOrigin(0.5).setDepth(51)
+                    .setInteractive({ useHandCursor: true })
+                    .on("pointerover", function (this: any) { this.setStyle({ color: "#ffffff", backgroundColor: "#6B8E4E" }); })
+                    .on("pointerout", function (this: any) { this.setStyle({ color: "#B8D8A8", backgroundColor: "#3d5e30" }); })
+                    .on("pointerdown", () => this.scene.restart());
+                });
+              };
             },
 
+            // ═══════════════════════════════════════════════════════════
+            // UPDATE LOOP
+            // ═══════════════════════════════════════════════════════════
             update(this: any, _time: number, delta: number) {
+              if (this.gameOver) return;
+
               const dt = delta / 1000;
               const ptr = this.input.activePointer;
 
-              // ── Move active bacteria toward cursor ──────────────────
+              // ── Oxygen depletion (Stage 5) ──────────────────────────
+              this.oxygen = Math.max(0, this.oxygen - OXYGEN_DEPLETION_RATE * dt);
+              const speedMult = this.oxygen <= 0 ? 0
+                : this.oxygen < LOW_OXYGEN_THRESHOLD ? LOW_OXYGEN_SPEED_MULT
+                : 1;
+              const currentSpeed = BASE_SPEED * speedMult;
+
+              // Gasp animation when low oxygen
+              if (this.oxygen < LOW_OXYGEN_THRESHOLD) {
+                const pulse = 0.8 + 0.2 * Math.sin(this.time.now / 150);
+                const activeHead = this.activeBacteria === "ns" ? this.headA : this.headB;
+                activeHead.setScale(pulse);
+              } else {
+                this.headA.setScale(1);
+                this.headB.setScale(1);
+              }
+
+              // ── Move active bacteria ────────────────────────────────
               const isNS = this.activeBacteria === "ns";
               const head = isNS ? this.headA : this.headB;
               const hist = isNS ? this.histA : this.histB;
@@ -394,12 +791,12 @@ export default function BacteriaGame() {
               const dy = ptr.worldY - head.y;
               const dist = Math.sqrt(dx * dx + dy * dy);
 
-              if (dist > 8) {
+              if (dist > 8 && currentSpeed > 0) {
                 const angle = Math.atan2(dy, dx);
                 const sf = Math.min(dist / 80, 1);
                 head.setVelocity(
-                  Math.cos(angle) * this.SPEED * sf,
-                  Math.sin(angle) * this.SPEED * sf,
+                  Math.cos(angle) * currentSpeed * sf,
+                  Math.sin(angle) * currentSpeed * sf,
                 );
                 head.setRotation(angle);
               } else {
@@ -412,8 +809,6 @@ export default function BacteriaGame() {
               head.y = Phaser.Math.Clamp(head.y, this.WATER_TOP + m, this.WATER_BOT - m);
 
               // Body trail
-              // segs[0] = near head → history index SEG_SPACE (1 step back)
-              // segs[7] = tail     → history index 8*SEG_SPACE (furthest)
               hist.unshift({ x: head.x, y: head.y });
               const maxLen = segs.length * this.SEG_SPACE + 1;
               if (hist.length > maxLen) hist.length = maxLen;
@@ -423,34 +818,70 @@ export default function BacteriaGame() {
                 if (pos) segs[i].setPosition(pos.x, pos.y);
               }
 
-              // ── Fish idle movement ──────────────────────────────────
+              // ── Fish behavior + stress (Stage 3) ────────────────────
+              const ammoniaCount = this.liveCount(this.ammoniaGroup);
+              const nitriteCount = this.liveCount(this.nitriteGroup);
+              const maxDanger = Math.max(
+                ammoniaCount / AMMONIA_DANGER_THRESHOLD,
+                nitriteCount / NITRITE_DANGER_THRESHOLD
+              );
+
               for (const f of this.fishes) {
+                if (maxDanger >= 0.75) {
+                  f.spd = f.baseSpd * 2.5;
+                  f.spr.setTint(0xFF7F5C);
+                  f.spr.setAlpha(0.9);
+                  if (Math.random() < 0.02) f.dir *= -1;
+                } else if (maxDanger >= 0.5) {
+                  f.spd = f.baseSpd * 1.8;
+                  f.spr.clearTint();
+                  f.spr.setAlpha(0.8);
+                } else {
+                  f.spd = f.baseSpd;
+                  f.spr.clearTint();
+                  f.spr.setAlpha(0.7);
+                }
+
                 f.spr.x += f.dir * f.spd * dt;
                 if (f.spr.x > this.GW - 50) { f.dir = -1; f.spr.setFlipX(true); }
                 if (f.spr.x < 50) { f.dir = 1; f.spr.setFlipX(false); }
               }
 
-              // ── Nitrate rises and gets absorbed by plants ───────────
+              // ── Redraw gauges before game-over check so bar shows full ─
+              this.drawGauges();
+
+              // ── Game over check (Stage 3) ───────────────────────────
+              if (ammoniaCount >= AMMONIA_DANGER_THRESHOLD) {
+                this.triggerGameOver("ammonia");
+                return;
+              }
+              if (nitriteCount >= NITRITE_DANGER_THRESHOLD) {
+                this.triggerGameOver("nitrite");
+                return;
+              }
+
+              // ── Nitrate absorption ──────────────────────────────────
               for (const nr of [...this.nitrateGroup.getChildren()]) {
                 if (!nr || !nr.active) continue;
                 if (nr.label) { nr.label.x = nr.x; nr.label.y = nr.y - 18; }
 
                 if (nr.y <= this.WATER_TOP + 18) {
-                  // Find nearest plant
                   let nearest = this.plants[0];
                   let minD = Infinity;
                   for (const p of this.plants) {
                     const d = Math.abs(nr.x - p.x);
                     if (d < minD) { minD = d; nearest = p; }
                   }
+                  const growAmt = nr.isCombo ? 2 : 1;
                   if (nearest.growth < GROWTH_MAX) {
-                    nearest.growth++;
+                    nearest.growth = Math.min(GROWTH_MAX, nearest.growth + growAmt);
                     if (nearest.growth >= GROWTH_MAX) {
                       this.totalGrown++;
-                      this.plantsText.setText("Plants fully grown: " + this.totalGrown);
+                      this.plantsText.setText("Plants grown: " + this.totalGrown);
                     }
                     this.drawPlants();
-                    const spark = this.add.text(nr.x, this.WATER_TOP + 4, "✨", {
+                    const sparkTxt = nr.isCombo ? "\u2728\u00D72" : "\u2728";
+                    const spark = this.add.text(nr.x, this.WATER_TOP + 4, sparkTxt, {
                       fontSize: "18px",
                     }).setDepth(12);
                     this.time.delayedCall(700, () => { if (spark?.active) spark.destroy(); });
@@ -459,6 +890,14 @@ export default function BacteriaGame() {
                   nr.destroy();
                 }
               }
+
+              // ── Oxygen bubbles movement (Stage 5) ───────────────────
+              for (const b of [...this.bubbleGroup.getChildren()]) {
+                if (!b || !b.active) continue;
+                b.x += Math.sin(this.time.now / 500 + (b.wobbleOffset || 0)) * 0.3;
+                if (b.y <= this.WATER_TOP) b.destroy();
+              }
+
             },
           },
           scale: {
@@ -485,7 +924,7 @@ export default function BacteriaGame() {
   if (error) {
     return (
       <div style={{ width: 800, height: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "#0a1f35" }}>
-        <div style={{ color: "#f1948a", maxWidth: 700 }}>
+        <div style={{ color: "#E49678", maxWidth: 700 }}>
           <strong>Game error:</strong>
           <pre style={{ whiteSpace: "pre-wrap" }}>{error}</pre>
         </div>
