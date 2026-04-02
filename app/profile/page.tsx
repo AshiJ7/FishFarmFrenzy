@@ -5,9 +5,9 @@ import { updateProfile } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
 
 const avatars = [
-  { name: "Otter", src: "/otter.png" },
-  { name: "Koi", src: "/koi.png" },
   { name: "Fly", src: "/fly.png" },
+  { name: "Koi", src: "/koi.png" },
+  { name: "Otter", src: "/otter.png" },
   { name: "Tomato", src: "/tomato.png" },
 ];
 
