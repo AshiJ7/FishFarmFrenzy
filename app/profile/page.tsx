@@ -8,6 +8,7 @@ const avatars = [
   { name: "Otter", src: "/otter.png" },
   { name: "Koi", src: "/koi.png" },
   { name: "Fly", src: "/fly.png" },
+  { name: "Tomato", src: "/tomato.png" },
 ];
 
 export default function ProfilePage() {
@@ -170,6 +171,35 @@ export default function ProfilePage() {
             <p className="h-6 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               {status}
             </p>
+
+            <div className="card">
+            {/* progress bar here and need to input the percentage with firebase in everything*/}
+            <p className=" text-left text-xl font-semibold" style={{ color: "var(--color-text-secondary)" }}>
+              Your current progress on the minigames: 80%
+            </p>
+            <div
+            className="h-3 rounded-full"
+            style={{ background: "var(--periwinkle)" }}
+          >
+            <div
+            className="h-3 rounded-full transition-all duration-500"
+            style={{
+              width: `80%`,
+              background: `linear-gradient(to right, var(--teal-medium), var(--olive-green))`,
+            }}
+          />
+          </div>
+        </div>
+
+        <div className="card">
+            {/* here is badge space but unsure how we want badges to look*/}
+            <p className=" text-center text-2xl font-extrabold" style={{ color: "var(--color-text-secondary)" }}>
+              Your Badges
+            </p>
+            
+        </div>
+          
+
           </div>
         </section>
       </main>
