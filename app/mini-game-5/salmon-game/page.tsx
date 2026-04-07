@@ -5,6 +5,9 @@ import grassImg from "./grass.jpg"
 
 import React, { useState, useEffect, useRef, useCallback} from 'react';
 import { randomInt } from "crypto";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "../../../lib/firebase";
+import { useAuth } from "../../../context/AuthContext"; 
 
 interface LettuceData {
   id: number;
@@ -32,6 +35,7 @@ export default function SalmonGame() {
   const [showCompletion, setShowCompletion] = useState(false);
   //setting game objects before so everything is fresh
   const [showInfo, setShowInfo] = useState<boolean>(true);
+  const { user } = useAuth();
   const startGame = () => {
     setScore(0);
     setScore2(0);
@@ -50,6 +54,20 @@ export default function SalmonGame() {
     setIsPlaying(false);
     setGameOver(true);
     setShowCompletion(true);
+    if (user) {
+      const ref = doc(db, "users", user.uid);
+      getDoc(ref).then((snap) => {
+        const data = snap.data();
+        const alreadyCompleted = data?.tilapiaGame ?? false;
+
+        if (!alreadyCompleted) {
+          updateDoc(ref, {
+            gamesCompleted: increment(1),
+            tilapiaGame: true,  
+          });
+        }
+      });
+    }
     return;
   }
 

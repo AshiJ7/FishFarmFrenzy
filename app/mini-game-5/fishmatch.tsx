@@ -1,6 +1,9 @@
 //using Teji's fish feeding as a basis
 "use client";
 import { useState, useEffect } from "react";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useAuth } from "../../context/AuthContext"; 
 
 type Crop = {
   id: number;
@@ -103,12 +106,27 @@ export default function FishCropMatch() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [wrongFish, setWrongFish] = useState<number | null>(null);
   const [showCompletion, setShowCompletion] = useState(false);
+  const { user } = useAuth();
 
 useEffect(() => {
   if (score === 4) {
     setShowCompletion(true);
+    if (user) {
+      const ref = doc(db, "users", user.uid);
+      getDoc(ref).then((snap) => {
+        const data = snap.data();
+        const alreadyCompleted = data?.fishCropCompleted ?? false;
+
+        if (!alreadyCompleted) {
+          updateDoc(ref, {
+            gamesCompleted: increment(1),
+            fishCropCompleted: true,  // mark this specific game as done
+          });
+        }
+      });
+    }
   }
-}, [score]);
+}, [score, user]);
 
   // store the id of dragged food in dataTransfer object
   const handleDraggingStart = (

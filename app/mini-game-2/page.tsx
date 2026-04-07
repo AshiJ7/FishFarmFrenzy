@@ -3,6 +3,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useAuth } from "../../context/AuthContext"; 
 
 const BubbleBackground = () => (
   <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -324,6 +327,8 @@ export default function MiniGame2() {
 
   const bubbleBackground = useMemo(() => <BubbleBackground />, []);
 
+  const { user } = useAuth();
+
   const selectScenario = (newScenario: Scenario) => {
     setScenario(newScenario);
     setLocked(false);
@@ -351,13 +356,29 @@ export default function MiniGame2() {
       newCompleted.add(scenario);
       setCompletedScenarios(newCompleted);
       const allDone = SCENARIO_ORDER.every((s) => newCompleted.has(s));
+      if (allDone && user) {
+  const ref = doc(db, "users", user.uid);
+  getDoc(ref).then((snap) => {
+    const data = snap.data();
+    const alreadyCompleted = data?.nitrogenCycleCompleted ?? false;
+    if (!alreadyCompleted) {
+      updateDoc(ref, {
+        gamesCompleted: increment(1),
+        nitrogenCycleCompleted: true,
+      });
+    }
+  });
+}
       setTimeout(() => {
         setScenario("balanced");
+        
         setLocked(false);
         setFeedback("");
         setSelectedAnswer(null);
         setWrongGuesses(0);
-        if (allDone) setShowFinish(true);
+        if (allDone){
+
+          setShowFinish(true);}
       }, 2200);
     } else {
       const newWrong = wrongGuesses + 1;

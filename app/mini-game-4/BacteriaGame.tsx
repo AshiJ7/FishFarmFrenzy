@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useAuth } from "../../context/AuthContext"; 
 
 export default function BacteriaGame() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const {user} = useAuth();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -688,6 +692,20 @@ export default function BacteriaGame() {
               this.triggerGameOver = (cause: string) => {
                 if (this.gameOver) return;
                 this.gameOver = true;
+
+                if (user) {
+    const ref = doc(db, "users", user.uid);
+    getDoc(ref).then((snap) => {
+      const data = snap.data();
+      const alreadyCompleted = data?.bacteriaGameCompleted ?? false;
+      if (!alreadyCompleted) {
+        updateDoc(ref, {
+          gamesCompleted: increment(1),
+          bacteriaGameCompleted: true,
+        });
+      }
+    });
+  }
 
                 this.headA.setVelocity(0, 0);
                 this.headB.setVelocity(0, 0);

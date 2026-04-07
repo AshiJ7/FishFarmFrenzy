@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, updateDoc, setDoc, increment } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../lib/firebase";
 
@@ -328,6 +328,18 @@ export default function FishFeeding() {
     saveProgress(score).catch(() => {
       setProgressStatus("Could not save progress");
     });
+    if (user) {
+    const ref = doc(db, "users", user.uid);
+    getDoc(ref).then((data) => {
+      const alreadyCompleted = data.data()?.fishFoodCompleted ?? false;
+      if (!alreadyCompleted) {
+        updateDoc(ref, {
+          gamesCompleted: increment(1),
+          fishFoodCompleted: true,
+        });
+      }
+    });
+  }
   }, [gameOver, score, user]);
 
   // randomly selects next food to appear from foods not yet used after current food has been dropped

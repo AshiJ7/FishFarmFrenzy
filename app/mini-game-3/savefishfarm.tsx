@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useAuth } from "../../context/AuthContext"; 
 
 //scenario types
 type Choice = {
@@ -802,6 +805,7 @@ export default function SaveFishFarmGame() {
   const [hoveredRestart, setHoveredRestart] = useState(false);
   const [hovered, setHovered] = useState(false);
   const bubbleBackground = useMemo(() => <BubbleBackground />, []);
+  const { user } = useAuth();
 
   //initialize scenarios
   useEffect(() => {
@@ -846,6 +850,19 @@ export default function SaveFishFarmGame() {
       setLastImpact(0);
     } else {
       setGameState("complete");
+      if (user) {
+      const ref = doc(db, "users", user.uid);
+      getDoc(ref).then((snap) => {
+        const data = snap.data();
+        const alreadyCompleted = data?.saveFishFarmCompleted ?? false;
+        if (!alreadyCompleted) {
+          updateDoc(ref, {
+            gamesCompleted: increment(1),
+            saveFishFarmCompleted: true,
+          });
+        }
+      });
+    }
     }
   };
 
