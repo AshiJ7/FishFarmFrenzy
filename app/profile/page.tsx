@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { updateProfile } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
 
 const avatars = [
   { name: "Fly", src: "/fly.png" },
@@ -11,13 +13,58 @@ const avatars = [
   { name: "Tomato", src: "/tomato.png" },
 ];
 
+const TOTAL_GAMES = 7;
+
+const BADGE_META = [
+  {
+    key: "first_game",
+    emoji: "🏅",
+    label: "First Step",
+    desc: "Complete your first minigame",
+  },
+  {
+    key: "all_games",
+    emoji: "🏆",
+    label: "Champion",
+    desc: "Complete all 7 minigames",
+  },
+];
+
 export default function ProfilePage() {
   const { user } = useAuth();
   const [selectedAvatar, setSelectedAvatar] = useState(user?.photoURL || "/otter.png");
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [gamesCompleted, setGamesCompleted] = useState(0);
+  const [progressLoading, setProgressLoading] = useState(true);
+
   const displayName = user?.displayName || "Player";
+
+  const progressPercent = Math.round((Math.min(gamesCompleted, TOTAL_GAMES) / TOTAL_GAMES) * 100);
+  const badges = {
+    first_game: gamesCompleted >= 1,
+    all_games: gamesCompleted >= TOTAL_GAMES,
+  };
+ 
+  // Load gamesCompleted from Firestore when user is available
+  useEffect(() => {
+    if (!user) return;
+ 
+    const ref = doc(db, "users", user.uid);
+ 
+    getDoc(ref).then((snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setGamesCompleted(data.gamesCompleted ?? 0);
+      } else {
+        
+        setDoc(ref, { gamesCompleted: 0 });
+        setGamesCompleted(0);
+      }
+      setProgressLoading(false);
+    });
+  }, [user]);
 
   const bubbles = useMemo(
     () =>
@@ -173,9 +220,10 @@ export default function ProfilePage() {
             </p>
 
             <div className="card">
-            {/* progress bar here and need to input the percentage with firebase in everything*/}
+            {/* progress bar here*/}
             <p className=" text-left text-xl font-semibold" style={{ color: "var(--color-text-secondary)" }}>
-              Your current progress on the minigames: 80%
+              Your current progress on the minigames:{" "}
+                {progressLoading ? "..." : `${gamesCompleted} / ${TOTAL_GAMES} (${progressPercent}%)`}
             </p>
             <div
             className="h-3 rounded-full"
@@ -184,7 +232,7 @@ export default function ProfilePage() {
             <div
             className="h-3 rounded-full transition-all duration-500"
             style={{
-              width: `80%`,
+              width: progressLoading ? "0%" : `${progressPercent}%`,
               background: `linear-gradient(to right, var(--teal-medium), var(--olive-green))`,
             }}
           />
@@ -192,10 +240,35 @@ export default function ProfilePage() {
         </div>
 
         <div className="card">
-            {/* here is badge space but unsure how we want badges to look*/}
+            {/* here is badge space*/}
             <p className=" text-center text-2xl font-extrabold" style={{ color: "var(--color-text-secondary)" }}>
               Your Badges
             </p>
+            <div className="mt-4 flex justify-center gap-6">
+                {BADGE_META.map((badge) => {
+                  const earned = badges[badge.key as keyof typeof badges];
+                  return (
+                    <div
+                      key={badge.key}
+                      className="flex flex-col items-center gap-1 rounded-2xl border-2 px-5 py-4 w-32 text-center"
+                      title={badge.desc}
+                      style={{
+                        borderColor: earned ? "var(--teal-medium)" : "var(--color-border-light)",
+                        background: earned ? "rgba(168,200,232,0.28)" : "rgba(255,255,255,0.4)",
+                        opacity: earned ? 1 : 0.4,
+                      }}
+                    >
+                      <span className="text-4xl">{badge.emoji}</span>
+                      <span className="text-sm font-bold mt-1" style={{ color: "var(--color-text-primary)" }}>
+                        {badge.label}
+                      </span>
+                      <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                        {earned ? "Earned!" : "Locked"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             
         </div>
           

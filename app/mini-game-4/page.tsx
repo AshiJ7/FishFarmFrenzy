@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import BacteriaGame from "./BacteriaGame";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 const BubbleBackground = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+  <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
     {[...Array(18)].map((_, i) => {
       const size = 12 + Math.random() * 24;
       return (
@@ -33,56 +33,115 @@ const BubbleBackground = () => (
   </div>
 );
 
-const OtterMascot = ({ message }: { message: string }) => (
-  <div className="flex items-start gap-4 bg-white p-4 rounded-2xl shadow-md mb-6 w-full">
-    <div className="text-5xl">🦦</div>
-    <div className="bg-[var(--mint-light)] p-3 rounded-xl text-gray-700 text-sm">
-      {message}
-    </div>
-  </div>
-);
-
 export default function MiniGame4() {
   const bubbleBackground = useMemo(() => <BubbleBackground />, []);
+  const [showInfo, setShowInfo] = useState<boolean>(true);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FDF6EC] to-[#D6F4FF] p-8">
+    <div className="flex min-h-screen items-center justify-center">
       {bubbleBackground}
 
-      <main className="relative z-10 flex w-full max-w-3xl flex-col items-center py-8 px-8 bg-gradient-to-b from-[#FFF9F2] to-[#E8F8F5] rounded-3xl shadow-2xl border-4 border-white">
-        <OtterMascot message="Switch between Nitrosomonas and Nitrobacter to complete the nitrogen cycle! Ammonia → Nitrite → Nitrate → Plant growth! 🦠🌿" />
+      {/* Info Modal */}
+      {showInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-4xl">
+                <img src="/otter.png" alt="otter" className="w-16 h-16 object-contain" />
+              </span>
+              <div
+                className="rounded-2xl rounded-tl-none px-4 py-2 text-sm text-gray-800 font-medium"
+                style={{ backgroundColor: "var(--mint-light)", border: "1px solid rgba(107,142,78,0.3)" }}
+              >
+                Hi! I&apos;m Otto the Otter. Let me tell you about the invisible heroes of aquaponics — bacteria!
+              </div>
+            </div>
+            <h2 className="text-xl font-bold mb-3 text-gray-800">Bacteria Make It All Work!</h2>
+            <ul className="space-y-2 text-sm text-gray-700 mb-6">
+              <li className="flex gap-2"><span>🦠</span><span>Fish produce toxic <strong>ammonia (NH&#x2083;)</strong> as waste. Too much ammonia kills fish!</span></li>
+              <li className="flex gap-2"><span>🟢</span><span><strong>Nitrosomonas</strong> bacteria eat ammonia and turn it into <strong>nitrite (NO&#x2082;&#x207B;)</strong>.</span></li>
+              <li className="flex gap-2"><span>🟣</span><span><strong>Nitrobacter</strong> bacteria eat nitrite and turn it into <strong>nitrate (NO&#x2083;&#x207B;)</strong> — plant food!</span></li>
+              <li className="flex gap-2"><span>🌿</span><span>Plants absorb the nitrate and grow. The cycle keeps fish safe and plants fed!</span></li>
+              <li className="flex gap-2"><span>💨</span><span>Both bacteria need <strong>oxygen</strong> to survive — don&apos;t forget to collect bubbles!</span></li>
+            </ul>
+            <p className="text-sm text-gray-500 mb-6 italic">
+              Switch between bacteria with Space to manage the nitrogen cycle and keep the fish alive!
+            </p>
+            <button
+              onClick={() => setShowInfo(false)}
+              className="w-full font-semibold py-2 rounded-lg transition-colors text-white hover:opacity-90"
+              style={{ backgroundColor: "var(--olive-green)" }}
+            >
+              Let&apos;s Play!
+            </button>
+          </div>
+        </div>
+      )}
 
-        <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
-          Bacteria Battle
-        </h1>
-        <p className="mb-6 text-center text-[var(--color-text-secondary)]">
-          Control two types of bacteria to convert ammonia into plant food. Switch with Space or the on-screen button!
-        </p>
+      {/* Floating otter button */}
+      <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-center gap-1">
+        <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
+          Learn More
+        </span>
+        <button
+          onClick={() => setShowInfo(true)}
+          className="rounded-full w-20 h-20 shadow-lg transition-colors flex items-center justify-center overflow-hidden p-1 border-2"
+          style={{ backgroundColor: "var(--mint-light)", borderColor: "var(--olive-green)" }}
+        >
+          <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+        </button>
+      </div>
 
-        <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+      <main
+        className="relative z-10 flex w-full max-w-5xl flex-col items-center py-8 px-8"
+        style={{ color: "var(--foreground)" }}
+      >
+        {/* Header card */}
+        <div
+          className="flex flex-col items-center gap-2 mb-4 w-full py-6 px-8 rounded-3xl shadow-md"
+          style={{ backgroundColor: "rgba(255,255,255,0.88)", border: "2px solid var(--color-border-light)" }}
+        >
+          <div className="text-5xl" style={{ animation: "bounce 2s infinite" }}>🥊🦠</div>
+          <h1
+            className="text-4xl font-extrabold text-center"
+            style={{
+              backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Bacteria Battle
+          </h1>
+          <p className="mt-1 text-center" style={{ color: "var(--color-text-secondary)" }}>
+            Control two types of bacteria to convert ammonia into plant food. Switch with Space or the on-screen button!
+          </p>
+        </div>
+
+        {/* Game */}
+        <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ border: "2px solid var(--color-border-light)" }}>
           <BacteriaGame />
         </div>
 
-        <nav className="mt-8 flex gap-4">
-          <Link
-            href="/"
-            className="px-4 py-2 bg-[var(--teal-medium)] text-white font-semibold rounded-2xl shadow-md hover:scale-105 transition-transform"
-          >
-            Home
-          </Link>
-          <Link
-            href="/mini-game-3"
-            className="px-4 py-2 bg-[var(--teal-medium)] text-white font-semibold rounded-2xl shadow-md hover:scale-105 transition-transform"
-          >
-            Prev
-          </Link>
-          <Link
-            href="/mini-game-5"
-            className="px-4 py-2 bg-[var(--olive-green)] text-white font-semibold rounded-2xl shadow-md hover:scale-105 transition-transform"
-          >
-            Next
-          </Link>
+        {/* Nav card */}
+        <nav
+          className="mt-4 flex gap-4 w-full justify-center py-4 px-8 rounded-3xl shadow-md"
+          style={{ backgroundColor: "rgba(255,255,255,0.88)", border: "2px solid var(--color-border-light)" }}
+        >
+          <Link href="/" className="px-4 py-2 font-semibold rounded-2xl shadow-md transition-transform hover:scale-105"
+            style={{ backgroundColor: "var(--teal-medium)", color: "white" }}>Home</Link>
+          <Link href="/mini-game-3" className="px-4 py-2 font-semibold rounded-2xl shadow-md transition-transform hover:scale-105"
+            style={{ backgroundColor: "var(--teal-medium)", color: "white" }}>Prev</Link>
+          <Link href="/mini-game-5" className="px-4 py-2 font-semibold rounded-2xl shadow-md transition-transform hover:scale-105"
+            style={{ backgroundColor: "var(--olive-green)", color: "white" }}>Next</Link>
         </nav>
+
+        <style>{`
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-10px); }
+          }
+        `}</style>
       </main>
     </div>
   );

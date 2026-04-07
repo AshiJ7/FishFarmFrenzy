@@ -4,6 +4,10 @@ import grassImg from './grass.jpg';
 
 
 import React, { useState, useEffect, useRef, useCallback} from 'react';
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "../../../lib/firebase";
+import { useAuth } from "../../../context/AuthContext"; 
+
 
 interface LettuceData {
   id: number;
@@ -24,6 +28,8 @@ export default function LettuceGame() {
     const [timeLeft, setTimeLeft] = useState(30);
     const [showInfo, setShowInfo] = useState<boolean>(true);
     const [showCompletion, setShowCompletion] = useState(false);
+    const { user } = useAuth();
+
     //setting game objects before so everything is fresh
     const startGame = () => {
       setScore(0);
@@ -41,6 +47,20 @@ export default function LettuceGame() {
         setIsPlaying(false);
         setGameOver(true);
         setShowCompletion(true);
+        if (user) {
+      const ref = doc(db, "users", user.uid);
+      getDoc(ref).then((snap) => {
+        const data = snap.data();
+        const alreadyCompleted = data?.tomatoCompleted ?? false;
+
+        if (!alreadyCompleted) {
+          updateDoc(ref, {
+            gamesCompleted: increment(1),
+            tomatoCompleted: true,  // mark this specific game as done
+          });
+        }
+      });
+    }
         return;
       }
     
@@ -191,7 +211,7 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
               <li className="flex gap-2"><span>🐠</span><span><strong>Fertilizer</strong> — Special plant food added to the dirt</span></li>
             </ul>
             <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A tomato farm grows tomatos. A fish farm grows fish. They are always separate!
-Regular farms also use a LOT of water. In fact, it can take up to 250 cups of water just to grow one head of lettuce! Most of that water gets used up or soaks into the ground and is gone. </h4>
+Regular farms also use a LOT of water. In fact, it can take up to 96 cups of water just to grow one tomato plant! Most of that water gets used up or soaks into the ground and is gone. </h4>
             <button
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"

@@ -6,6 +6,8 @@ const games = [
     emoji: "🐟🐛🌿",
     title: "Feeding Frenzy",
     desc: "Decide if each food is good or bad for the selected fish!",
+    cycleLabel: "Fish & Feeding",
+    cycleStep: "Fish eat and produce waste, releasing ammonia into the water. The aquaponics cycle starts with the fish.",
     accent: "#4A8E9E",
     glow: "rgba(74,142,158,0.35)",
   },
@@ -14,40 +16,61 @@ const games = [
     emoji: "🦠🔁🌿",
     title: "Cycle Explorer",
     desc: "Learn about the nitrogen cycle and keep the aquaponics system balanced!",
+    cycleLabel: "Nitrogen Cycle",
+    cycleStep: "Ammonia travels through the system and drives the full nitrogen cycle.",
     accent: "#6B8E4E",
     glow: "rgba(107,142,78,0.35)",
   },
   {
     n: 3,
-    emoji: "🦸🐟",
-    title: "Save Your Fish Farm",
-    desc: "Make the right decisions to keep your aquaponics farm healthy!",
-    accent: "#E49678",
-    glow: "rgba(228,150,120,0.35)",
-  },
-  {
-    n: 4,
     emoji: "🥊🦠",
     title: "Bacteria Battle",
     desc: "Feed the bacteria nutrients while staying away from toxic waste!",
+    cycleLabel: "Nitrification",
+    cycleStep: "The bacteria convert toxic ammonia into nitrate, which is the key to clean water.",
     accent: "#A8C8E8",
     glow: "rgba(168,200,232,0.4)",
+  },
+  {
+    n: 4,
+    emoji: "🦸🐟",
+    title: "Save Your Fish Farm",
+    desc: "Make the right decisions to keep your aquaponics farm healthy!",
+    cycleLabel: "System Balance",
+    cycleStep: "Apply everything you learned to keep the whole system in balance",
+    accent: "#E49678",
+    glow: "rgba(228,150,120,0.35)",
   },
   {
     n: 5,
     emoji: "🐟✅🌿",
     title: "Perfect Pairs",
     desc: "Match each fish with the best plant to grow with it in the aquaponics system!",
+    cycleLabel: "Plant & Fish Harmony",
+    cycleStep: "See how aquaponics farms generate more output compared to traditional farming.",
     accent: "#B8D8A8",
     glow: "rgba(184,216,168,0.4)",
   },
 ];
 
+// Positions for 5 cards arranged in a cycle/pentagon shape
+// Center of layout: cx=500, cy=360 (within a 1000x720 logical space)
+// We'll use % for positioning so it's responsive
+const CYCLE_POSITIONS = [
+  { top: "2%",  left: "50%",  transform: "translateX(-50%)" },           // top center  (game 1)
+  { top: "28%", left: "82%",  transform: "translateX(-50%)" },           // right (game 2)
+  { top: "65%", left: "70%",  transform: "translateX(-50%)" },           // bottom right (game 3)
+  { top: "65%", left: "30%",  transform: "translateX(-50%)" },           // bottom left (game 4)
+  { top: "28%", left: "18%",  transform: "translateX(-50%)" },           // left (game 5)
+];
+
 export default function Home() {
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: "linear-gradient(145deg, #CFFCFF 0%, #AAEFDF 45%, #63C132 100%)" }}>
-
-      {/* Animated bubble background */}
+    <div
+      className="relative min-h-screen overflow-x-hidden"
+      style={{ background: "linear-gradient(145deg, #CFFCFF 0%, #AAEFDF 45%, #63C132 100%)" }}
+    >
+      {/* Bubble background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {[
           { left: 8,  size: 18, dur: 9,  delay: 0   },
@@ -93,34 +116,26 @@ export default function Home() {
           100% { transform: translateY(-105vh) scale(1.2); opacity: 0; }
         }
         @keyframes cardFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-6px); }
-        }
-        @keyframes titleGlow {
-          0%, 100% { text-shadow: 0 0 20px rgba(74,142,158,0.4), 0 0 40px rgba(107,142,78,0.2); }
-          50%       { text-shadow: 0 0 30px rgba(74,142,158,0.6), 0 0 60px rgba(107,142,78,0.35); }
+          0%, 100% { transform: translateY(0px) translateX(-50%); }
+          50%       { transform: translateY(-6px) translateX(-50%); }
         }
         @keyframes shimmer {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
+        @keyframes rotateCycle {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
         .game-card {
           transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease, filter 0.3s ease;
         }
         .game-card:hover {
-          transform: translateY(-10px) scale(1.04);
           filter: brightness(1.05);
+          z-index: 20 !important;
         }
-        .game-card:active {
-          transform: translateY(-4px) scale(1.01);
-        }
-        .emoji-bounce {
-          display: inline-block;
-          transition: transform 0.3s ease;
-        }
-        .game-card:hover .emoji-bounce {
-          animation: emojiBounce 0.5s ease;
-        }
+        .emoji-bounce { display: inline-block; transition: transform 0.3s ease; }
+        .game-card:hover .emoji-bounce { animation: emojiBounce 0.5s ease; }
         @keyframes emojiBounce {
           0%   { transform: scale(1); }
           40%  { transform: scale(1.3) rotate(-5deg); }
@@ -134,6 +149,18 @@ export default function Home() {
           -webkit-text-fill-color: transparent;
           background-clip: text;
           animation: shimmer 4s linear infinite;
+        }
+        .cycle-label {
+          font-family: var(--font-nunito), sans-serif;
+          font-size: 0.7rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 4px 12px;
+          border-radius: 50px;
+          display: inline-block;
+          margin-bottom: 10px;
+          color: white;
         }
       `}</style>
 
@@ -151,36 +178,89 @@ export default function Home() {
         </div>
         <p
           className="mx-auto max-w-xl text-center"
-          style={{
-            color: "rgba(44,36,22,0.75)",
-            fontSize: "1.05rem",
-            fontFamily: "var(--font-nunito), sans-serif",
-            fontWeight: 600,
-          }}
+          style={{ color: "rgba(44,36,22,0.75)", fontSize: "1.05rem", fontFamily: "var(--font-nunito), sans-serif", fontWeight: 600 }}
         >
           Dive into 5 mini-games and discover the wonders of aquaponics!
         </p>
-        <div
-          className="mx-auto mt-3 rounded-full"
-          style={{
-            width: "80px",
-            height: "3px",
-            background: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
-          }}
-        />
+        <div className="mx-auto mt-3 rounded-full" style={{ width: "80px", height: "3px", background: "linear-gradient(to right, var(--teal-medium), var(--olive-green))" }} />
       </header>
 
-      {/* Game cards */}
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-wrap justify-center gap-6 px-6 py-10 items-stretch">
-        {games.map(({ n, emoji, title, desc, accent, glow }, idx) => (
+      {/* Cycle layout */}
+      <main className="relative z-10 w-full" style={{ height: "860px", maxWidth: "1000px", margin: "0 auto" }}>
+
+        {/* Dashed cycle ring */}
+        <div
+          className="absolute"
+          style={{
+            top: "50%", left: "50%",
+            width: "580px", height: "580px",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "50%",
+            border: "2px dashed rgba(255,255,255,0.45)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Center label */}
+        <div
+          className="absolute text-center"
+          style={{
+            top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "none",
+          }}
+        >
+          <div style={{ fontSize: "3rem", marginBottom: "6px" }}></div>
+          <div style={{
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontWeight: 800,
+            fontSize: "2.8rem",
+            color: "rgba(44,36,22,0.7)",
+            letterSpacing: "0.04em",
+            lineHeight: 1.3,
+          }}>
+            Aquaponics<br />Cycle
+          </div>
+        </div>
+
+        {/* Arrow indicators around the ring */}
+        {[0, 72, 144, 216, 288].map((deg, i) => (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              top: "50%", left: "50%",
+              width: "580px", height: "0",
+              transformOrigin: "0 0",
+              transform: `rotate(${deg + 36}deg)`,
+              pointerEvents: "none",
+            }}
+          >
+            <div style={{
+              position: "absolute",
+              right: "-12px",
+              top: "-8px",
+              width: 0,
+              height: 0,
+              borderTop: "7px solid transparent",
+              borderBottom: "7px solid transparent",
+              borderLeft: "10px solid rgba(255,255,255,0.5)",
+            }} />
+          </div>
+        ))}
+
+        {/* Game cards */}
+        {games.map(({ n, emoji, title, desc, cycleLabel, cycleStep, accent, glow }, idx) => (
           <Link
             key={n}
             href={`/mini-game-${n}`}
             className="game-card"
             style={{
-              width: "clamp(220px, 28vw, 280px)",
-              borderRadius: "28px",
-              background: "rgba(255,255,255,0.62)",
+              position: "absolute",
+              ...CYCLE_POSITIONS[idx],
+              width: "260px",
+              borderRadius: "24px",
+              background: "rgba(255,255,255,0.65)",
               backdropFilter: "blur(18px)",
               border: `2px solid rgba(255,255,255,0.75)`,
               boxShadow: `0 8px 32px ${glow}, 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.8)`,
@@ -188,128 +268,100 @@ export default function Home() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "flex-start",
-              padding: "32px 24px 28px",
+              padding: "24px 20px 22px",
               textDecoration: "none",
               animation: `cardFloat ${4.5 + idx * 0.3}s ease-in-out infinite`,
               animationDelay: `${idx * 0.4}s`,
-              position: "relative",
+              zIndex: 10,
               overflow: "hidden",
             }}
           >
-            {/* Accent stripe at top */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "5px",
-                background: `linear-gradient(to right, ${accent}, ${accent}88)`,
-                borderRadius: "28px 28px 0 0",
-              }}
-            />
+            {/* Accent stripe */}
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: "4px",
+              background: `linear-gradient(to right, ${accent}, ${accent}88)`,
+              borderRadius: "24px 24px 0 0",
+            }} />
 
             {/* Number badge */}
-            <div
-              style={{
-                position: "absolute",
-                top: "14px",
-                right: "16px",
-                width: "28px",
-                height: "28px",
-                borderRadius: "50%",
-                background: `linear-gradient(135deg, ${accent}, ${accent}aa)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "0.75rem",
-                fontWeight: 800,
-                color: "white",
-                boxShadow: `0 2px 8px ${glow}`,
-                fontFamily: "var(--font-nunito), sans-serif",
-              }}
-            >
-              {n}
-            </div>
+            <div style={{
+              position: "absolute", top: "10px", right: "12px",
+              width: "24px", height: "24px", borderRadius: "50%",
+              background: `linear-gradient(135deg, ${accent}, ${accent}aa)`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "0.7rem", fontWeight: 800, color: "white",
+              boxShadow: `0 2px 8px ${glow}`,
+              fontFamily: "var(--font-nunito), sans-serif",
+            }}>{n}</div>
+
+            {/* Cycle label tag */}
+            <span className="cycle-label" style={{ backgroundColor: accent }}>
+              {cycleLabel}
+            </span>
 
             {/* Emoji */}
-            <div
-              className="emoji-bounce"
-              style={{
-                fontSize: "2.8rem",
-                marginBottom: "14px",
-                marginTop: "8px",
-                filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.12))",
-                lineHeight: 1,
-              }}
-            >
+            <div className="emoji-bounce" style={{
+              fontSize: "2rem", marginBottom: "10px",
+              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.12))", lineHeight: 1,
+            }}>
               {emoji}
             </div>
 
             {/* Title */}
-            <h2
-              style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                fontWeight: 800,
-                fontSize: "1.15rem",
-                color: "var(--color-text-primary)",
-                textAlign: "center",
-                marginBottom: "10px",
-                lineHeight: 1.25,
-              }}
-            >
-              {title}
-            </h2>
+            <h2 style={{
+              fontFamily: "var(--font-nunito), sans-serif", fontWeight: 800,
+              fontSize: "1rem", color: "var(--color-text-primary)",
+              textAlign: "center", marginBottom: "8px", lineHeight: 1.25,
+            }}>{title}</h2>
 
             {/* Divider */}
-            <div
-              style={{
-                width: "40px",
-                height: "2px",
-                borderRadius: "2px",
-                background: `linear-gradient(to right, ${accent}, ${accent}55)`,
-                marginBottom: "10px",
-                flexShrink: 0,
-              }}
-            />
+            <div style={{
+              width: "32px", height: "2px", borderRadius: "2px",
+              background: `linear-gradient(to right, ${accent}, ${accent}55)`,
+              marginBottom: "8px", flexShrink: 0,
+            }} />
 
             {/* Description */}
-            <p
-              style={{
-                fontFamily: "var(--font-nunito), sans-serif",
-                fontSize: "0.85rem",
-                color: "var(--color-text-secondary)",
-                textAlign: "center",
-                lineHeight: 1.55,
-                fontWeight: 500,
-              }}
-            >
-              {desc}
-            </p>
+            <p style={{
+              fontFamily: "var(--font-nunito), sans-serif",
+              fontSize: "0.75rem", color: "var(--color-text-secondary)",
+              textAlign: "center", lineHeight: 1.5, fontWeight: 500,
+            }}>{desc}</p>
 
-            {/* Play button hint */}
-            <div
-              style={{
-                marginTop: "18px",
-                padding: "8px 22px",
-                borderRadius: "50px",
-                background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
-                color: "white",
-                fontSize: "0.8rem",
-                fontWeight: 700,
-                fontFamily: "var(--font-nunito), sans-serif",
-                letterSpacing: "0.04em",
-                boxShadow: `0 3px 10px ${glow}`,
-              }}
-            >
+            {/* Play button */}
+            <div style={{
+              marginTop: "14px", padding: "6px 18px", borderRadius: "50px",
+              background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+              color: "white", fontSize: "0.75rem", fontWeight: 700,
+              fontFamily: "var(--font-nunito), sans-serif",
+              letterSpacing: "0.04em", boxShadow: `0 3px 10px ${glow}`,
+            }}>
               Play Now ›
             </div>
+
+            {/* Cycle step */}
+            <div style={{
+              marginTop: "12px",
+              paddingTop: "10px",
+              borderTop: `1px solid ${accent}44`,
+              fontSize: "0.7rem",
+              fontFamily: "var(--font-nunito), sans-serif",
+              fontWeight: 600,
+              color: "rgba(44,36,22,0.6)",
+              textAlign: "center",
+              lineHeight: 1.4,
+            }}>
+              {cycleStep}
+            </div>
+
           </Link>
         ))}
       </main>
 
+      
+
       {/* Footer */}
-      <footer className="relative z-10 pb-8 text-center">
+      <footer className="relative z-10 pt-10 pb-12 text-center">
         <p style={{ color: "black", fontSize: "0.8rem", fontFamily: "var(--font-nunito), sans-serif" }}>
           🌊 Explore the world of aquaponics where fish and plants grow together!
         </p>
