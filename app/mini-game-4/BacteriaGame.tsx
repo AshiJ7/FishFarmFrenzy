@@ -80,6 +80,13 @@ export default function BacteriaGame() {
               this.spawnInterval = BASE_SPAWN_INTERVAL;
               this.firstBubbleShown = false;
 
+              // Coach mode: first-time guided walkthrough before normal gameplay begins.
+              // While in coach mode, normal spawn / feeding / oxygen timers are paused so
+              // the player can learn the cycle without pressure.
+              this.coachMode = true;
+              // waitAmmonia -> waitSwitch -> waitNitrite -> waitSwitchBack -> done
+              this.coachStep = "waitAmmonia";
+
               // ── Background ──────────────────────────────────────────
               const bg = this.add.graphics().setDepth(0);
 
@@ -210,6 +217,36 @@ export default function BacteriaGame() {
                 g.fillStyle(0x8B4513, 1); g.fillCircle(6, 6, 5);
                 g.fillStyle(0xA0522D, 1); g.fillCircle(5, 5, 3);
               }, "food_pellet", 12, 12);
+
+              // ── Reaction chain HUD (top of plant zone) ──────────────
+              // Persistent visual of the nitrogen cycle so players can always
+              // see the relationship between molecules and bacteria without
+              // having to reread a tutorial modal.
+              const chainBg = this.add.graphics().setDepth(9);
+              chainBg.fillStyle(0xffffff, 0.82);
+              chainBg.fillRoundedRect(80, 3, GW - 160, 26, 13);
+              chainBg.lineStyle(1.5, 0x4A8E9E, 0.45);
+              chainBg.strokeRoundedRect(80, 3, GW - 160, 26, 13);
+
+              const chainY = 16;
+              const chainParts: Array<{ text: string; color: string; x: number }> = [
+                { text: "NH\u2083",             color: "#c0392b", x: 225 },
+                { text: "\u2192",               color: "#5C5444", x: 260 },
+                { text: "Nitrosomonas",         color: "#1a7a40", x: 330 },
+                { text: "\u2192",               color: "#5C5444", x: 400 },
+                { text: "NO\u2082\u207B",       color: "#a07810", x: 440 },
+                { text: "\u2192",               color: "#5C5444", x: 480 },
+                { text: "Nitrobacter",          color: "#7d3c98", x: 550 },
+                { text: "\u2192",               color: "#5C5444", x: 620 },
+                { text: "NO\u2083\u207B",       color: "#1a7a40", x: 665 },
+                { text: "\u2192 \uD83C\uDF3F",  color: "#5C5444", x: 715 },
+              ];
+              for (const p of chainParts) {
+                this.add.text(p.x, chainY, p.text, {
+                  fontSize: "13px", color: p.color,
+                  fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                }).setOrigin(0.5).setDepth(10);
+              }
 
               // ── Plants ──────────────────────────────────────────────
               this.plants = plantXs.map((px: number) => ({
@@ -351,8 +388,8 @@ export default function BacteriaGame() {
                 spr.setVelocityY(-65);
               };
 
-              // Spawn a few initial ammonia
-              for (let i = 0; i < 3; i++) this.spawnAmmonia();
+              // (Initial ammonia spawning moved into startGameplay() so the
+              // coach sequence can run on an empty-ish board before real play.)
 
               // ── Bacteria A: Nitrosomonas ────────────────────────────
               this.histA = [] as { x: number; y: number }[];
@@ -380,6 +417,18 @@ export default function BacteriaGame() {
               this.headB = this.physics.add.sprite(600, 300, "nb_head")
                 .setMaxVelocity(BASE_SPEED).setAlpha(0.3).setDepth(5);
 
+              // ── Active bacteria halo + target molecule glow ─────────
+              // Redrawn each frame in update(); the active bacteria gets a
+              // pulsing ring in the colour of the food it should be eating,
+              // and each currently-edible molecule gets a matching glow.
+              this.targetGlowGfx = this.add.graphics().setDepth(1.8);
+              this.haloGfx = this.add.graphics().setDepth(5.5);
+
+              // Combo-window ring: drawn around any nitrite whose creation
+              // is still inside COMBO_WINDOW so the player can see exactly
+              // how long they have to chain NH₃ → NO₂⁻ for a Full Cycle bonus.
+              this.comboRingGfx = this.add.graphics().setDepth(2.5);
+
               // ── Overlaps ────────────────────────────────────────────
 
               // Nitrosomonas eats ammonia → drops nitrite
@@ -392,6 +441,15 @@ export default function BacteriaGame() {
                   this.score += 10;
                   this.scoreText.setText("Score: " + this.score);
                   this.dropNitrite(sx, sy);
+
+                  // Coach mode: first ammonia eaten → prompt for bacteria swap
+                  if (this.coachMode && this.coachStep === "waitAmmonia") {
+                    this.coachStep = "waitSwitch";
+                    this.setCoachHint(
+                      "Nice! That ammonia became nitrite (NO\u2082\u207B).\n" +
+                      "Press SPACE to switch to the purple Nitrobacter."
+                    );
+                  }
                 }, undefined, this);
 
               // Nitrobacter eats nitrite → drops nitrate (+ combo check)
@@ -411,24 +469,54 @@ export default function BacteriaGame() {
                     const bonus = 20 * this.comboStreak;
                     this.score += 15 + bonus;
                     const label = this.comboStreak > 1
-                      ? `Full Cycle! \u00D7${this.comboStreak}`
-                      : "Full Cycle!";
-                    const ct = this.add.text(head.x, head.y - 30, label, {
-                      fontSize: "16px", color: "#B8860B",
+                      ? `Full Cycle! \u00D7${this.comboStreak}  +${15 + bonus}`
+                      : `Full Cycle!  +${15 + bonus}`;
+                    const ct = this.add.text(head.x, head.y - 32, label, {
+                      fontSize: "22px", color: "#F9C400",
                       fontFamily: "Nunito, sans-serif", fontStyle: "bold",
-                      stroke: "#fff", strokeThickness: 3,
-                    }).setOrigin(0.5).setDepth(15);
+                      stroke: "#5a3a00", strokeThickness: 4,
+                    }).setOrigin(0.5).setDepth(15).setScale(0.5);
+                    // Pop-in, then float up and fade.
                     this.tweens.add({
-                      targets: ct, y: head.y - 70, alpha: 0,
-                      duration: 1200, onComplete: () => ct.destroy(),
+                      targets: ct, scale: 1.15,
+                      duration: 180, ease: "Back.out",
+                      onComplete: () => {
+                        this.tweens.add({
+                          targets: ct, y: head.y - 95, alpha: 0,
+                          duration: 1200, onComplete: () => ct.destroy(),
+                        });
+                      },
                     });
+                    // Update the persistent combo streak indicator in the UI bar.
+                    this.comboText.setText(
+                      `Full Cycle Streak: \u00D7${this.comboStreak}   \u00B7   Plants grow 2\u00D7 faster on combos!`
+                    );
+                    this.comboText.setStyle({ color: "#1a7a40" });
                   } else {
+                    if (this.comboStreak > 0) {
+                      // Streak just broke — reset the UI indicator to its idle state.
+                      this.comboText.setText(
+                        "Full Cycle Streak: \u00D70   \u00B7   Eat fresh NO\u2082\u207B (gold ring) within 5s for bonus!"
+                      );
+                      this.comboText.setStyle({ color: "#8B6914" });
+                    }
                     this.comboStreak = 0;
                     this.score += 15;
                   }
 
                   this.scoreText.setText("Score: " + this.score);
                   this.dropNitrate(sx, sy, isCombo);
+
+                  // Coach mode: full cycle completed once → now teach that
+                  // SPACE is a two-way toggle by asking the player to switch
+                  // back to Nitrosomonas before real gameplay begins.
+                  if (this.coachMode && this.coachStep === "waitNitrite") {
+                    this.coachStep = "waitSwitchBack";
+                    this.setCoachHint(
+                      "Great! You turned the nitrite into nitrate (NO\u2083\u207B) — plant food.\n" +
+                      "Press SPACE again to switch back to the green Nitrosomonas."
+                    );
+                  }
                 }, undefined, this);
 
               // Active bacterium eats oxygen bubbles
@@ -476,6 +564,39 @@ export default function BacteriaGame() {
                   );
                 }
                 this.updateActiveLabel();
+
+                // Coach mode: player just switched to Nitrobacter → prompt for nitrite
+                if (this.coachMode && this.coachStep === "waitSwitch" && this.activeBacteria === "nb") {
+                  this.coachStep = "waitNitrite";
+                  this.setCoachHint(
+                    "Now drag your purple Nitrobacter onto the yellow\n" +
+                    "NO\u2082\u207B nitrite molecule to complete the cycle!"
+                  );
+                }
+
+                // Coach mode: player switched back to Nitrosomonas → done, kick off real game
+                if (this.coachMode && this.coachStep === "waitSwitchBack" && this.activeBacteria === "ns") {
+                  this.coachStep = "done";
+                  this.setCoachHint(
+                    "Perfect! Press SPACE any time you want to switch bacteria."
+                  );
+                  // Two-part outro: first the "you got it" beat, then a pro-tip
+                  // explaining the Full Cycle bonus mechanic before real play starts.
+                  this.time.delayedCall(2200, () => {
+                    this.setCoachHint(
+                      "Pro tip: when you make a nitrite (NO\u2082\u207B), a shrinking\n" +
+                      "gold ring shows how long you have to eat it for a\n" +
+                      "Full Cycle bonus — extra score AND plants grow 2\u00D7 faster!"
+                    );
+                    this.time.delayedCall(4600, () => {
+                      this.tweens.add({
+                        targets: this.coachText, alpha: 0, duration: 500,
+                        onComplete: () => { this.coachText.setVisible(false); },
+                      });
+                      this.startGameplay();
+                    });
+                  });
+                }
               };
 
               const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -568,125 +689,169 @@ export default function BacteriaGame() {
                 }
               };
 
-              // ── UI Bar — Row 3: Plants + legend ─────────────────────
+              // ── UI Bar — Row 3: Plants + combo streak ───────────────
               this.plantsText = this.add.text(12, WATER_BOT + 54, "Plants grown: 0", {
                 fontSize: "10px", color: "#5C5444",
                 fontFamily: "Nunito, sans-serif",
               }).setDepth(10);
 
-              this.add.text(GW / 2, WATER_BOT + 54,
-                "\uD83D\uDFE2 Nitrosomonas: NH\u2083\u2192NO\u2082\u207B   \uD83D\uDFE3 Nitrobacter: NO\u2082\u207B\u2192NO\u2083\u207B", {
-                  fontSize: "9px", color: "#5C5444",
-                  fontFamily: "Nunito, sans-serif",
+              // Persistent combo-mechanic helper text. Explains the bonus when
+              // the streak is 0, celebrates it when the streak is active, and
+              // is updated by the nitrite overlap handler.
+              this.comboText = this.add.text(GW / 2, WATER_BOT + 54,
+                "Full Cycle Streak: \u00D70   \u00B7   Eat fresh NO\u2082\u207B (gold ring) within 5s for bonus!", {
+                  fontSize: "10px", color: "#8B6914",
+                  fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5, 0).setDepth(10);
 
-              // Plant zone label
-              this.add.text(8, 3, "\uD83C\uDF3F Plant Zone", {
-                fontSize: "11px", color: "#358600",
-                fontFamily: "Nunito, sans-serif",
-              }).setDepth(10);
+              // (Old bottom-row text legend and "Plant Zone" label removed —
+              // the reaction chain HUD at the top of the plant zone now
+              // conveys the same information more visually.)
 
-              // ── Continuous ammonia spawning (Stage 3) ────────────────
-              this.spawnTimer = this.time.addEvent({
-                delay: this.spawnInterval,
-                callback: () => {
-                  if (this.gameOver) return;
-                  const fish = this.fishes[Phaser.Math.Between(0, this.fishes.length - 1)];
-                  this.spawnAmmonia(
-                    fish.spr.x + Phaser.Math.Between(-30, 30),
-                    fish.spr.y + Phaser.Math.Between(-15, 15)
-                  );
-                  this.spawnInterval = Math.max(MIN_SPAWN_INTERVAL, this.spawnInterval - SPAWN_ACCELERATION);
-                  this.spawnTimer.delay = this.spawnInterval;
-                },
-                loop: true,
-              });
-
-              // ── Feeding events (Stage 4) ────────────────────────────
+              // ── Feeding-time announcement text (used by startGameplay) ─
               this.feedingText = this.add.text(GW / 2, WATER_TOP + 30, "", {
                 fontSize: "22px", color: "#B8860B",
                 fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 stroke: "#fff", strokeThickness: 3,
               }).setOrigin(0.5).setDepth(15).setAlpha(0);
 
-              this.time.addEvent({
-                delay: FEEDING_INTERVAL,
-                callback: () => {
-                  if (this.gameOver) return;
+              // ── Coach hint box (centered near the top of the water) ────
+              this.coachText = this.add.text(GW / 2, WATER_TOP + 50, "", {
+                fontSize: "15px", color: "#2C2416",
+                fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                backgroundColor: "#fff8e7",
+                padding: { x: 16, y: 10 },
+                align: "center",
+              }).setOrigin(0.5, 0).setDepth(30);
+              this.setCoachHint = (msg: string) => {
+                this.coachText.setVisible(true);
+                this.coachText.setAlpha(1);
+                this.coachText.setText(msg);
+              };
 
-                  // Flash "Feeding Time!"
-                  this.feedingText.setText("Feeding Time!");
-                  this.feedingText.setAlpha(1);
-                  this.tweens.add({
-                    targets: this.feedingText, alpha: 0,
-                    duration: 2500, delay: 1500,
-                  });
+              // ── startGameplay: kicks off all the live-gameplay timers ──
+              // Called immediately if coachMode is off, or by the coach
+              // sequence once the player has completed one full cycle.
+              this.startGameplay = () => {
+                this.coachMode = false;
 
-                  // Food pellet drops
-                  const pelletX = Phaser.Math.Between(200, GW - 200);
-                  const pellet = this.add.image(pelletX, WATER_TOP + 10, "food_pellet").setDepth(6);
-                  this.tweens.add({
-                    targets: pellet,
-                    y: (WATER_TOP + WATER_BOT) / 2,
-                    duration: 1500,
-                    onComplete: () => {
-                      pellet.destroy();
-                      if (this.gameOver) return;
-                      // Stagger ammonia spawns so player can react
-                      const burstCount = Phaser.Math.Between(FEEDING_BURST_MIN, FEEDING_BURST_MAX);
-                      for (let i = 0; i < burstCount; i++) {
-                        this.time.delayedCall(i * 800, () => {
-                          if (this.gameOver) return;
-                          const fish = this.fishes[Phaser.Math.Between(0, this.fishes.length - 1)];
-                          this.spawnAmmonia(
-                            fish.spr.x + Phaser.Math.Between(-40, 40),
-                            fish.spr.y + Phaser.Math.Between(-25, 25)
-                          );
-                        });
-                      }
-                    },
-                  });
-                },
-                loop: true,
-              });
+                // Spawn a few initial ammonia to get the player going
+                for (let i = 0; i < 3; i++) this.spawnAmmonia();
 
-              // ── Oxygen bubbles (Stage 5) ────────────────────────────
-              this.time.addEvent({
-                delay: BUBBLE_SPAWN_INTERVAL,
-                callback: () => {
-                  if (this.gameOver) return;
-                  const count = Phaser.Math.Between(2, 3);
-                  for (let i = 0; i < count; i++) {
-                    const bx = GW / 2 + Phaser.Math.Between(-25, 25);
-                    const by = WATER_BOT - 20;
-                    const bubble = this.bubbleGroup.create(bx, by, "o2bubble").setDepth(2);
-                    bubble.setVelocityY(Phaser.Math.Between(-50, -35));
-                    bubble.setVelocityX(Phaser.Math.Between(-12, 12));
-                    bubble.wobbleOffset = Phaser.Math.FloatBetween(0, Math.PI * 2);
-                  }
+                // Continuous ammonia spawning (Stage 3)
+                this.spawnTimer = this.time.addEvent({
+                  delay: this.spawnInterval,
+                  callback: () => {
+                    if (this.gameOver) return;
+                    const fish = this.fishes[Phaser.Math.Between(0, this.fishes.length - 1)];
+                    this.spawnAmmonia(
+                      fish.spr.x + Phaser.Math.Between(-30, 30),
+                      fish.spr.y + Phaser.Math.Between(-15, 15)
+                    );
+                    this.spawnInterval = Math.max(MIN_SPAWN_INTERVAL, this.spawnInterval - SPAWN_ACCELERATION);
+                    this.spawnTimer.delay = this.spawnInterval;
+                  },
+                  loop: true,
+                });
 
-                  // Tooltip on first oxygen bubble appearance
-                  if (!this.firstBubbleShown) {
-                    this.firstBubbleShown = true;
-                    const tip = this.add.text(GW / 2, WATER_TOP + 60,
-                      "Bacteria need oxygen! Swim through\nbubbles to keep your bacteria energized.", {
-                        fontSize: "13px", color: "#2C2416",
-                        fontFamily: "Nunito, sans-serif", fontStyle: "bold",
-                        stroke: "#fff", strokeThickness: 2,
-                        align: "center",
-                        backgroundColor: "#ffffffcc",
-                        padding: { x: 12, y: 8 },
-                      }).setOrigin(0.5).setDepth(20);
-                    this.time.delayedCall(4000, () => {
-                      this.tweens.add({
-                        targets: tip, alpha: 0, duration: 800,
-                        onComplete: () => tip.destroy(),
-                      });
+                // Feeding events (Stage 4)
+                this.time.addEvent({
+                  delay: FEEDING_INTERVAL,
+                  callback: () => {
+                    if (this.gameOver) return;
+
+                    // Flash "Feeding Time!"
+                    this.feedingText.setText("Feeding Time!");
+                    this.feedingText.setAlpha(1);
+                    this.tweens.add({
+                      targets: this.feedingText, alpha: 0,
+                      duration: 2500, delay: 1500,
                     });
-                  }
-                },
-                loop: true,
-              });
+
+                    // Food pellet drops
+                    const pelletX = Phaser.Math.Between(200, GW - 200);
+                    const pellet = this.add.image(pelletX, WATER_TOP + 10, "food_pellet").setDepth(6);
+                    this.tweens.add({
+                      targets: pellet,
+                      y: (WATER_TOP + WATER_BOT) / 2,
+                      duration: 1500,
+                      onComplete: () => {
+                        pellet.destroy();
+                        if (this.gameOver) return;
+                        // Stagger ammonia spawns so player can react
+                        const burstCount = Phaser.Math.Between(FEEDING_BURST_MIN, FEEDING_BURST_MAX);
+                        for (let i = 0; i < burstCount; i++) {
+                          this.time.delayedCall(i * 800, () => {
+                            if (this.gameOver) return;
+                            const fish = this.fishes[Phaser.Math.Between(0, this.fishes.length - 1)];
+                            this.spawnAmmonia(
+                              fish.spr.x + Phaser.Math.Between(-40, 40),
+                              fish.spr.y + Phaser.Math.Between(-25, 25)
+                            );
+                          });
+                        }
+                      },
+                    });
+                  },
+                  loop: true,
+                });
+
+                // Oxygen bubbles (Stage 5)
+                this.time.addEvent({
+                  delay: BUBBLE_SPAWN_INTERVAL,
+                  callback: () => {
+                    if (this.gameOver) return;
+                    const count = Phaser.Math.Between(2, 3);
+                    for (let i = 0; i < count; i++) {
+                      const bx = GW / 2 + Phaser.Math.Between(-25, 25);
+                      const by = WATER_BOT - 20;
+                      const bubble = this.bubbleGroup.create(bx, by, "o2bubble").setDepth(2);
+                      bubble.setVelocityY(Phaser.Math.Between(-50, -35));
+                      bubble.setVelocityX(Phaser.Math.Between(-12, 12));
+                      bubble.wobbleOffset = Phaser.Math.FloatBetween(0, Math.PI * 2);
+                    }
+
+                    // Tooltip on first oxygen bubble appearance
+                    if (!this.firstBubbleShown) {
+                      this.firstBubbleShown = true;
+                      const tip = this.add.text(GW / 2, WATER_TOP + 60,
+                        "Bacteria need oxygen! Swim through\nbubbles to keep your bacteria energized.", {
+                          fontSize: "13px", color: "#2C2416",
+                          fontFamily: "Nunito, sans-serif", fontStyle: "bold",
+                          stroke: "#fff", strokeThickness: 2,
+                          align: "center",
+                          backgroundColor: "#ffffffcc",
+                          padding: { x: 12, y: 8 },
+                        }).setOrigin(0.5).setDepth(20);
+                      this.time.delayedCall(4000, () => {
+                        this.tweens.add({
+                          targets: tip, alpha: 0, duration: 800,
+                          onComplete: () => tip.destroy(),
+                        });
+                      });
+                    }
+                  },
+                  loop: true,
+                });
+              };
+
+              // ── Coach / gameplay kickoff ────────────────────────────
+              if (this.coachMode) {
+                // Seed a single ammonia molecule in the far bottom-right of the
+                // water column — diagonally opposite from the Nitrosomonas
+                // starting position (200, 300) and well clear of where the
+                // cursor is likely to be after the user dismisses the React
+                // info modal. This keeps the bacteria from accidentally eating
+                // the food before the player has had a chance to read the hint.
+                this.spawnAmmonia(GW - 120, WATER_BOT - 90);
+                this.setCoachHint(
+                  "Welcome! Take a moment to read this, then drag your green\n" +
+                  "bacteria (Nitrosomonas) onto the red NH\u2083 ammonia molecule\n" +
+                  "in the bottom-right of the tank to eat it."
+                );
+              } else {
+                this.startGameplay();
+              }
 
               // ── Game Over (Stage 3) ─────────────────────────────────
               this.triggerGameOver = (cause: string) => {
@@ -783,7 +948,10 @@ export default function BacteriaGame() {
               const ptr = this.input.activePointer;
 
               // ── Oxygen depletion (Stage 5) ──────────────────────────
-              this.oxygen = Math.max(0, this.oxygen - OXYGEN_DEPLETION_RATE * dt);
+              // Paused during coach mode so the tutorial isn't under pressure.
+              if (!this.coachMode) {
+                this.oxygen = Math.max(0, this.oxygen - OXYGEN_DEPLETION_RATE * dt);
+              }
               const speedMult = this.oxygen <= 0 ? 0
                 : this.oxygen < LOW_OXYGEN_THRESHOLD ? LOW_OXYGEN_SPEED_MULT
                 : 1;
@@ -825,6 +993,51 @@ export default function BacteriaGame() {
               const m = 22;
               head.x = Phaser.Math.Clamp(head.x, m, this.GW - m);
               head.y = Phaser.Math.Clamp(head.y, this.WATER_TOP + m, this.WATER_BOT - m);
+
+              // ── Active bacteria halo + target molecule glow ─────────
+              // Pulsing ring around the active bacteria in its target-food
+              // colour, plus matching soft discs behind every edible molecule
+              // so the player can always tell at a glance what to chase.
+              {
+                const targetGroup = isNS ? this.ammoniaGroup : this.nitriteGroup;
+                const glowColor = isNS ? 0xe74c3c : 0xf1c40f;
+                const t = this.time.now;
+                const ringPulse = 0.55 + 0.25 * Math.sin(t / 260);
+
+                this.haloGfx.clear();
+                this.haloGfx.lineStyle(4, glowColor, Math.min(1, ringPulse + 0.15));
+                this.haloGfx.strokeCircle(head.x, head.y, 26);
+                this.haloGfx.lineStyle(2, glowColor, Math.max(0, ringPulse - 0.2));
+                this.haloGfx.strokeCircle(head.x, head.y, 33);
+
+                this.targetGlowGfx.clear();
+                const glowAlpha = 0.22 + 0.15 * Math.sin(t / 320);
+                for (const mol of targetGroup.getChildren()) {
+                  if (!mol.active) continue;
+                  this.targetGlowGfx.fillStyle(glowColor, glowAlpha);
+                  this.targetGlowGfx.fillCircle(mol.x, mol.y, 22);
+                }
+
+                // ── Full Cycle combo window indicator ────────────────
+                // Every nitrite that's still inside COMBO_WINDOW gets a
+                // golden ring whose radius shrinks as the window closes.
+                // This makes the "eat fresh nitrites for a bonus" mechanic
+                // visually discoverable instead of hidden in the code.
+                this.comboRingGfx.clear();
+                for (const nit of this.nitriteGroup.getChildren()) {
+                  if (!nit.active || !nit.createdAt) continue;
+                  const elapsed = t - nit.createdAt;
+                  if (elapsed >= COMBO_WINDOW) continue;
+                  const remaining = 1 - elapsed / COMBO_WINDOW; // 1 → 0
+                  const radius = 14 + 18 * remaining;
+                  this.comboRingGfx.lineStyle(3, 0xF9C400, 0.5 + 0.5 * remaining);
+                  this.comboRingGfx.strokeCircle(nit.x, nit.y, radius);
+                  if (remaining > 0.35) {
+                    this.comboRingGfx.lineStyle(1.5, 0xFFEB3B, (remaining - 0.35) * 0.9);
+                    this.comboRingGfx.strokeCircle(nit.x, nit.y, radius + 5);
+                  }
+                }
+              }
 
               // Body trail
               hist.unshift({ x: head.x, y: head.y });

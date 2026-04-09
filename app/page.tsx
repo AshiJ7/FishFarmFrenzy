@@ -23,16 +23,6 @@ const games = [
   },
   {
     n: 3,
-    emoji: "🥊🦠",
-    title: "Bacteria Battle",
-    desc: "Feed the bacteria nutrients while staying away from toxic waste!",
-    cycleLabel: "Nitrification",
-    cycleStep: "The bacteria convert toxic ammonia into nitrate, which is the key to clean water.",
-    accent: "#A8C8E8",
-    glow: "rgba(168,200,232,0.4)",
-  },
-  {
-    n: 4,
     emoji: "🦸🐟",
     title: "Save Your Fish Farm",
     desc: "Make the right decisions to keep your aquaponics farm healthy!",
@@ -40,6 +30,16 @@ const games = [
     cycleStep: "Apply everything you learned to keep the whole system in balance",
     accent: "#E49678",
     glow: "rgba(228,150,120,0.35)",
+  },
+  {
+    n: 4,
+    emoji: "🥊🦠",
+    title: "Bacteria Battle",
+    desc: "Feed the bacteria nutrients while staying away from toxic waste!",
+    cycleLabel: "Nitrification",
+    cycleStep: "The bacteria convert toxic ammonia into nitrate, which is the key to clean water.",
+    accent: "#A8C8E8",
+    glow: "rgba(168,200,232,0.4)",
   },
   {
     n: 5,

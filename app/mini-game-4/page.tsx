@@ -36,6 +36,17 @@ const BubbleBackground = () => (
 export default function MiniGame4() {
   const bubbleBackground = useMemo(() => <BubbleBackground />, []);
   const [showInfo, setShowInfo] = useState<boolean>(true);
+  // Track whether the player has dismissed the tutorial at least once.
+  // The Phaser game should not start until they have, otherwise it runs
+  // (and drains oxygen / spawns ammonia) behind the modal. Re-opening the
+  // tutorial via the otter button later must NOT unmount the game and lose
+  // progress, so we key mounting on this flag rather than on `showInfo`.
+  const [hasStarted, setHasStarted] = useState<boolean>(false);
+
+  const dismissTutorial = () => {
+    setShowInfo(false);
+    setHasStarted(true);
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -68,7 +79,7 @@ export default function MiniGame4() {
               Switch between bacteria with Space to manage the nitrogen cycle and keep the fish alive!
             </p>
             <button
-              onClick={() => setShowInfo(false)}
+              onClick={dismissTutorial}
               className="w-full font-semibold py-2 rounded-lg transition-colors text-white hover:opacity-90"
               style={{ backgroundColor: "var(--olive-green)" }}
             >
@@ -118,9 +129,13 @@ export default function MiniGame4() {
           </p>
         </div>
 
-        {/* Game */}
+        {/* Game — only mount once the tutorial has been dismissed for the
+            first time so the Phaser scene doesn't start (and drain oxygen /
+            spawn ammonia) while the user is still reading the modal. We key
+            off `hasStarted` rather than `!showInfo` so reopening the tutorial
+            mid-game via the otter button doesn't unmount and reset the game. */}
         <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ border: "2px solid var(--color-border-light)" }}>
-          <BacteriaGame />
+          {hasStarted && <BacteriaGame />}
         </div>
 
         {/* Nav card */}
