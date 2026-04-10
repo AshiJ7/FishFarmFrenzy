@@ -444,11 +444,11 @@ export default function MiniGame2() {
             </div>
             <h2 className="text-xl font-bold mb-4 text-gray-800">How the Nitrogen Cycle Works</h2>
             <ul className="space-y-3 text-sm text-gray-700 mb-6">
-              <li className="flex gap-3 items-start"><span className="text-xl shrink-0">🐟</span><span>Fish produce waste that releases <strong>ammonia</strong> into the water. This kicks off the nitrogen cycle.</span></li>
-              <li className="flex gap-3 items-start"><span className="text-xl shrink-0">🦠</span><span>Nitrifying bacteria convert that ammonia: first to <strong>nitrite</strong>, then to <strong>nitrate</strong>.</span></li>
-              <li className="flex gap-3 items-start"><span className="text-xl shrink-0">⚠️</span><span>Ammonia and nitrite are <strong>toxic</strong> to both fish and plants. Thus, they must be converted quickly.</span></li>
-              <li className="flex gap-3 items-start"><span className="text-xl shrink-0">🌿</span><span>Plants absorb <strong>nitrate</strong> as fertilizer to grow, cleaning the water in the process.</span></li>
-              <li className="flex gap-3 items-start"><span className="text-xl shrink-0">♻️</span><span>The clean water returns to the fish tank, and the cycle begins again!</span></li>
+              <li className="flex gap-3 items-start"><span className="text-xl shrink-0"><img src="/happy_fish.png" alt="happyfish" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>Fish produce waste that releases <strong>ammonia</strong> into the water. This kicks off the nitrogen cycle.</span></li>
+              <li className="flex gap-3 items-start"><span className="text-xl shrink-0"><img src="/bacteria.png" alt="bacteria" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>Nitrifying bacteria convert that ammonia: first to <strong>nitrite</strong>, then to <strong>nitrate</strong>.</span></li>
+              <li className="flex gap-3 items-start"><span className="text-xl shrink-0"><img src="/trashcan.png" alt="trashcan" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>Ammonia and nitrite are <strong>toxic</strong> to both fish and plants. Thus, they must be converted quickly.</span></li>
+              <li className="flex gap-3 items-start"><span className="text-xl shrink-0"><img src="/happy_plant.png" alt="happyplant" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>Plants absorb <strong>nitrate</strong> as fertilizer to grow, cleaning the water in the process.</span></li>
+              <li className="flex gap-3 items-start"><span className="text-xl shrink-0"><img src="/reverse.png" alt="reverse" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>The clean water returns to the fish tank, and the cycle begins again!</span></li>
             </ul>
             <p className="text-sm text-gray-500 mb-6 italic border-l-4 border-blue-200 pl-3">
               Select a scenario below to see what happens when something goes wrong. Then answer the quiz to fix it!
@@ -731,7 +731,7 @@ export default function MiniGame2() {
               <div className="mt-8 w-full max-w-4xl">
                 <div className="bg-white border-2 border-gray-200 rounded-2xl shadow-md p-6">
                   <div className="flex items-center gap-2 mb-5">
-                    <span className="text-2xl">🔧</span>
+                    <span className="text-2xl"><img src="/superhero.png" alt="superhero" style={{ width: "58px", height: "58px", objectFit: "contain" }} /></span>
                     <h2 className="text-lg font-bold text-gray-800">How can we fix this system?</h2>
                     {wrongGuesses === 1 && !locked && (
                       <span className="ml-auto text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
@@ -779,26 +779,29 @@ export default function MiniGame2() {
               <p className="text-sm text-gray-500 mb-5">Freely adjust the system and see what happens. There are no right or wrong answers.</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-                {[
-                  { label: "🐟 Fish",              value: sbFish,     min: 1,  max: 20,  setter: setSbFish,     color: "text-blue-600"   },
-                  { label: "🌿 Plants",             value: sbPlants,   min: 1,  max: 20,  setter: setSbPlants,   color: "text-green-600"  },
-                  { label: "🌡️ Temperature (°C)",   value: sbTemp,     min: 10, max: 38,  setter: setSbTemp,     color: "text-orange-500" },
-                  { label: "🦠 Bacteria Level (%)", value: sbBacteria, min: 0,  max: 100, setter: setSbBacteria, color: "text-purple-600" },
-                ].map(({ label, value, min, max, setter, color }) => (
-                  <div key={label}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-semibold text-gray-700">{label}</span>
-                      <span className={`text-sm font-bold ${color}`}>
-                        {value}{label.includes("°C") ? "°C" : label.includes("%") ? "%" : ""}
-                      </span>
-                    </div>
-                    <input type="range" min={min} max={max} value={value}
-                      onChange={e => setter(Number(e.target.value))}
-                      className="w-full accent-teal-500" />
-                    <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>{min}</span><span>{max}</span></div>
+              {[
+                { icon: "/happy_fish.png",    text: "Fish",              value: sbFish,     min: 1,  max: 20,  setter: setSbFish,     color: "text-blue-600"   },
+                { icon: "/happy_plant.png",   text: "Plants",            value: sbPlants,   min: 1,  max: 20,  setter: setSbPlants,   color: "text-green-600"  },
+                { icon: "/thermometer.png",   text: "Temperature (°C)",  value: sbTemp,     min: 10, max: 38,  setter: setSbTemp,     color: "text-orange-500" },
+                { icon: "/bacteria.png",      text: "Bacteria Level (%)", value: sbBacteria, min: 0,  max: 100, setter: setSbBacteria, color: "text-purple-600" },
+              ].map(({ icon, text, value, min, max, setter, color }) => (
+                <div key={text}>
+                  <div className="flex justify-between mb-1 items-center">
+                    <span className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <img src={icon} alt={text} style={{ width: "24px", height: "24px", objectFit: "contain" }} />
+                      {text}
+                    </span>
+                    <span className={`text-sm font-bold ${color}`}>
+                      {value}{text.includes("°C") ? "°C" : text.includes("%") ? "%" : ""}
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <input type="range" min={min} max={max} value={value}
+                    onChange={e => setter(Number(e.target.value))}
+                    className="w-full accent-teal-500" />
+                  <div className="flex justify-between text-xs text-gray-400 mt-0.5"><span>{min}</span><span>{max}</span></div>
+                </div>
+              ))}
+            </div>
 
               <div className={`rounded-xl px-4 py-3 mb-4 border font-semibold text-center text-sm`}
                 style={{ backgroundColor: `${sbHealth.color}22`, borderColor: `${sbHealth.color}66`, color: sbHealth.healthy ? "#166534" : "#991b1b" }}>

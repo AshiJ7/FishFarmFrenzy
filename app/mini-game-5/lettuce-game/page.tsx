@@ -205,10 +205,10 @@ useEffect(() => {
             <h4 className="text-medium mb-3 text-gray-800">Have you ever seen a big field full of green plants growing in the dirt? That's a traditional farm!
 On a regular farm, farmers need a lot of things to grow food:</h4>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              <li className="flex gap-2"><span>🐟</span><span><strong>Water</strong> — They spray water on the plants every single day</span></li>
-              <li className="flex gap-2"><span>🐠</span><span><strong>Soil</strong> — The dirt holds the plants and gives them food</span></li>
-              <li className="flex gap-2"><span>🐟</span><span><strong>Sunlight</strong> — Plants use sunlight to grow big and strong</span></li>
-              <li className="flex gap-2"><span>🐠</span><span><strong>Fertilizer</strong> — Special plant food added to the dirt</span></li>
+              <li className="flex gap-2"><span><img src="/spinach.png" alt="water" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Water</strong> — They spray water on the plants every single day</span></li>
+              <li className="flex gap-2"><span><img src="/rice_bran.png" alt="dirt" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Soil</strong> — The dirt holds the plants and gives them food</span></li>
+              <li className="flex gap-2"><span><img src="/happy_plant.png" alt="sunlight" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Sunlight</strong> — Plants use sunlight to grow big and strong</span></li>
+              <li className="flex gap-2"><span><img src="/water_plant.png" alt="fertilizer" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Fertilizer</strong> — Special plant food added to the dirt</span></li>
             </ul>
             <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A tomato farm grows tomatos. A fish farm grows fish. They are always separate!
 Regular farms also use a LOT of water. In fact, it can take up to 96 cups of water just to grow one tomato plant! Most of that water gets used up or soaks into the ground and is gone. </h4>
@@ -216,7 +216,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
             >
-              Let's Play! 🎮
+              Let's Play!
             </button>
           </div>
         </div>
@@ -320,7 +320,12 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
 {showCompletion && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
     <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 text-center">
-      <div className="text-5xl mb-3">🏆</div>
+      <div className="mb-3 flex justify-center">
+        <img
+          src="/trophy.png"
+          alt="trophy"
+          className="w-18 h-18 object-contain"
+        /></div>
       <h2 className="text-xl font-bold mb-2 text-gray-800">Great job catching tomatoes and tilapia!</h2>
       <p className="text-medium text-gray-500 italic" id="counter">You ended up catching <span>{score}</span> tomatoes!</p>
       <p className="text-medium text-gray-500 mb-3 italic" id="counter">In total you earned  $<span>{(score * 3)}</span>!!!</p>
@@ -332,13 +337,27 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
           onClick={startGame}
           className="btn btn-mint"
         >
-          🔄 Play Again
+          <span className="flex items-center gap-2 justify-center">
+            <img
+              src="/reverse.png"   
+              alt="restart"
+              className="w-5 h-5 object-contain"
+            />
+            Play Again
+          </span>
         </button>
         
           <a href="/mini-game-5/salmon-game"
           className="btn btn-green"
         >
-          Next Game 🐟
+         <span className="flex items-center gap-2 justify-center">
+              Next Game
+              <img
+                src="/happy_fish.png"
+                alt="fish"
+                className="w-5 h-5 object-contain"
+              />
+            </span>
         </a>
       </div>
     </div>

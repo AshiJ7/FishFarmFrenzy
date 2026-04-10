@@ -61,8 +61,11 @@ export default function MiniGame3() {
     className="flex flex-col items-center gap-2 mb-2 w-full py-6 px-8 rounded-3xl shadow-md"
     style={{ backgroundColor: "rgba(255,255,255,0.88)", border: "2px solid var(--color-border-light)" }}
   >
-    <div className="text-5xl" style={{ animation: "bounce 2s infinite" }}>🐟🌿✨</div>
-    <h1
+    <div className="flex items-center gap-2 text-5xl" style={{ animation: "bounce 2s infinite" }}>
+      <img src="/happy_fish.png" alt="happyfish" style={{ width: "58px", height: "58px", objectFit: "contain" }} />
+      <img src="/happy_plant.png" alt="happy_plant" style={{ width: "48px", height: "48px", objectFit: "contain" }} />
+      <img src="/star.png" alt="star" style={{ width: "48px", height: "48px", objectFit: "contain" }} />
+    </div><h1
       className="text-4xl font-extrabold text-center"
       style={{
         backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",

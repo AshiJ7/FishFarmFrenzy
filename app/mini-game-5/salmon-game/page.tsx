@@ -293,13 +293,13 @@ useEffect(() => {
 Here's the big secret: fish and plants are best friends in aquaponics.
 So how does it work?</h4>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              <li className="flex gap-2"><span>🐟</span><span><strong>Step 1</strong> — Fish eat and make waste 🐟
+              <li className="flex gap-2"><span></span><span><strong>Step 1</strong> — Fish eat and make waste 🐟
 Fish like tilapia live in a big tank of water. Just like you, fish eat food and then make waste (yes, that means fish poop! 💩). That waste goes into the water.</span></li>
-              <li className="flex gap-2"><span>🐠</span><span><strong>Step 2</strong> — Tiny helpers clean the water 🦠
+              <li className="flex gap-2"><span></span><span><strong>Step 2</strong> — Tiny helpers clean the water 🦠
 Super tiny living things called bacteria (so small you can't even see them!) eat the fish waste and turn it into plant food called nutrients.</span></li>
-              <li className="flex gap-2"><span>🐟</span><span><strong>Step 3</strong> — Plants drink up the nutrients 🥬
+              <li className="flex gap-2"><span></span><span><strong>Step 3</strong> — Plants drink up the nutrients 🥬
 The nutrient-filled water flows to where the plants are growing. Tomatos and other plants drink up those nutrients and grow big and healthy!</span></li>
-              <li className="flex gap-2"><span>🐠</span><span><strong>Step 4</strong> — Plants clean the water 💧
+              <li className="flex gap-2"><span></span><span><strong>Step 4</strong> — Plants clean the water 💧
 As the plants soak up the nutrients, they clean the water — and then that clean water goes back to the fish tank!
 Then the whole cycle starts all over again! 🔄</span></li>
             </ul>
@@ -307,7 +307,7 @@ Then the whole cycle starts all over again! 🔄</span></li>
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
             >
-              Let's Play! 🎮
+              Let's Play!
             </button>
           </div>
         </div>
@@ -427,7 +427,12 @@ Then the whole cycle starts all over again! 🔄</span></li>
   {showCompletion && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
     <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 text-center">
-      <div className="text-5xl mb-3">🏆</div>
+      <div className="mb-3 flex justify-center">
+        <img
+          src="/trophy.png"
+          alt="trophy"
+          className="w-18 h-18 object-contain"
+        /></div>
       <h2 className="text-xl font-bold mb-2 text-gray-800">Great job catching tomatoes and tilapia!</h2>
       <p className="text-medium text-gray-500 italic" id="counter">You ended up catching <span>{score}</span> tomatoes and <span>{score2}</span> tilapia!</p>
       <p className="text-medium text-gray-500 mb-3 italic" id="counter">In total you earned  $<span>{(score * 3) + (score2 * 5)}</span>!!!</p>
@@ -439,7 +444,14 @@ Then the whole cycle starts all over again! 🔄</span></li>
           onClick={startGame}
           className="btn btn-mint"
         >
-          🔄 Play Again
+          <span className="flex items-center gap-2 justify-center">
+            <img
+              src="/reverse.png"   
+              alt="restart"
+              className="w-5 h-5 object-contain"
+            />
+            Play Again
+          </span>
         </button>
         
           <a href="/"
