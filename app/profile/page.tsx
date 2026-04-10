@@ -18,13 +18,21 @@ const TOTAL_GAMES = 7;
 const BADGE_META = [
   {
     key: "first_game",
-    emoji: "🏅",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/star.png" alt="star" style={{ width: "62px", height: "62px", objectFit: "contain" }} />
+    </div>
+  ),
     label: "First Step",
     desc: "Complete your first minigame",
   },
   {
     key: "all_games",
-    emoji: "🏆",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/trophy.png" alt="star" style={{ width: "62px", height: "62px", objectFit: "contain" }} />
+    </div>
+  ),
     label: "Champion",
     desc: "Complete all 7 minigames",
   },

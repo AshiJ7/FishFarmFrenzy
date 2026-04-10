@@ -229,7 +229,13 @@ useEffect(() => {
       {showCompletion && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
     <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 text-center">
-      <div className="text-5xl mb-3">🏆</div>
+      <div className="mb-3 flex justify-center">
+        <img
+          src="/trophy.png"
+          alt="trophy"
+          className="w-18 h-18 object-contain"
+        />
+      </div>
       <h2 className="text-xl font-bold mb-2 text-gray-800">You matched them all!</h2>
       <p className="text-sm text-gray-500 mb-6 italic">
         Great job! You really know your fish and crops!
@@ -239,13 +245,27 @@ useEffect(() => {
           onClick={() => { setScore(0); setMatchedCrops([]); setShowCompletion(false); }}
           className="btn btn-mint"
         >
-          🔄 Play Again
+          <span className="flex items-center gap-2 justify-center">
+            <img
+              src="/reverse.png"   
+              alt="restart"
+              className="w-5 h-5 object-contain"
+            />
+            Play Again
+          </span>
         </button>
         
           <a href="/mini-game-5/lettuce-game"
           className="btn btn-green"
         >
-          Next Game 🐟
+          <span className="flex items-center gap-2 justify-center">
+              Next Game
+              <img
+                src="/happy_fish.png"
+                alt="fish"
+                className="w-5 h-5 object-contain"
+              />
+            </span>
         </a>
       </div>
     </div>
