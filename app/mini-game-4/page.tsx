@@ -71,9 +71,9 @@ export default function MiniGame4() {
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
               <li className="flex gap-2"><span>🦠</span><span>Fish produce toxic <strong>ammonia (NH&#x2083;)</strong> as waste. Too much ammonia kills fish!</span></li>
               <li className="flex gap-2"><span>🟢</span><span><strong>Nitrosomonas</strong> bacteria eat ammonia and turn it into <strong>nitrite (NO&#x2082;&#x207B;)</strong>.</span></li>
-              <li className="flex gap-2"><span>🟣</span><span><strong>Nitrobacter</strong> bacteria eat nitrite and turn it into <strong>nitrate (NO&#x2083;&#x207B;)</strong> — plant food!</span></li>
+              <li className="flex gap-2"><span>🟣</span><span><strong>Nitrobacter</strong> bacteria eat nitrite and turn it into <strong>nitrate (NO&#x2083;&#x207B;)</strong>, or plant food!</span></li>
               <li className="flex gap-2"><span>🌿</span><span>Plants absorb the nitrate and grow. The cycle keeps fish safe and plants fed!</span></li>
-              <li className="flex gap-2"><span>💨</span><span>Both bacteria need <strong>oxygen</strong> to survive — don&apos;t forget to collect bubbles!</span></li>
+              <li className="flex gap-2"><span>💨</span><span>Both bacteria need <strong>oxygen</strong> to survive! Don&apos;t forget to collect bubbles!</span></li>
             </ul>
             <p className="text-sm text-gray-500 mb-6 italic">
               Switch between bacteria with Space to manage the nitrogen cycle and keep the fish alive!

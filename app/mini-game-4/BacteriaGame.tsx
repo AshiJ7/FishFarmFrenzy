@@ -513,7 +513,7 @@ export default function BacteriaGame() {
                   if (this.coachMode && this.coachStep === "waitNitrite") {
                     this.coachStep = "waitSwitchBack";
                     this.setCoachHint(
-                      "Great! You turned the nitrite into nitrate (NO\u2083\u207B) — plant food.\n" +
+                      "Great! You turned the nitrite into nitrate (NO\u2083\u207B), or plant food.\n" +
                       "Press SPACE again to switch back to the green Nitrosomonas."
                     );
                   }
@@ -586,7 +586,7 @@ export default function BacteriaGame() {
                     this.setCoachHint(
                       "Pro tip: when you make a nitrite (NO\u2082\u207B), a shrinking\n" +
                       "gold ring shows how long you have to eat it for a\n" +
-                      "Full Cycle bonus — extra score AND plants grow 2\u00D7 faster!"
+                      "Full Cycle bonus: extra score AND plants grow 2\u00D7 faster!"
                     );
                     this.time.delayedCall(4600, () => {
                       this.tweens.add({
