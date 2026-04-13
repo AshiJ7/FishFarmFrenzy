@@ -85,20 +85,7 @@ export default function MiniGame3() {
   <div className="mt-4 w-full">
     <SaveFishFarmGame />
   </div>
-
-  {/* Nav card */}
-  <nav
-    className="mt-4 flex gap-4 w-full justify-center py-4 px-8 rounded-3xl shadow-md"
-    style={{ backgroundColor: "rgba(255,255,255,0.88)", border: "2px solid var(--color-border-light)" }}
-  >
-    <Link href="/" className="px-4 py-2 font-semibold rounded-2xl shadow-md transition-transform hover:scale-105"
-      style={{ backgroundColor: "var(--teal-medium)", color: "white" }}>Home</Link>
-    <Link href="/mini-game-2" className="px-4 py-2 font-semibold rounded-2xl shadow-md transition-transform hover:scale-105"
-      style={{ backgroundColor: "var(--teal-medium)", color: "white" }}>Prev</Link>
-    <Link href="/mini-game-4" className="px-4 py-2 font-semibold rounded-2xl shadow-md transition-transform hover:scale-105"
-      style={{ backgroundColor: "var(--olive-green)", color: "white" }}>Next</Link>
-  </nav>
-
+  
   <style>{`
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
