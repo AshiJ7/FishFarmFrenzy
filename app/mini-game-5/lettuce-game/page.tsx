@@ -210,8 +210,7 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
               <li className="flex gap-2"><span><img src="/happy_plant.png" alt="sunlight" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Sunlight</strong> — Plants use sunlight to grow big and strong</span></li>
               <li className="flex gap-2"><span><img src="/water_plant.png" alt="fertilizer" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Fertilizer</strong> — Special plant food added to the dirt</span></li>
             </ul>
-            <h4 className="text-small mb-3 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A tomato farm grows tomatos. A fish farm grows fish. They are always separate!
-Regular farms also use a LOT of water. In fact, it can take up to 96 cups of water just to grow one tomato plant! Most of that water gets used up or soaks into the ground and is gone. </h4>
+            <h4 className="text-small mb-1 text-gray-800">But here's something to think about... regular farms only grow ONE thing at a time. A tomato farm only grows tomatoes. Regular farms also use a LOT of water. In fact, it can take up to 96 cups of water just to grow one tomato plant! Most of that water gets used up or soaks into the ground and is gone. </h4>
             <button
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
@@ -222,14 +221,21 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
         </div>
       )}
       <main className="card">
-        <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Tomato Catcher</h1>
+        <h1 className="text-4xl font-extrabold text-center"
+      style={{
+        backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}>Tomato Catcher</h1>
         <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
 
             <p className="text-sm text-gray-500 mb-6 italic">
               After you press the start button, you will use your left and right arrow keys to move your basket to collect as much lettuce from the farm as you can.
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
             </p>
-        <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
+            <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
+        <p className="text-center mt-4 text-xl">
           Press Start to begin!
         </p>
         <br></br>
@@ -252,13 +258,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
   )}
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Tomato Score : <span>{score}</span></div>
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3)}</span></div>
-        {gameOver && (
-    <div>
-      <p>Game Over!</p>
-      <button className="btn btn-green" onClick={startGame}>Retry</button>
-    </div>
-
-  )}
+        
 
   {isPlaying && <div>Time Left: {timeLeft}</div>}
 
@@ -330,7 +330,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
       <p className="text-medium text-gray-500 italic" id="counter">You ended up catching <span>{score}</span> tomatoes!</p>
       <p className="text-medium text-gray-500 mb-3 italic" id="counter">In total you earned  $<span>{(score * 3)}</span>!!!</p>
       <p className="text-medium text-gray-500 mb-3 italic">
-        Great job! Want to play again and earn more? Or return home for a new game?
+        Great job! Want to play again and earn more? Or go to the next game for a new challenge?
       </p>
       <div className="flex gap-3 justify-center">
         <button
@@ -369,12 +369,7 @@ Regular farms also use a LOT of water. In fact, it can take up to 96 cups of wat
 
 
 
-        <nav className="mt-8 flex gap-4">
-          <Link href="/" className="text-foreground">Home</Link>
-          {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
-          <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          {/* <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link> */}
-        </nav>
+        
       </main>
     </div>
   );

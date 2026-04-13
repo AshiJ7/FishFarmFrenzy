@@ -141,7 +141,7 @@ const [position, setPosition] = useState({ x: 200});
 const basketWidth = 50;
 const basketHeight = 50;
 const objectSize = 30;
-const gravity = Math.floor(Math.random() * (6 - 3 + 1)) + 3;
+const gravity = 3;
 const [score, setScore] = useState(0);
 const [score2, setScore2] = useState(0);
 
@@ -293,15 +293,10 @@ useEffect(() => {
 Here's the big secret: fish and plants are best friends in aquaponics.
 So how does it work?</h4>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              <li className="flex gap-2"><span></span><span><strong>Step 1</strong> — Fish eat and make waste 🐟
-Fish like tilapia live in a big tank of water. Just like you, fish eat food and then make waste (yes, that means fish poop! 💩). That waste goes into the water.</span></li>
-              <li className="flex gap-2"><span></span><span><strong>Step 2</strong> — Tiny helpers clean the water 🦠
-Super tiny living things called bacteria (so small you can't even see them!) eat the fish waste and turn it into plant food called nutrients.</span></li>
-              <li className="flex gap-2"><span></span><span><strong>Step 3</strong> — Plants drink up the nutrients 🥬
-The nutrient-filled water flows to where the plants are growing. Tomatos and other plants drink up those nutrients and grow big and healthy!</span></li>
-              <li className="flex gap-2"><span></span><span><strong>Step 4</strong> — Plants clean the water 💧
-As the plants soak up the nutrients, they clean the water — and then that clean water goes back to the fish tank!
-Then the whole cycle starts all over again! 🔄</span></li>
+              <li className="flex gap-2"><span></span><span><strong>Step 1</strong> — Fish live in a tank and produce waste that goes into the water.</span></li>
+              <li className="flex gap-2"><span></span><span><strong>Step 2</strong> — Tiny helpers called bacteria turn that waste into nutrients (plant food!).</span></li>
+              <li className="flex gap-2"><span></span><span><strong>Step 3</strong> — Tomatoes and other plants soak up the nutrients and grow big!</span></li>
+              <li className="flex gap-2"><span></span><span><strong>Step 4</strong> — By soaking up nutrients, the plants clean the water that flows back to the fish, and the cycle starts again! </span></li>
             </ul>
             <button
               onClick={() => setShowInfo(false)}
@@ -313,12 +308,24 @@ Then the whole cycle starts all over again! 🔄</span></li>
         </div>
       )}
       <main className="card">
-        <h1 className="text-3xl font-semibold text-[var(--color-text-secondary)] dark:text-zinc-50">Aquaponics Adventure</h1>
-        <h2>How to play</h2>
-        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect tomatos and tilapia.
+        <h1 className="text-4xl font-extrabold text-center"
+      style={{
+        backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}>Aquaponics Adventure</h1>
+        <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
+        <p className="text-sm text-gray-500 mb-6 italic">After you press the start button, you will use your left and right arrow keys to move your basket to collect tomatos and tilapia.
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
-        <br></br>
+        <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
+        <h2 className="text-center mt-4 text-xl">
+    Press Start to begin
+  </h2>
+  
+  <br></br>
+        
         {/* Floating otter button — bottom right */}
         <div className="fixed bottom-6 right-6 z-40 group flex flex-col items-center gap-1">
           <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow pointer-events-none">
@@ -343,12 +350,7 @@ Then the whole cycle starts all over again! 🔄</span></li>
   {isPlaying && <div>Time Left: {timeLeft}</div>}
 
   
-  {gameOver && (
-    <div>
-      <p>Game Over!</p>
-      <button className="btn btn-green" onClick={startGame}>Retry</button>
-    </div>
-  )}
+  
 </div>
 {!gameOver && (
         <div
@@ -464,11 +466,7 @@ Then the whole cycle starts all over again! 🔄</span></li>
   </div>
 )}
 
-        <nav className="mt-8 flex gap-4">
-          <Link href="/" className="text-foreground">Home</Link>
-          {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
-          <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-        </nav>
+      
       </main>
     </div>
   );
