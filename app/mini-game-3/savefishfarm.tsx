@@ -738,11 +738,9 @@ const OtterMascot = ({ message }: { message: string }) => (
     className="flex items-start gap-4 p-4 rounded-2xl shadow-md mb-6 w-full"
     style={{ backgroundColor: "rgba(255,255,255,0.7)", border: "2px solid var(--mint-light)" }}
   >
-    <div className="text-4xl" style={{ animation: "gentleFloat 3s ease-in-out infinite" }}><img
-          src="/otter.png"
-          alt="otter"
-          style={{ width: "68px", height: "68px", objectFit: "contain", animation: "gentleFloat 3s ease-in-out infinite", flexShrink: 0 }}
-        /></div>
+    <div className="w-16 h-16 shrink-0" style={{ animation: "gentleFloat 3s ease-in-out infinite" }}>
+  <img src="/otter.png" alt="otter" className="w-full h-full object-contain" />
+</div>
     <div
       className="p-3 rounded-xl text-sm leading-relaxed"
       style={{
