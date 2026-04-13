@@ -112,7 +112,13 @@ export default function MiniGame5() {
           </button>
         </div>
   
-  <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50">
+  <h1 className="text-4xl font-extrabold text-center"
+      style={{
+        backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}>
     Fish & Crop Match
   </h1>
 
