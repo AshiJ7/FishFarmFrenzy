@@ -78,16 +78,16 @@ export default function MiniGame5() {
             <h2 className="text-xl font-bold mb-3 text-gray-800">Did you know that some plants and fish grow better together?</h2>
             <h4 className="text-medium mb-3 text-gray-800">In special farms called aquaponics farms, fish and plants help each other grow! It works by having fish live in water and produce waste. That waste turns into nutrients which plants needs to grow big and healthy. As plants clean the water, the fish get fresh, clean water again! It’s a team effort!</h4>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              <li className="flex gap-2"><span>🐟</span><span><strong>Tilapia</strong> loves to help tomatos and basil grow!</span></li>
-              <li className="flex gap-2"><span>🐠</span><span><strong>Trout</strong> likes spinach and arugula!</span></li>
-              <li className="flex gap-2"><span>🐟</span><span><strong>Catfish</strong> helps cucumbers and lettuce out!</span></li>
-              <li className="flex gap-2"><span>🐠</span><span><strong>Koi</strong> is friends with watercress and mint!</span></li>
+              <li className="flex gap-2"><span><img src="/tilapia_image.png" alt="tilapia" style={{ width: "20px", height: "20px", objectFit: "contain" }} /></span><span><strong>Tilapia</strong> loves to help tomatos and basil grow!</span></li>
+              <li className="flex gap-2"><span><img src="/trout.png" alt="trout" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Trout</strong> likes spinach and arugula!</span></li>
+              <li className="flex gap-2"><span><img src="/catfish.png" alt="catfish" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Catfish</strong> helps cucumbers and lettuce out!</span></li>
+              <li className="flex gap-2"><span><img src="/koi.png" alt="koi" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span><strong>Koi</strong> is friends with watercress and mint!</span></li>
             </ul>
             <button
               onClick={() => setShowInfo(false)}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition-colors"
             >
-              Let's Play! 🎮
+              Let's Play!
             </button>
           </div>
         </div>
@@ -112,7 +112,13 @@ export default function MiniGame5() {
           </button>
         </div>
   
-  <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50">
+  <h1 className="text-4xl font-extrabold text-center"
+      style={{
+        backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}>
     Fish & Crop Match
   </h1>
 
@@ -123,10 +129,11 @@ export default function MiniGame5() {
     click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair and gotten a score of 3,
     continue to the next game.
             </p>
+            <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
             <h2 className="text-center mt-4 text-xl">
     Press Start to begin
   </h2>
-  <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
+  
   <br></br>
   
 
@@ -155,12 +162,6 @@ export default function MiniGame5() {
 
         
 
-        <nav className="mt-8 flex gap-4">
-          <Link href="/" className="text-foreground">Home</Link>
-          {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
-          <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          {/* <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link> */}
-        </nav>
       </main>
       
     </div>

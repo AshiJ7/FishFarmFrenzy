@@ -3,7 +3,13 @@ import Link from "next/link";
 const games = [
   {
     n: 1,
-    emoji: "🐟🐛🌿",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/happy_fish.png" alt="fish" style={{ width: "42px", height: "42px", objectFit: "contain" }} />
+      <img src="/worms.png" alt="worms" style={{ width: "34px", height: "34px", objectFit: "contain" }} />
+      <img src="/happy_plant.png" alt="plant" style={{ width: "42px", height: "42px", objectFit: "contain" }} />
+    </div>
+  ),
     title: "Feeding Frenzy",
     desc: "Decide if each food is good or bad for the selected fish!",
     cycleLabel: "Fish & Feeding",
@@ -13,7 +19,13 @@ const games = [
   },
   {
     n: 2,
-    emoji: "🦠🔁🌿",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/bacteria.png" alt="bacteria" style={{ width: "42px", height: "42px", objectFit: "contain" }} />
+      <img src="/reverse.png" alt="reverse" style={{ width: "34px", height: "34px", objectFit: "contain" }} />
+      <img src="/water_plant.png" alt="plant" style={{ width: "42px", height: "42px", objectFit: "contain" }} />
+    </div>
+  ),
     title: "Cycle Explorer",
     desc: "Learn about the nitrogen cycle and keep the aquaponics system balanced!",
     cycleLabel: "Nitrogen Cycle",
@@ -23,7 +35,12 @@ const games = [
   },
   {
     n: 3,
-    emoji: "🦸🐟",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/superhero.png" alt="superhero" style={{ width: "62px", height: "62px", objectFit: "contain" }} />
+      <img src="/trout.png" alt="fish" style={{ width: "62px", height: "62px", objectFit: "contain" }} />
+    </div>
+  ),
     title: "Save Your Fish Farm",
     desc: "Make the right decisions to keep your aquaponics farm healthy!",
     cycleLabel: "System Balance",
@@ -33,7 +50,12 @@ const games = [
   },
   {
     n: 4,
-    emoji: "🥊🦠",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/boxing_glove.png" alt="glove" style={{ width: "42px", height: "42px", objectFit: "contain" }} />
+      <img src="/bacteria.png" alt="bacteria" style={{ width: "34px", height: "34px", objectFit: "contain" }} />
+    </div>
+  ),
     title: "Bacteria Battle",
     desc: "Feed the bacteria nutrients while staying away from toxic waste!",
     cycleLabel: "Nitrification",
@@ -43,7 +65,13 @@ const games = [
   },
   {
     n: 5,
-    emoji: "🐟✅🌿",
+    emoji: (
+    <div className="flex items-center gap-1">
+      <img src="/fish.png" alt="fish" style={{ width: "42px", height: "42px", objectFit: "contain" }} />
+      <img src="/check.png" alt="check" style={{ width: "54px", height: "54px", objectFit: "contain" }} />
+      <img src="/happy_plant.png" alt="plant" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
+    </div>
+  ),
     title: "Perfect Pairs",
     desc: "Match each fish with the best plant to grow with it in the aquaponics system!",
     cycleLabel: "Plant & Fish Harmony",
@@ -60,7 +88,7 @@ const CYCLE_POSITIONS = [
   { top: "2%",  left: "50%",  transform: "translateX(-50%)" },           // top center  (game 1)
   { top: "28%", left: "82%",  transform: "translateX(-50%)" },           // right (game 2)
   { top: "65%", left: "70%",  transform: "translateX(-50%)" },           // bottom right (game 3)
-  { top: "65%", left: "30%",  transform: "translateX(-50%)" },           // bottom left (game 4)
+  { top: "67%", left: "35%",  transform: "translateX(-50%)" },           // bottom left (game 4)
   { top: "28%", left: "18%",  transform: "translateX(-50%)" },           // left (game 5)
 ];
 
@@ -167,14 +195,14 @@ export default function Home() {
       {/* Header */}
       <header className="relative z-10 pt-10 pb-4 text-center px-4">
         <div className="inline-flex items-center gap-3 mb-3">
-          <span style={{ fontSize: "2.5rem" }}>🐟</span>
+          <span style={{ fontSize: "2.5rem" }}><img src="/happy_fish.png" alt="happyfish" style={{ width: "84px", height: "84px", objectFit: "contain" }} /></span>
           <h1
             className="shine-text font-extrabold"
             style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", fontFamily: "var(--font-nunito), sans-serif" }}
           >
             Fish Farm Frenzy
           </h1>
-          <span style={{ fontSize: "2.5rem" }}>🌿</span>
+          <span style={{ fontSize: "2.5rem" }}><img src="/water_plant.png" alt="waterplant" style={{ width: "54px", height: "54px", objectFit: "contain" }} /></span>
         </div>
         <p
           className="mx-auto max-w-xl text-center"

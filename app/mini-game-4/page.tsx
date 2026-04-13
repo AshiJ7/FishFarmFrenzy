@@ -58,7 +58,7 @@ export default function MiniGame4() {
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">
-                <img src="/otter.png" alt="otter" className="w-16 h-16 object-contain" />
+                <img src="/otter.png" alt="otter" className="w-26 h-26 object-contain" />
               </span>
               <div
                 className="rounded-2xl rounded-tl-none px-4 py-2 text-sm text-gray-800 font-medium"
@@ -69,10 +69,10 @@ export default function MiniGame4() {
             </div>
             <h2 className="text-xl font-bold mb-3 text-gray-800">Bacteria Make It All Work!</h2>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
-              <li className="flex gap-2"><span>🦠</span><span>Fish produce toxic <strong>ammonia (NH&#x2083;)</strong> as waste. Too much ammonia kills fish!</span></li>
+              <li className="flex gap-2"><span><img src="/bacteria.png" alt="bacteria" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>Fish produce toxic <strong>ammonia (NH&#x2083;)</strong> as waste. Too much ammonia kills fish!</span></li>
               <li className="flex gap-2"><span>🟢</span><span><strong>Nitrosomonas</strong> bacteria eat ammonia and turn it into <strong>nitrite (NO&#x2082;&#x207B;)</strong>.</span></li>
               <li className="flex gap-2"><span>🟣</span><span><strong>Nitrobacter</strong> bacteria eat nitrite and turn it into <strong>nitrate (NO&#x2083;&#x207B;)</strong>, or plant food!</span></li>
-              <li className="flex gap-2"><span>🌿</span><span>Plants absorb the nitrate and grow. The cycle keeps fish safe and plants fed!</span></li>
+              <li className="flex gap-2"><span><img src="/water_plant.png" alt="plant" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span>Plants absorb the nitrate and grow. The cycle keeps fish safe and plants fed!</span></li>
               <li className="flex gap-2"><span>💨</span><span>Both bacteria need <strong>oxygen</strong> to survive! Don&apos;t forget to collect bubbles!</span></li>
             </ul>
             <p className="text-sm text-gray-500 mb-6 italic">
@@ -112,7 +112,9 @@ export default function MiniGame4() {
           className="flex flex-col items-center gap-2 mb-4 w-full py-6 px-8 rounded-3xl shadow-md"
           style={{ backgroundColor: "rgba(255,255,255,0.88)", border: "2px solid var(--color-border-light)" }}
         >
-          <div className="text-5xl" style={{ animation: "bounce 2s infinite" }}>🥊🦠</div>
+          <div className="flex items-center gap-2 text-5xl" style={{ animation: "bounce 2s infinite" }}>
+            <img src="/boxing_glove.png" alt="glove" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
+            <img src="/bacteria.png" alt="bacteria" style={{ width: "50px", height: "50px", objectFit: "contain" }} /></div>
           <h1
             className="text-4xl font-extrabold text-center"
             style={{

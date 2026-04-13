@@ -68,8 +68,8 @@ export default function MiniGame1() {
             <h2 className="text-xl font-bold mb-3 text-gray-800"> Every Type of Fish Likes Different Food! </h2>
             <ul className="space-y-2 text-sm text-gray-700 mb-6">
               <li className="flex gap-2"><span> There are many different kinds of fish that can be used in aquaponics! Since each type of fish is special, they all need different kinds of food. </span></li>
-              <li className="flex gap-2"><span>🌿</span><span> Tilapia and grass carp like <strong> plants and plant-based fish food! </strong> </span></li>
-              <li className="flex gap-2"><span>🐛</span><span> Trout and salmon are carnivorous, so they like <strong> bugs and small fish! </strong> </span></li>
+              <li className="flex gap-2"><span><img src="/happy_plant.png" alt="happyplant" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span> Tilapia and grass carp like <strong> plants and plant-based fish food! </strong> </span></li>
+              <li className="flex gap-2"><span><img src="/worms.png" alt="worms" style={{ width: "24px", height: "24px", objectFit: "contain" }} /></span><span> Trout and salmon are carnivorous, so they like <strong> bugs and small fish! </strong> </span></li>
             </ul>
             <p className="text-sm text-gray-500 mb-6 italic">
               Play this game to learn more about the diets of different fish! 
@@ -98,7 +98,15 @@ export default function MiniGame1() {
         </div>
 
       <main className="card mt-4 mb-4">
-        <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50"> Fish Feeding </h1>
+        <h1 className="text-4xl font-extrabold text-center [font-family:var(--font-nunito)]"
+          style={{
+          backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+        }}>
+          Fish Feeding
+        </h1>
         <p className="mt-2 text-center text-zinc-600 dark:text-zinc-400">
           Pick the best food for your fish to keep them healthy!
         </p>

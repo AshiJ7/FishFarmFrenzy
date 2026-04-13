@@ -922,7 +922,15 @@ export default function SaveFishFarmGame() {
           className="text-2xl font-bold text-center mb-4"
           style={{ color: "var(--color-text-primary)" }}
         >
-          Game Complete! 🎉
+
+        <span className="flex items-center gap-2 justify-center">
+          Game Complete!
+          <img
+            src="/superhero.png"   
+            alt="superhero"
+            className="w-15 h-15 object-contain"
+          />
+        </span>
         </h2>
 
         <div className="mb-6 text-center">
@@ -1011,18 +1019,27 @@ export default function SaveFishFarmGame() {
         >
           {lastImpact > 0 ? (
             <>
-              <StarIcon className="w-16 h-16 mx-auto mb-4" />
+              <img
+                src="/star.png"
+                alt="star"
+                className="w-20 h-20 mx-auto mb-4"
+              />
               <h2
                 className="text-2xl font-bold mb-2"
                 style={{ color: "var(--olive-green)" }}
               >
-                Great Job! 🌿
+                Great Job!
               </h2>
             </>
           ) : (
             <>
-              <div className="text-6xl mb-4">🐡</div>
-              <h2
+              <div className="mb-4 flex justify-center">
+                <img
+                  src="/sad_fish.png"
+                  alt="sad_fish"
+                  className="w-20 h-20 object-contain"
+                />
+              </div> <h2
                 className="text-2xl font-bold mb-2"
                 style={{ color: "var(--coral-medium)" }}
               >
@@ -1058,7 +1075,14 @@ export default function SaveFishFarmGame() {
               transition: "all 0.2s ease",
             }}
           >
-            {currentScenarioIndex < scenarios.length - 1 ? "Next Scenario →" : "See Results 🏆"}
+            {currentScenarioIndex < scenarios.length - 1 ? ("Next Scenario →") : (<span className="flex items-center gap-2 justify-center">See Results
+              <img
+                src="/trophy.png"   
+                alt="trophy"
+                className="w-8 h-8 object-contain"
+              />
+            </span>
+            )}
           </button>
         </div>
       </div>
@@ -1084,7 +1108,11 @@ export default function SaveFishFarmGame() {
         {/* Header row: scenario counter + score */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <FishIcon />
+            <img
+                src="/happy_fish.png"
+                alt="happyfish"
+                className="w-7 h-7 object-contain"
+              />
             <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
               Scenario {currentScenarioIndex + 1} of {scenarios.length}
             </span>
@@ -1094,7 +1122,11 @@ export default function SaveFishFarmGame() {
             className="flex items-center gap-2 px-4 py-1 rounded-full shadow"
             style={{ backgroundColor: "rgba(255,255,255,0.9)", border: "1.5px solid var(--color-border-light)" }}
           >
-            <StarIcon className="w-4 h-4" />
+            <img
+                src="/star.png"
+                alt="star"
+                className="w-6 h-6 object-contain"
+              />
             <span className="font-bold" style={{ color: "var(--color-text-primary)" }}>
               {score}
             </span>
