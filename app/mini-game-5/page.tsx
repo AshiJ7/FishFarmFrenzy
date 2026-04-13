@@ -129,10 +129,11 @@ export default function MiniGame5() {
     click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair and gotten a score of 3,
     continue to the next game.
             </p>
+            <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
             <h2 className="text-center mt-4 text-xl">
     Press Start to begin
   </h2>
-  <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
+  
   <br></br>
   
 
@@ -161,12 +162,6 @@ export default function MiniGame5() {
 
         
 
-        <nav className="mt-8 flex gap-4">
-          <Link href="/" className="text-foreground">Home</Link>
-          {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
-          <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          {/* <Link href="/mini-game-5/lettuce-game" className="text-foreground">Next Game</Link> */}
-        </nav>
       </main>
       
     </div>

@@ -316,7 +316,7 @@ So how does it work?</h4>
         backgroundClip: "text",
       }}>Aquaponics Adventure</h1>
         <h2 className="text-xl font-bold mb-3 text-gray-800">How to play the game:</h2>
-        <p>After you press the start button, you will use your left and right arrow keys to move your basket to collect tomatos and tilapia.
+        <p className="text-sm text-gray-500 mb-6 italic">After you press the start button, you will use your left and right arrow keys to move your basket to collect tomatos and tilapia.
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
         </p>
         <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
@@ -350,12 +350,7 @@ So how does it work?</h4>
   {isPlaying && <div>Time Left: {timeLeft}</div>}
 
   
-  {gameOver && (
-    <div>
-      <p>Game Over!</p>
-      <button className="btn btn-green" onClick={startGame}>Retry</button>
-    </div>
-  )}
+  
 </div>
 {!gameOver && (
         <div
@@ -471,11 +466,7 @@ So how does it work?</h4>
   </div>
 )}
 
-        <nav className="mt-8 flex gap-4">
-          <Link href="/" className="text-foreground">Home</Link>
-          {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
-          <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-        </nav>
+      
       </main>
     </div>
   );

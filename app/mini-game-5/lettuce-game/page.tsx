@@ -235,7 +235,7 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
           You have 30 seconds to catch as much as you can before time runs out! After you can click the retry button to start again.
             </p>
             <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
-        <p className="mt-4 max-w-2xl text-center text-lg text-zinc-600 dark:text-zinc-400">
+        <p className="text-center mt-4 text-xl">
           Press Start to begin!
         </p>
         <br></br>
@@ -258,13 +258,7 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
   )}
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Tomato Score : <span>{score}</span></div>
         <div className="text-xl font-bold text-[var(--color-text-primary)]" id="counter">Money Earned : <span>{(score * 3)}</span></div>
-        {gameOver && (
-    <div>
-      <p>Game Over!</p>
-      <button className="btn btn-green" onClick={startGame}>Retry</button>
-    </div>
-
-  )}
+        
 
   {isPlaying && <div>Time Left: {timeLeft}</div>}
 
@@ -375,12 +369,7 @@ On a regular farm, farmers need a lot of things to grow food:</h4>
 
 
 
-        <nav className="mt-8 flex gap-4">
-          <Link href="/" className="text-foreground">Home</Link>
-          {/* <Link href="/mini-game-4" className="text-foreground">Prev</Link>
-          <Link href="/mini-game-1" className="text-foreground">Next</Link> */}
-          {/* <Link href="/mini-game-5/salmon-game" className="text-foreground">Next Game</Link> */}
-        </nav>
+        
       </main>
     </div>
   );
