@@ -98,7 +98,15 @@ export default function MiniGame1() {
         </div>
 
       <main className="card mt-4 mb-4">
-        <h1 className="text-3xl font-semibold text-center text-[var(--color-text-secondary)] dark:text-zinc-50"> Fish Feeding </h1>
+        <h1 className="text-4xl font-extrabold text-center [font-family:var(--font-nunito)]"
+          style={{
+          backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+        }}>
+          Fish Feeding
+        </h1>
         <p className="mt-2 text-center text-zinc-600 dark:text-zinc-400">
           Pick the best food for your fish to keep them healthy!
         </p>
