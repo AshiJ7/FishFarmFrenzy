@@ -126,7 +126,7 @@ export default function MiniGame5() {
 
             <p className="text-sm text-gray-500 mb-6 italic">
               Below are cards with different crops and different fish. Using what you just learned,
-    click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair and gotten a score of 3,
+    click on the plant cards and slide to the fish it grows best with. After you have correctly matched each pair,
     continue to the next game.
             </p>
             <p>If you need some help during the game, press the Otter bottom in the bottom right!</p>
