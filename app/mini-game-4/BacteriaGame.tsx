@@ -26,7 +26,10 @@ export default function BacteriaGame() {
         if (containerRef.current) containerRef.current.innerHTML = "";
 
         // ── Constants ──────────────────────────────────────────────────
-        const GW = 960, GH = 700;
+        const isMobile = window.innerWidth < 640;
+        const GW = isMobile ? 480 : 960;
+        const GH = 700;
+        const sx = GW / 960; // scale factor for hardcoded x-positions
         const PLANT_H = 140;
         const UI_H = 90;
         const WATER_TOP = PLANT_H;
@@ -224,26 +227,26 @@ export default function BacteriaGame() {
               // having to reread a tutorial modal.
               const chainBg = this.add.graphics().setDepth(9);
               chainBg.fillStyle(0xffffff, 0.82);
-              chainBg.fillRoundedRect(80, 3, GW - 160, 26, 13);
+              chainBg.fillRoundedRect(80 * sx, 3, GW - 160 * sx, 26, 13);
               chainBg.lineStyle(1.5, 0x4A8E9E, 0.45);
-              chainBg.strokeRoundedRect(80, 3, GW - 160, 26, 13);
+              chainBg.strokeRoundedRect(80 * sx, 3, GW - 160 * sx, 26, 13);
 
               const chainY = 16;
               const chainParts: Array<{ text: string; color: string; x: number }> = [
-                { text: "NH\u2083",             color: "#c0392b", x: 225 },
-                { text: "\u2192",               color: "#5C5444", x: 260 },
-                { text: "Nitrosomonas",         color: "#1a7a40", x: 330 },
-                { text: "\u2192",               color: "#5C5444", x: 400 },
-                { text: "NO\u2082\u207B",       color: "#a07810", x: 440 },
-                { text: "\u2192",               color: "#5C5444", x: 480 },
-                { text: "Nitrobacter",          color: "#7d3c98", x: 550 },
-                { text: "\u2192",               color: "#5C5444", x: 620 },
-                { text: "NO\u2083\u207B",       color: "#1a7a40", x: 665 },
-                { text: "\u2192 \uD83C\uDF3F",  color: "#5C5444", x: 715 },
+                { text: "NH\u2083",             color: "#c0392b", x: 225 * sx },
+                { text: "\u2192",               color: "#5C5444", x: 260 * sx },
+                { text: "Nitrosomonas",         color: "#1a7a40", x: 330 * sx },
+                { text: "\u2192",               color: "#5C5444", x: 400 * sx },
+                { text: "NO\u2082\u207B",       color: "#a07810", x: 440 * sx },
+                { text: "\u2192",               color: "#5C5444", x: 480 * sx },
+                { text: "Nitrobacter",          color: "#7d3c98", x: 550 * sx },
+                { text: "\u2192",               color: "#5C5444", x: 620 * sx },
+                { text: "NO\u2083\u207B",       color: "#1a7a40", x: 665 * sx },
+                { text: "\u2192 \uD83C\uDF3F",  color: "#5C5444", x: 715 * sx },
               ];
               for (const p of chainParts) {
                 this.add.text(p.x, chainY, p.text, {
-                  fontSize: "13px", color: p.color,
+                  fontSize: isMobile ? "10px" : "13px", color: p.color,
                   fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5).setDepth(10);
               }
@@ -331,9 +334,9 @@ export default function BacteriaGame() {
 
               // ── Fish ────────────────────────────────────────────────
               this.fishes = [
-                { spr: this.add.image(140, 220, "fish").setDepth(1).setAlpha(0.7), dir: 1, baseSpd: 33, spd: 33 },
-                { spr: this.add.image(520, 360, "fish").setDepth(1).setAlpha(0.7).setFlipX(true), dir: -1, baseSpd: 26, spd: 26 },
-                { spr: this.add.image(310, 455, "fish").setDepth(1).setAlpha(0.7), dir: 1, baseSpd: 40, spd: 40 },
+                { spr: this.add.image(140 * sx, 220, "fish").setDepth(1).setAlpha(0.7), dir: 1, baseSpd: 33, spd: 33 },
+                { spr: this.add.image(520 * sx, 360, "fish").setDepth(1).setAlpha(0.7).setFlipX(true), dir: -1, baseSpd: 26, spd: 26 },
+                { spr: this.add.image(310 * sx, 455, "fish").setDepth(1).setAlpha(0.7), dir: 1, baseSpd: 40, spd: 40 },
               ];
 
               // ── Physics groups ──────────────────────────────────────
@@ -395,26 +398,26 @@ export default function BacteriaGame() {
               this.histA = [] as { x: number; y: number }[];
               this.segsA = [] as any[];
               for (let i = 0; i < BODY_SEGS; i++) {
-                const s = this.add.image(200, 300, "ns_body")
+                const s = this.add.image(200 * sx, 300, "ns_body")
                   .setScale(Math.max(0.95 - i * 0.07, 0.3))
                   .setAlpha(Math.max(0.9 - i * 0.07, 0.3))
                   .setDepth(4 - i * 0.1);
                 this.segsA.push(s);
               }
-              this.headA = this.physics.add.sprite(200, 300, "ns_head")
+              this.headA = this.physics.add.sprite(200 * sx, 300, "ns_head")
                 .setMaxVelocity(BASE_SPEED).setDepth(5);
 
               // ── Bacteria B: Nitrobacter ─────────────────────────────
               this.histB = [] as { x: number; y: number }[];
               this.segsB = [] as any[];
               for (let i = 0; i < BODY_SEGS; i++) {
-                const s = this.add.image(600, 300, "nb_body")
+                const s = this.add.image(600 * sx, 300, "nb_body")
                   .setScale(Math.max(0.95 - i * 0.07, 0.3))
                   .setAlpha(0.28)
                   .setDepth(4 - i * 0.1);
                 this.segsB.push(s);
               }
-              this.headB = this.physics.add.sprite(600, 300, "nb_head")
+              this.headB = this.physics.add.sprite(600 * sx, 300, "nb_head")
                 .setMaxVelocity(BASE_SPEED).setAlpha(0.3).setDepth(5);
 
               // ── Active bacteria halo + target molecule glow ─────────
@@ -489,15 +492,15 @@ export default function BacteriaGame() {
                     });
                     // Update the persistent combo streak indicator in the UI bar.
                     this.comboText.setText(
-                      `Full Cycle Streak: \u00D7${this.comboStreak}   \u00B7   Plants grow 2\u00D7 faster on combos!`
+                      isMobile
+                        ? `Streak: \u00D7${this.comboStreak}  \u00B7  Plants grow 2\u00D7 faster!`
+                        : `Full Cycle Streak: \u00D7${this.comboStreak}   \u00B7   Plants grow 2\u00D7 faster on combos!`
                     );
                     this.comboText.setStyle({ color: "#1a7a40" });
                   } else {
                     if (this.comboStreak > 0) {
                       // Streak just broke — reset the UI indicator to its idle state.
-                      this.comboText.setText(
-                        "Full Cycle Streak: \u00D70   \u00B7   Eat fresh NO\u2082\u207B (gold ring) within 5s for bonus!"
-                      );
+                      this.comboText.setText(this.comboIdleText);
                       this.comboText.setStyle({ color: "#8B6914" });
                     }
                     this.comboStreak = 0;
@@ -627,16 +630,20 @@ export default function BacteriaGame() {
               this.gaugeGfx = this.add.graphics().setDepth(10);
               const gaugeY = WATER_BOT + 34;
               const barH = 12;
+              const gaugeX1 = isMobile ? 10 : 15;
+              const gaugeX2 = isMobile ? 160 : 280;
+              const gaugeX3 = isMobile ? 310 : 545;
+              const gaugeW  = isMobile ? 120 : 220;
 
-              this.add.text(15, gaugeY - 12, "NH\u2083 Danger", {
+              this.add.text(gaugeX1, gaugeY - 12, "NH\u2083 Danger", {
                 fontSize: "9px", color: "#B83A1A",
                 fontFamily: "Nunito, sans-serif", fontStyle: "bold",
               }).setDepth(10);
-              this.add.text(280, gaugeY - 12, "NO\u2082\u207B Danger", {
+              this.add.text(gaugeX2, gaugeY - 12, "NO\u2082\u207B Danger", {
                 fontSize: "9px", color: "#8B6914",
                 fontFamily: "Nunito, sans-serif", fontStyle: "bold",
               }).setDepth(10);
-              this.add.text(545, gaugeY - 12, "O\u2082 Level", {
+              this.add.text(gaugeX3, gaugeY - 12, "O\u2082 Level", {
                 fontSize: "9px", color: "#4A8E9E",
                 fontFamily: "Nunito, sans-serif", fontStyle: "bold",
               }).setDepth(10);
@@ -648,43 +655,43 @@ export default function BacteriaGame() {
               this.drawGauges = () => {
                 this.gaugeGfx.clear();
                 const y = gaugeY;
-                const w = 220;
+                const w = gaugeW;
 
                 // Ammonia gauge
                 const ammoniaFill = Math.min(this.liveCount(this.ammoniaGroup) / AMMONIA_DANGER_THRESHOLD, 1);
                 this.gaugeGfx.fillStyle(0xC8D0CC, 1);
-                this.gaugeGfx.fillRoundedRect(15, y, w, barH, 3);
+                this.gaugeGfx.fillRoundedRect(gaugeX1, y, w, barH, 3);
                 if (ammoniaFill > 0) {
                   const c = ammoniaFill > 0.75 ? 0xff0000 : ammoniaFill > 0.5 ? 0xe74c3c : 0xc0392b;
                   this.gaugeGfx.fillStyle(c, 1);
-                  this.gaugeGfx.fillRoundedRect(15, y, w * ammoniaFill, barH, 3);
+                  this.gaugeGfx.fillRoundedRect(gaugeX1, y, w * ammoniaFill, barH, 3);
                 }
 
                 // Nitrite gauge
                 const nitriteFill = Math.min(this.liveCount(this.nitriteGroup) / NITRITE_DANGER_THRESHOLD, 1);
                 this.gaugeGfx.fillStyle(0xC8D0CC, 1);
-                this.gaugeGfx.fillRoundedRect(280, y, w, barH, 3);
+                this.gaugeGfx.fillRoundedRect(gaugeX2, y, w, barH, 3);
                 if (nitriteFill > 0) {
                   const c = nitriteFill > 0.75 ? 0xff8c00 : nitriteFill > 0.5 ? 0xf39c12 : 0xb7950b;
                   this.gaugeGfx.fillStyle(c, 1);
-                  this.gaugeGfx.fillRoundedRect(280, y, w * nitriteFill, barH, 3);
+                  this.gaugeGfx.fillRoundedRect(gaugeX2, y, w * nitriteFill, barH, 3);
                 }
 
                 // Oxygen gauge
                 const oxygenFill = this.oxygen / 100;
                 this.gaugeGfx.fillStyle(0xC8D0CC, 1);
-                this.gaugeGfx.fillRoundedRect(545, y, w, barH, 3);
+                this.gaugeGfx.fillRoundedRect(gaugeX3, y, w, barH, 3);
                 if (oxygenFill > 0) {
                   const c = oxygenFill < 0.25 ? 0x5a8aae : oxygenFill < 0.5 ? 0x88b4d0 : 0xA8C8E8;
                   this.gaugeGfx.fillStyle(c, 1);
-                  this.gaugeGfx.fillRoundedRect(545, y, w * oxygenFill, barH, 3);
+                  this.gaugeGfx.fillRoundedRect(gaugeX3, y, w * oxygenFill, barH, 3);
                 }
 
                 // Flash oxygen bar border when critical
                 if (this.oxygen < LOW_OXYGEN_THRESHOLD && this.oxygen > 0) {
                   if (Math.sin(this.time.now / 200) > 0) {
                     this.gaugeGfx.lineStyle(2, 0xFF7F5C, 0.8);
-                    this.gaugeGfx.strokeRoundedRect(545, y, w, barH, 3);
+                    this.gaugeGfx.strokeRoundedRect(gaugeX3, y, w, barH, 3);
                   }
                 }
               };
@@ -698,8 +705,11 @@ export default function BacteriaGame() {
               // Persistent combo-mechanic helper text. Explains the bonus when
               // the streak is 0, celebrates it when the streak is active, and
               // is updated by the nitrite overlap handler.
-              this.comboText = this.add.text(GW / 2, WATER_BOT + 54,
-                "Full Cycle Streak: \u00D70   \u00B7   Eat fresh NO\u2082\u207B (gold ring) within 5s for bonus!", {
+              const comboIdleText = isMobile
+                ? "Streak: \u00D70  \u00B7  Eat fresh NO\u2082\u207B fast for bonus!"
+                : "Full Cycle Streak: \u00D70   \u00B7   Eat fresh NO\u2082\u207B (gold ring) within 5s for bonus!";
+              this.comboIdleText = comboIdleText;
+              this.comboText = this.add.text(GW / 2, WATER_BOT + 54, comboIdleText, {
                   fontSize: "10px", color: "#8B6914",
                   fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 }).setOrigin(0.5, 0).setDepth(10);
@@ -717,7 +727,7 @@ export default function BacteriaGame() {
 
               // ── Coach hint box (centered near the top of the water) ────
               this.coachText = this.add.text(GW / 2, WATER_TOP + 50, "", {
-                fontSize: "15px", color: "#2C2416",
+                fontSize: isMobile ? "12px" : "15px", color: "#2C2416",
                 fontFamily: "Nunito, sans-serif", fontStyle: "bold",
                 backgroundColor: "#fff8e7",
                 padding: { x: 16, y: 10 },
@@ -1154,7 +1164,7 @@ export default function BacteriaGame() {
 
   if (error) {
     return (
-      <div style={{ width: 800, height: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "#0a1f35" }}>
+      <div style={{ width: "min(800px, 100%)", aspectRatio: "960/700", display: "flex", alignItems: "center", justifyContent: "center", background: "#0a1f35" }}>
         <div style={{ color: "#E49678", maxWidth: 700 }}>
           <strong>Game error:</strong>
           <pre style={{ whiteSpace: "pre-wrap" }}>{error}</pre>
@@ -1163,5 +1173,5 @@ export default function BacteriaGame() {
     );
   }
 
-  return <div ref={containerRef} style={{ width: 800, height: 600 }} />;
+  return <div ref={containerRef} style={{ width: "min(800px, 100%)", aspectRatio: "960/700", margin: "0 auto" }} />;
 }

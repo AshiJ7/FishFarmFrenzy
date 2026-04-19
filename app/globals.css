@@ -163,7 +163,8 @@ body {
 
 .falling-objects-container {
   position: relative;
-  width: 500px;   /* match canvas width */
+  width: 100%;
+  max-width: 500px;
   height: 400px;
   overflow: hidden;
   border: 1px solid #ccc;
