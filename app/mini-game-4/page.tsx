@@ -104,19 +104,19 @@ export default function MiniGame4() {
       </div>
 
       <main
-        className="relative z-10 flex w-full max-w-5xl flex-col items-center py-8 px-8"
+        className="relative z-10 flex w-full max-w-5xl flex-col items-center py-3 md:py-8 px-2 md:px-8"
         style={{ color: "var(--foreground)" }}
       >
         {/* Header card */}
         <div
-          className="flex flex-col items-center gap-2 mb-4 w-full py-6 px-8 rounded-3xl shadow-md"
+          className="flex flex-col items-center gap-1 md:gap-2 mb-3 md:mb-4 w-full py-3 md:py-6 px-4 md:px-8 rounded-3xl shadow-md"
           style={{ backgroundColor: "rgba(255,255,255,0.88)", border: "2px solid var(--color-border-light)" }}
         >
-          <div className="flex items-center gap-2 text-5xl" style={{ animation: "bounce 2s infinite" }}>
-            <img src="/boxing_glove.png" alt="glove" style={{ width: "60px", height: "60px", objectFit: "contain" }} />
-            <img src="/bacteria.png" alt="bacteria" style={{ width: "50px", height: "50px", objectFit: "contain" }} /></div>
+          <div className="flex items-center gap-2" style={{ animation: "bounce 2s infinite" }}>
+            <img src="/boxing_glove.png" alt="glove" className="w-8 h-8 md:w-14 md:h-14 object-contain" />
+            <img src="/bacteria.png" alt="bacteria" className="w-7 h-7 md:w-12 md:h-12 object-contain" /></div>
           <h1
-            className="text-4xl font-extrabold text-center"
+            className="text-xl md:text-4xl font-extrabold text-center"
             style={{
               backgroundImage: "linear-gradient(to right, var(--teal-medium), var(--olive-green))",
               WebkitBackgroundClip: "text",
@@ -126,7 +126,7 @@ export default function MiniGame4() {
           >
             Bacteria Battle
           </h1>
-          <p className="mt-1 text-center" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="hidden md:block mt-1 text-center" style={{ color: "var(--color-text-secondary)" }}>
             Control two types of bacteria to convert ammonia into plant food. Switch with Space or the on-screen button!
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function MiniGame4() {
             spawn ammonia) while the user is still reading the modal. We key
             off `hasStarted` rather than `!showInfo` so reopening the tutorial
             mid-game via the otter button doesn't unmount and reset the game. */}
-        <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ border: "2px solid var(--color-border-light)" }}>
+        <div className="rounded-2xl overflow-hidden shadow-2xl w-full" style={{ border: "2px solid var(--color-border-light)" }}>
           {hasStarted && <BacteriaGame />}
         </div>
 

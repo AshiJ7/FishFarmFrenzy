@@ -81,16 +81,80 @@ const games = [
   },
 ];
 
-// Positions for 5 cards arranged in a cycle/pentagon shape
-// Center of layout: cx=500, cy=360 (within a 1000x720 logical space)
-// We'll use % for positioning so it's responsive
+// Pentagon positions for desktop layout
 const CYCLE_POSITIONS = [
-  { top: "2%",  left: "50%",  transform: "translateX(-50%)" },           // top center  (game 1)
-  { top: "28%", left: "82%",  transform: "translateX(-50%)" },           // right (game 2)
-  { top: "65%", left: "70%",  transform: "translateX(-50%)" },           // bottom right (game 3)
-  { top: "67%", left: "35%",  transform: "translateX(-50%)" },           // bottom left (game 4)
-  { top: "28%", left: "18%",  transform: "translateX(-50%)" },           // left (game 5)
+  { top: "2%",  left: "50%",  transform: "translateX(-50%)" },
+  { top: "28%", left: "82%",  transform: "translateX(-50%)" },
+  { top: "65%", left: "70%",  transform: "translateX(-50%)" },
+  { top: "67%", left: "35%",  transform: "translateX(-50%)" },
+  { top: "28%", left: "18%",  transform: "translateX(-50%)" },
 ];
+
+function GameCardInner({ n, emoji, title, desc, cycleLabel, cycleStep, accent, glow }: typeof games[0]) {
+  return (
+    <>
+      {/* Accent stripe */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "4px",
+        background: `linear-gradient(to right, ${accent}, ${accent}88)`,
+        borderRadius: "24px 24px 0 0",
+      }} />
+      {/* Number badge */}
+      <div style={{
+        position: "absolute", top: "10px", right: "12px",
+        width: "24px", height: "24px", borderRadius: "50%",
+        background: `linear-gradient(135deg, ${accent}, ${accent}aa)`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: "0.7rem", fontWeight: 800, color: "white",
+        boxShadow: `0 2px 8px ${glow}`,
+        fontFamily: "var(--font-nunito), sans-serif",
+      }}>{n}</div>
+      {/* Cycle label */}
+      <span className="cycle-label" style={{ backgroundColor: accent }}>{cycleLabel}</span>
+      {/* Emoji */}
+      <div className="emoji-bounce" style={{
+        fontSize: "2rem", marginBottom: "10px",
+        filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.12))", lineHeight: 1,
+      }}>{emoji}</div>
+      {/* Title */}
+      <h2 style={{
+        fontFamily: "var(--font-nunito), sans-serif", fontWeight: 800,
+        fontSize: "1rem", color: "var(--color-text-primary)",
+        textAlign: "center", marginBottom: "8px", lineHeight: 1.25,
+      }}>{title}</h2>
+      {/* Divider */}
+      <div style={{
+        width: "32px", height: "2px", borderRadius: "2px",
+        background: `linear-gradient(to right, ${accent}, ${accent}55)`,
+        marginBottom: "8px", flexShrink: 0,
+      }} />
+      {/* Description */}
+      <p style={{
+        fontFamily: "var(--font-nunito), sans-serif",
+        fontSize: "0.75rem", color: "var(--color-text-secondary)",
+        textAlign: "center", lineHeight: 1.5, fontWeight: 500,
+      }}>{desc}</p>
+      {/* Play button */}
+      <div style={{
+        marginTop: "14px", padding: "6px 18px", borderRadius: "50px",
+        background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+        color: "white", fontSize: "0.75rem", fontWeight: 700,
+        fontFamily: "var(--font-nunito), sans-serif",
+        letterSpacing: "0.04em", boxShadow: `0 3px 10px ${glow}`,
+      }}>
+        Play Now ›
+      </div>
+      {/* Cycle step */}
+      <div style={{
+        marginTop: "12px", paddingTop: "10px",
+        borderTop: `1px solid ${accent}44`,
+        fontSize: "0.7rem", fontFamily: "var(--font-nunito), sans-serif",
+        fontWeight: 600, color: "rgba(44,36,22,0.6)",
+        textAlign: "center", lineHeight: 1.4,
+      }}>{cycleStep}</div>
+    </>
+  );
+}
 
 export default function Home() {
   return (
@@ -151,10 +215,6 @@ export default function Home() {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
-        @keyframes rotateCycle {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
         .game-card {
           transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease, filter 0.3s ease;
         }
@@ -190,32 +250,34 @@ export default function Home() {
           margin-bottom: 10px;
           color: white;
         }
+        .mobile-game-card:active {
+          transform: scale(0.98);
+        }
       `}</style>
 
-      {/* Header */}
-      <header className="relative z-10 pt-10 pb-4 text-center px-4">
-        <div className="inline-flex items-center gap-3 mb-3">
-          <span style={{ fontSize: "2.5rem" }}><img src="/happy_fish.png" alt="happyfish" style={{ width: "84px", height: "84px", objectFit: "contain" }} /></span>
+      {/* Shared header */}
+      <header className="relative z-10 pt-8 pb-4 text-center px-4">
+        <div className="inline-flex items-center gap-2 md:gap-3 mb-3 flex-wrap justify-center">
+          <img src="/happy_fish.png" alt="happyfish" style={{ width: "clamp(48px,10vw,84px)", height: "clamp(48px,10vw,84px)", objectFit: "contain" }} />
           <h1
             className="shine-text font-extrabold"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", fontFamily: "var(--font-nunito), sans-serif" }}
+            style={{ fontSize: "clamp(1.6rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", fontFamily: "var(--font-nunito), sans-serif" }}
           >
             Fish Farm Frenzy
           </h1>
-          <span style={{ fontSize: "2.5rem" }}><img src="/water_plant.png" alt="waterplant" style={{ width: "54px", height: "54px", objectFit: "contain" }} /></span>
+          <img src="/water_plant.png" alt="waterplant" style={{ width: "clamp(36px,8vw,54px)", height: "clamp(36px,8vw,54px)", objectFit: "contain" }} />
         </div>
         <p
           className="mx-auto max-w-xl text-center"
-          style={{ color: "rgba(44,36,22,0.75)", fontSize: "1.05rem", fontFamily: "var(--font-nunito), sans-serif", fontWeight: 600 }}
+          style={{ color: "rgba(44,36,22,0.75)", fontSize: "clamp(0.85rem,2.5vw,1.05rem)", fontFamily: "var(--font-nunito), sans-serif", fontWeight: 600 }}
         >
           Dive into 5 mini-games and discover the wonders of aquaponics!
         </p>
         <div className="mx-auto mt-3 rounded-full" style={{ width: "80px", height: "3px", background: "linear-gradient(to right, var(--teal-medium), var(--olive-green))" }} />
       </header>
 
-      {/* Cycle layout */}
-      <main className="relative z-10 w-full" style={{ height: "860px", maxWidth: "1000px", margin: "0 auto" }}>
-
+      {/* ── Desktop pentagon layout (hidden on mobile) ── */}
+      <main className="relative z-10 w-full hidden md:block" style={{ height: "860px", maxWidth: "1000px", margin: "0 auto" }}>
         {/* Dashed cycle ring */}
         <div
           className="absolute"
@@ -228,30 +290,21 @@ export default function Home() {
             pointerEvents: "none",
           }}
         />
-
         {/* Center label */}
         <div
           className="absolute text-center"
-          style={{
-            top: "50%", left: "50%",
-            transform: "translate(-50%, -50%)",
-            pointerEvents: "none",
-          }}
+          style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)", pointerEvents: "none" }}
         >
           <div style={{ fontSize: "3rem", marginBottom: "6px" }}></div>
           <div style={{
-            fontFamily: "var(--font-nunito), sans-serif",
-            fontWeight: 800,
-            fontSize: "2.8rem",
-            color: "rgba(44,36,22,0.7)",
-            letterSpacing: "0.04em",
-            lineHeight: 1.3,
+            fontFamily: "var(--font-nunito), sans-serif", fontWeight: 800,
+            fontSize: "2.8rem", color: "rgba(44,36,22,0.7)",
+            letterSpacing: "0.04em", lineHeight: 1.3,
           }}>
             Aquaponics<br />Cycle
           </div>
         </div>
-
-        {/* Arrow indicators around the ring */}
+        {/* Arrow indicators */}
         {[0, 72, 144, 216, 288].map((deg, i) => (
           <div
             key={i}
@@ -265,23 +318,19 @@ export default function Home() {
             }}
           >
             <div style={{
-              position: "absolute",
-              right: "-12px",
-              top: "-8px",
-              width: 0,
-              height: 0,
+              position: "absolute", right: "-12px", top: "-8px",
+              width: 0, height: 0,
               borderTop: "7px solid transparent",
               borderBottom: "7px solid transparent",
               borderLeft: "10px solid rgba(255,255,255,0.5)",
             }} />
           </div>
         ))}
-
-        {/* Game cards */}
-        {games.map(({ n, emoji, title, desc, cycleLabel, cycleStep, accent, glow }, idx) => (
+        {/* Pentagon game cards */}
+        {games.map((game, idx) => (
           <Link
-            key={n}
-            href={`/mini-game-${n}`}
+            key={game.n}
+            href={`/mini-game-${game.n}`}
             className="game-card"
             style={{
               position: "absolute",
@@ -290,8 +339,8 @@ export default function Home() {
               borderRadius: "24px",
               background: "rgba(255,255,255,0.65)",
               backdropFilter: "blur(18px)",
-              border: `2px solid rgba(255,255,255,0.75)`,
-              boxShadow: `0 8px 32px ${glow}, 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.8)`,
+              border: "2px solid rgba(255,255,255,0.75)",
+              boxShadow: `0 8px 32px ${game.glow}, 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.8)`,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -304,92 +353,100 @@ export default function Home() {
               overflow: "hidden",
             }}
           >
-            {/* Accent stripe */}
-            <div style={{
-              position: "absolute", top: 0, left: 0, right: 0, height: "4px",
-              background: `linear-gradient(to right, ${accent}, ${accent}88)`,
-              borderRadius: "24px 24px 0 0",
-            }} />
-
-            {/* Number badge */}
-            <div style={{
-              position: "absolute", top: "10px", right: "12px",
-              width: "24px", height: "24px", borderRadius: "50%",
-              background: `linear-gradient(135deg, ${accent}, ${accent}aa)`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "0.7rem", fontWeight: 800, color: "white",
-              boxShadow: `0 2px 8px ${glow}`,
-              fontFamily: "var(--font-nunito), sans-serif",
-            }}>{n}</div>
-
-            {/* Cycle label tag */}
-            <span className="cycle-label" style={{ backgroundColor: accent }}>
-              {cycleLabel}
-            </span>
-
-            {/* Emoji */}
-            <div className="emoji-bounce" style={{
-              fontSize: "2rem", marginBottom: "10px",
-              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.12))", lineHeight: 1,
-            }}>
-              {emoji}
-            </div>
-
-            {/* Title */}
-            <h2 style={{
-              fontFamily: "var(--font-nunito), sans-serif", fontWeight: 800,
-              fontSize: "1rem", color: "var(--color-text-primary)",
-              textAlign: "center", marginBottom: "8px", lineHeight: 1.25,
-            }}>{title}</h2>
-
-            {/* Divider */}
-            <div style={{
-              width: "32px", height: "2px", borderRadius: "2px",
-              background: `linear-gradient(to right, ${accent}, ${accent}55)`,
-              marginBottom: "8px", flexShrink: 0,
-            }} />
-
-            {/* Description */}
-            <p style={{
-              fontFamily: "var(--font-nunito), sans-serif",
-              fontSize: "0.75rem", color: "var(--color-text-secondary)",
-              textAlign: "center", lineHeight: 1.5, fontWeight: 500,
-            }}>{desc}</p>
-
-            {/* Play button */}
-            <div style={{
-              marginTop: "14px", padding: "6px 18px", borderRadius: "50px",
-              background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
-              color: "white", fontSize: "0.75rem", fontWeight: 700,
-              fontFamily: "var(--font-nunito), sans-serif",
-              letterSpacing: "0.04em", boxShadow: `0 3px 10px ${glow}`,
-            }}>
-              Play Now ›
-            </div>
-
-            {/* Cycle step */}
-            <div style={{
-              marginTop: "12px",
-              paddingTop: "10px",
-              borderTop: `1px solid ${accent}44`,
-              fontSize: "0.7rem",
-              fontFamily: "var(--font-nunito), sans-serif",
-              fontWeight: 600,
-              color: "rgba(44,36,22,0.6)",
-              textAlign: "center",
-              lineHeight: 1.4,
-            }}>
-              {cycleStep}
-            </div>
-
+            <GameCardInner {...game} />
           </Link>
         ))}
       </main>
 
-      
+      {/* ── Mobile card grid (hidden on desktop) ── */}
+      <main className="relative z-10 block md:hidden px-4 pb-8">
+        <div
+          style={{
+            fontFamily: "var(--font-nunito), sans-serif",
+            fontWeight: 800,
+            fontSize: "1.1rem",
+            color: "rgba(44,36,22,0.55)",
+            letterSpacing: "0.06em",
+            textAlign: "center",
+            marginBottom: "16px",
+            textTransform: "uppercase",
+          }}
+        >
+          Aquaponics Cycle
+        </div>
+        <div className="flex flex-col gap-4">
+          {games.map((game) => (
+            <Link
+              key={game.n}
+              href={`/mini-game-${game.n}`}
+              className="mobile-game-card game-card"
+              style={{
+                position: "relative",
+                borderRadius: "20px",
+                background: "rgba(255,255,255,0.7)",
+                backdropFilter: "blur(18px)",
+                border: "2px solid rgba(255,255,255,0.75)",
+                boxShadow: `0 6px 24px ${game.glow}, 0 2px 8px rgba(0,0,0,0.06)`,
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "16px",
+                padding: "16px",
+                textDecoration: "none",
+                overflow: "hidden",
+              }}
+            >
+              {/* Accent stripe on left */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, bottom: 0, width: "4px",
+                background: `linear-gradient(to bottom, ${game.accent}, ${game.accent}88)`,
+                borderRadius: "20px 0 0 20px",
+              }} />
+              {/* Number badge */}
+              <div style={{
+                flexShrink: 0,
+                width: "28px", height: "28px", borderRadius: "50%",
+                background: `linear-gradient(135deg, ${game.accent}, ${game.accent}aa)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.8rem", fontWeight: 800, color: "white",
+                boxShadow: `0 2px 8px ${game.glow}`,
+                fontFamily: "var(--font-nunito), sans-serif",
+                marginLeft: "8px",
+              }}>{game.n}</div>
+              {/* Emoji */}
+              <div className="emoji-bounce" style={{ flexShrink: 0, lineHeight: 1 }}>
+                {game.emoji}
+              </div>
+              {/* Text */}
+              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                <span className="cycle-label" style={{ backgroundColor: game.accent, marginBottom: "4px" }}>
+                  {game.cycleLabel}
+                </span>
+                <h2 style={{
+                  fontFamily: "var(--font-nunito), sans-serif", fontWeight: 800,
+                  fontSize: "0.95rem", color: "var(--color-text-primary)",
+                  marginBottom: "4px", lineHeight: 1.25,
+                }}>{game.title}</h2>
+                <p style={{
+                  fontFamily: "var(--font-nunito), sans-serif",
+                  fontSize: "0.72rem", color: "var(--color-text-secondary)",
+                  lineHeight: 1.4, fontWeight: 500,
+                }}>{game.desc}</p>
+              </div>
+              {/* Arrow */}
+              <div style={{
+                flexShrink: 0, padding: "6px 12px", borderRadius: "50px",
+                background: `linear-gradient(135deg, ${game.accent}, ${game.accent}cc)`,
+                color: "white", fontSize: "0.8rem", fontWeight: 700,
+                fontFamily: "var(--font-nunito), sans-serif",
+              }}>›</div>
+            </Link>
+          ))}
+        </div>
+      </main>
 
       {/* Footer */}
-      <footer className="relative z-10 pt-10 pb-12 text-center">
+      <footer className="relative z-10 pt-6 pb-12 text-center">
         <p style={{ color: "black", fontSize: "0.8rem", fontFamily: "var(--font-nunito), sans-serif" }}>
           🌊 Explore the world of aquaponics where fish and plants grow together!
         </p>

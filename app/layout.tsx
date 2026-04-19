@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   description: "Manage your aquaculture projects",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin"],
