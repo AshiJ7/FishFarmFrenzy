@@ -2,6 +2,9 @@
 import Link from "next/link";
 import grassImg from './grass.jpg';
 
+//this was originally lettuce falling but changed to tomatoes 
+//that is why everything is called lettuce
+
 
 import React, { useState, useEffect, useRef, useCallback} from 'react';
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
